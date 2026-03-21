@@ -248,6 +248,154 @@ Logout from all devices.
 }
 ```
 
+### Calendar Endpoints
+
+#### GET `/api/calendar/events`
+Get all calendar events for the authenticated user.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "events": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Team Meeting",
+      "description": "Weekly team sync",
+      "date": "2024-01-15",
+      "time": "10:00",
+      "location": "Conference Room",
+      "category": "Work",
+      "attendees": ["john@example.com", "jane@example.com"],
+      "reminder": "15 minutes before",
+      "color": "#3B82F6",
+      "createdAt": "2024-01-14T08:00:00.000Z",
+      "updatedAt": "2024-01-14T08:00:00.000Z"
+    }
+  ]
+}
+```
+
+#### POST `/api/calendar/events`
+Create a new calendar event.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "title": "Team Meeting",
+  "description": "Weekly team sync",
+  "date": "2024-01-15",
+  "time": "10:00",
+  "location": "Conference Room",
+  "category": "Work",
+  "attendees": ["john@example.com", "jane@example.com"],
+  "reminder": "15 minutes before"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Event created successfully",
+  "event": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "title": "Team Meeting",
+    "description": "Weekly team sync",
+    "date": "2024-01-15",
+    "time": "10:00",
+    "location": "Conference Room",
+    "category": "Work",
+    "attendees": ["john@example.com", "jane@example.com"],
+    "reminder": "15 minutes before",
+    "color": "#3B82F6",
+    "createdAt": "2024-01-14T08:00:00.000Z",
+    "updatedAt": "2024-01-14T08:00:00.000Z"
+  }
+}
+```
+
+#### PUT `/api/calendar/events/:id`
+Update an existing calendar event.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "title": "Updated Team Meeting",
+  "description": "Updated weekly team sync",
+  "date": "2024-01-15",
+  "time": "11:00",
+  "location": "New Conference Room",
+  "category": "Work"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Event updated successfully",
+  "event": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "title": "Updated Team Meeting",
+    "description": "Updated weekly team sync",
+    "date": "2024-01-15",
+    "time": "11:00",
+    "location": "New Conference Room",
+    "category": "Work",
+    "attendees": ["john@example.com", "jane@example.com"],
+    "reminder": "15 minutes before",
+    "color": "#3B82F6",
+    "updatedAt": "2024-01-14T09:00:00.000Z"
+  }
+}
+```
+
+#### DELETE `/api/calendar/events/:id`
+Delete a calendar event.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Event deleted successfully"
+}
+```
+
+#### GET `/api/calendar/events/:id`
+Get a specific calendar event.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "event": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "title": "Team Meeting",
+    "description": "Weekly team sync",
+    "date": "2024-01-15",
+    "time": "10:00",
+    "location": "Conference Room",
+    "category": "Work",
+    "attendees": ["john@example.com", "jane@example.com"],
+    "reminder": "15 minutes before",
+    "color": "#3B82F6",
+    "createdAt": "2024-01-14T08:00:00.000Z",
+    "updatedAt": "2024-01-14T08:00:00.000Z"
+  }
+}
+```
+
 ### System Endpoints
 
 #### GET `/health`
@@ -311,16 +459,23 @@ backend/
 │   ├── database.js      # MongoDB connection
 │   ├── logger.js        # Winston logging configuration
 │   └── rateLimiter.js   # Rate limiting configuration
+├── controllers/
+│   └── calendarController.js  # Calendar API logic
 ├── middleware/
 │   └── auth.js          # Authentication middleware
 ├── models/
 │   ├── User.js          # User model with security features
-│   └── RefreshToken.js  # Refresh token model
+│   ├── RefreshToken.js  # Refresh token model
+│   └── CalendarEvent.js # Calendar event model
 ├── routes/
-│   └── auth.js          # Authentication routes
+│   ├── auth.js          # Authentication routes
+│   └── calendar.js       # Calendar API routes
+├── src/
+│   └── types/           # TypeScript type definitions
 ├── logs/                # Log files directory
 ├── server.js            # Express server setup
-└── .env.example         # Environment variables template
+├── .env.example         # Environment variables template
+└── tsconfig.json        # TypeScript configuration
 ```
 
 ### Frontend Structure
@@ -336,9 +491,7 @@ frontend/src/
 │   ├── ProductGrid.js       # Product showcase component
 │   ├── Features.js          # Features display component
 │   ├── Footer.js            # Page footer
-│   ├── Calendar.js          # Basic calendar component
-│   ├── CalendarAdvanced.js  # Advanced calendar component
-│   └── CalendarSystem.js    # Full calendar system
+│   └── Calendar.js          # Full calendar system
 ├── contexts/
 │   └── AuthContext.js       # Authentication state management
 ├── config/
@@ -352,8 +505,8 @@ frontend/src/
 
 ### Calendar Components
 
-#### CalendarSystem.js
-The main calendar component providing a full-featured event management system:
+#### Calendar.js
+The main calendar component providing a comprehensive event management system:
 
 **Key Features:**
 - **Multiple View Modes**: Month, week, and day views
@@ -362,6 +515,7 @@ The main calendar component providing a full-featured event management system:
 - **Search & Filter**: Real-time event filtering
 - **Statistics Dashboard**: Event analytics and tracking
 - **Export Functionality**: JSON export of calendar data
+- **Backend Integration**: Full API integration for data persistence
 
 **State Management:**
 ```javascript
@@ -372,7 +526,16 @@ const [showEventForm, setShowEventForm] = useState(false);
 const [viewMode, setViewMode] = useState('month');
 const [searchTerm, setSearchTerm] = useState('');
 const [selectedCategory, setSelectedCategory] = useState('all');
+const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
 ```
+
+**API Integration:**
+- Fetches events from `/api/calendar/events`
+- Creates events via POST to `/api/calendar/events`
+- Updates events via PUT to `/api/calendar/events/:id`
+- Deletes events via DELETE to `/api/calendar/events/:id`
+- Handles authentication tokens automatically
 
 **Event Categories:**
 - **Work** (💼): Professional events and meetings
@@ -499,11 +662,17 @@ The Comprehensive Local Ecosystem consists of two main components:
    ↓
 2. State updates in React components
    ↓
-3. Data saved to localStorage
+3. API calls to backend (/api/calendar/*)
    ↓
-4. UI re-renders with new state
+4. Backend processes requests with authentication
    ↓
-5. Export functionality available
+5. MongoDB operations (CRUD)
+   ↓
+6. Response sent to frontend
+   ↓
+7. UI re-renders with new state
+   ↓
+8. Local backup for offline functionality
 ```
 
 ### Security Architecture
@@ -563,16 +732,30 @@ server.js
 │   ├── Cookie Parser
 │   └── Rate Limiter
 ├── Routes
-│   └── /api/auth
-│       ├── POST /register
-│       ├── POST /login
-│       ├── POST /refresh
-│       ├── GET /me
-│       ├── POST /logout
-│       └── POST /logout-all
+│   ├── /api/auth
+│   │   ├── POST /register
+│   │   ├── POST /login
+│   │   ├── POST /refresh
+│   │   ├── GET /me
+│   │   ├── POST /logout
+│   │   └── POST /logout-all
+│   └── /api/calendar
+│       ├── GET /events
+│       ├── POST /events
+│       ├── PUT /events/:id
+│       ├── DELETE /events/:id
+│       └── GET /events/:id
+├── Controllers
+│   └── calendarController.js
+│       ├── getAllEvents
+│       ├── createEvent
+│       ├── updateEvent
+│       ├── deleteEvent
+│       └── getEventById
 ├── Models
 │   ├── User.js
-│   └── RefreshToken.js
+│   ├── RefreshToken.js
+│   └── CalendarEvent.js
 └── Config
     ├── database.js
     ├── logger.js
@@ -599,6 +782,7 @@ server.js
 | `AUTH_RATE_LIMIT_MAX_REQUESTS` | Authentication rate limit | 5 | No |
 | `LOG_LEVEL` | Logging level | debug | No |
 | `REACT_APP_API_URL` | Frontend API URL | http://localhost:3001 | No |
+| `SOCKET_CORS_ORIGIN` | Socket.io CORS origin | http://localhost:3000 | No |
 
 ### Database Schema
 
@@ -627,6 +811,23 @@ server.js
     userAgent: String,
     ip: String
   },
+  timestamps: true
+}
+```
+
+#### CalendarEvent Model
+```javascript
+{
+  title: String (required),
+  description: String,
+  date: Date (required),
+  time: String,
+  location: String,
+  category: String (enum: ['Work', 'Personal', 'Social', 'Health', 'Education', 'Travel']),
+  attendees: [String],
+  reminder: String,
+  color: String,
+  user: ObjectId (ref: User, required),
   timestamps: true
 }
 ```
@@ -839,5 +1040,6 @@ For technical support or questions:
 ---
 
 **Version**: 2.0.0  
-**Last Updated**: 2024-01-15  
-**Status**: Production Ready
+**Last Updated**: 2025-03-21  
+**Status**: Production Ready  
+**Features**: Authentication, Calendar Management, Real-time Updates
