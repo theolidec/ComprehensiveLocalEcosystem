@@ -8,6 +8,7 @@ const connectDB = require('./config/database');
 const logger = require('./config/logger');
 const { generalLimiter } = require('./config/rateLimiter');
 const authRoutes = require('./routes/auth');
+const calendarRoutes = require('./routes/calendar');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -75,6 +76,7 @@ app.get('/', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/calendar', calendarRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

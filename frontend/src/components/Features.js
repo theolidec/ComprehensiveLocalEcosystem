@@ -41,12 +41,6 @@ const Features = () => {
     }
   ];
 
-  const stats = [
-    { icon: Users, label: 'Users', value: '100M+', description: 'people and businesses' },
-    { icon: CheckCircle, label: 'Encryption', value: 'AES-256', description: 'military-grade security' },
-    { icon: Award, label: 'Founded', value: '2014', description: 'at CERN, birthplace of the web' },
-    { icon: Shield, label: 'Privacy', value: 'Swiss', description: 'strongest privacy laws' }
-  ];
 
   return (
     <section id="privacy" className="py-20 bg-gray-50">
@@ -87,22 +81,6 @@ const Features = () => {
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-12 text-center text-white">
-          <h3 className="text-3xl font-bold mb-8">Trusted by millions worldwide</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="flex justify-center mb-3">
-                  <stat.icon className="h-8 w-8 text-blue-200" />
-                </div>
-                <div className="text-3xl font-bold mb-1">{stat.value}</div>
-                <div className="text-sm text-blue-100">{stat.label}</div>
-                <div className="text-xs text-blue-200 mt-1">{stat.description}</div>
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     </section>

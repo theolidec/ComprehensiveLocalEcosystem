@@ -8,6 +8,7 @@ import Hero from './components/Hero';
 import ProductGrid from './components/ProductGrid';
 import Features from './components/Features';
 import Footer from './components/Footer';
+import CalendarApp from './components/Calendar';
 import './App.css';
 
 function App() {
@@ -25,6 +26,15 @@ function App() {
                   <Hero />
                   <ProductGrid />
                   <Features />
+                  <Footer />
+                </div>
+              </ProtectedRoute>
+            } />
+            <Route path="/calendar" element={
+              <ProtectedRoute>
+                <div>
+                  <Header />
+                  <CalendarApp />
                   <Footer />
                 </div>
               </ProtectedRoute>

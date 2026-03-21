@@ -14,6 +14,14 @@ const API_ENDPOINTS = {
   
   // Health check
   HEALTH: '/health',
+  
+  // Calendar endpoints
+  CALENDAR: {
+    EVENTS: '/api/calendar/events',
+    UPCOMING: '/api/calendar/events/upcoming',
+    STATS: '/api/calendar/events/stats',
+    EXPORT: '/api/calendar/events/export',
+  },
 };
 
 // Create full URLs for endpoints
@@ -31,4 +39,8 @@ export const API_URLS = {
   REFRESH: createApiUrl(API_ENDPOINTS.AUTH.REFRESH),
   ME: createApiUrl(API_ENDPOINTS.AUTH.ME),
   HEALTH: createApiUrl(API_ENDPOINTS.HEALTH),
+  CALENDAR_EVENTS: createApiUrl(API_ENDPOINTS.CALENDAR.EVENTS),
+  CALENDAR_UPCOMING: createApiUrl(API_ENDPOINTS.CALENDAR.UPCOMING),
+  CALENDAR_STATS: createApiUrl(API_ENDPOINTS.CALENDAR.STATS),
+  CALENDAR_EXPORT: createApiUrl(API_ENDPOINTS.CALENDAR.EXPORT),
 };

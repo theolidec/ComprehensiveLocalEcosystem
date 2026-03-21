@@ -1,18 +1,32 @@
 import React, { useState } from 'react';
-import { Menu, X, Shield, User, LogOut } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const navigation = [
-    { name: 'Products', href: '#products' },
-    { name: 'Privacy', href: '#privacy' },
-    { name: 'Business', href: '#business' },
-    { name: 'Company', href: '#company' },
-    { name: 'Support', href: '#support' }
+    { name: 'Home', href: '/home' },
+    { name: 'Calendar', href: '/calendar' }
   ];
+
+  // Determine the title based on current route
+  const getHeaderTitle = () => {
+    if (location.pathname === '/calendar' || 
+        location.pathname === '/calendar-basic' || 
+        location.pathname === '/calendar-advanced' || 
+        location.pathname === '/calendar-system') {
+      return 'Calendar';
+    }
+    if (location.pathname === '/home') {
+      return 'Home';
+    }
+    return 'Proton';
+  };
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
@@ -21,20 +35,20 @@ const Header = () => {
           <div className="flex items-center">
             <div className="flex items-center space-x-2">
               <Shield className="h-8 w-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">Proton</span>
+              <span className="text-xl font-bold text-gray-900">{getHeaderTitle()}</span>
             </div>
           </div>
 
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-8">
               {navigation.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href={item.href}
+                  onClick={() => item.href.startsWith('/') ? navigate(item.href) : null}
                   className="text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
                 >
                   {item.name}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -80,13 +94,13 @@ const Header = () => {
           <div className="md:hidden">
             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
               {navigation.map((item) => (
-                <a
+                <button
                   key={item.name}
-                  href={item.href}
-                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium"
+                  onClick={() => item.href.startsWith('/') ? navigate(item.href) : null}
+                  className="text-gray-700 hover:text-blue-600 block px-3 py-2 text-base font-medium w-full text-left"
                 >
                   {item.name}
-                </a>
+                </button>
               ))}
               <div className="pt-4 pb-3 border-t border-gray-200">
                 {isAuthenticated ? (
