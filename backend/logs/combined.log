@@ -1,0 +1,60 @@
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 11:53:43"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 11:53:43"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 11:53:43"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"auth-service","timestamp":"2026-03-21 11:53:52"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 11:59:55"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 11:59:55"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 11:59:55"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 11:59:55"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 11:59:55"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"auth-service","timestamp":"2026-03-21 12:00:18"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 12:03:03"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 12:03:03"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 12:03:03"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 12:03:03"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 12:03:03"}
+{"level":"warn","message":"Access denied - No token provided","service":"auth-service","timestamp":"2026-03-21 12:03:06"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [21/Mar/2026:11:03:06 +0000] \"GET /api/auth/me HTTP/1.1\" 401 51 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0\"","service":"auth-service","timestamp":"2026-03-21 12:03:06"}
+{"level":"warn","message":"Access denied - No token provided","service":"auth-service","timestamp":"2026-03-21 12:03:06"}
+{"level":"info","message":"::ffff:127.0.0.1 - - [21/Mar/2026:11:03:06 +0000] \"GET /api/auth/me HTTP/1.1\" 401 51 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64; rv:148.0) Gecko/20100101 Firefox/148.0\"","service":"auth-service","timestamp":"2026-03-21 12:03:06"}
+{"level":"warn","message":"Access denied - No token provided","service":"auth-service","timestamp":"2026-03-21 12:03:17"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:17 +0000] \"GET /api/auth/me HTTP/1.1\" 401 51 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:17"}
+{"level":"warn","message":"Access denied - No token provided","service":"auth-service","timestamp":"2026-03-21 12:03:17"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:17 +0000] \"GET /api/auth/me HTTP/1.1\" 401 51 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:17"}
+{"level":"warn","message":"Login attempt with non-existent email: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:03:19"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:19 +0000] \"POST /api/auth/login HTTP/1.1\" 401 60 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:19"}
+{"level":"info","message":"New user registered: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:03:41"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:41 +0000] \"POST /api/auth/register HTTP/1.1\" 201 124 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:41"}
+{"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:03:42"}
+{"level":"info","message":"User logged out: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:03:42"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:42 +0000] \"POST /api/auth/logout HTTP/1.1\" 200 31 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:42"}
+{"level":"info","message":"User logged in successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:03:45"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:03:45 +0000] \"POST /api/auth/login HTTP/1.1\" 200 151 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:03:45"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 12:10:05"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 12:10:05"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 12:10:05"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 12:10:05"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 12:10:05"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 12:10:55"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 12:10:55"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 12:10:55"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 12:10:55"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 12:10:55"}
+{"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:11:27"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:11:27 +0000] \"GET /api/auth/me HTTP/1.1\" 200 169 \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:11:27"}
+{"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:11:27"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:11:27 +0000] \"GET /api/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:11:27"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 12:11:39"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 12:11:39"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 12:11:39"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 12:11:39"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 12:11:39"}
+{"level":"info","message":"Server is running on port 3001","service":"auth-service","timestamp":"2026-03-21 12:13:21"}
+{"level":"info","message":"Environment: development","service":"auth-service","timestamp":"2026-03-21 12:13:21"}
+{"level":"info","message":"CORS origin: http://localhost:3000","service":"auth-service","timestamp":"2026-03-21 12:13:21"}
+{"level":"info","message":"Mongoose connected to MongoDB","service":"auth-service","timestamp":"2026-03-21 12:13:21"}
+{"level":"info","message":"MongoDB Connected: localhost","service":"auth-service","timestamp":"2026-03-21 12:13:21"}
+{"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:13:31"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:13:31 +0000] \"GET /api/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:13:31"}
+{"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-21 12:13:31"}
+{"level":"info","message":"::1 - - [21/Mar/2026:11:13:31 +0000] \"GET /api/auth/me HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-21 12:13:31"}

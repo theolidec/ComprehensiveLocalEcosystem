@@ -1,0 +1,138 @@
+const rateLimit = require('express-rate-limit');
+const logger = require('./logger');
+
+// General rate limiter for all requests
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: {
+    error: 'Too many requests from this IP, please try again later.',
+    code: 'RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  handler: (req, res) => {
+    logger.warn(`Rate limit exceeded for IP: ${req.ip}, Path: ${req.path}`);
+    res.status(429).json({
+      error: 'Too many requests from this IP, please try again later.',
+      code: 'RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
+// Strict rate limiter for authentication endpoints
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // Limit each IP to 5 auth requests per windowMs
+  message: {
+    error: 'Too many authentication attempts, please try again later.',
+    code: 'AUTH_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false, // Count successful requests too
+  handler: (req, res) => {
+    logger.warn(`Auth rate limit exceeded for IP: ${req.ip}, Email: ${req.body?.email || 'unknown'}`);
+    res.status(429).json({
+      error: 'Too many authentication attempts, please try again later.',
+      code: 'AUTH_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
+// Password reset rate limiter
+const passwordResetLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // Limit each IP to 3 password reset requests per hour
+  message: {
+    error: 'Too many password reset attempts, please try again later.',
+    code: 'PASSWORD_RESET_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Password reset rate limit exceeded for IP: ${req.ip}, Email: ${req.body?.email || 'unknown'}`);
+    res.status(429).json({
+      error: 'Too many password reset attempts, please try again later.',
+      code: 'PASSWORD_RESET_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
+// Token refresh rate limiter
+const tokenRefreshLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 token refresh requests per windowMs
+  message: {
+    error: 'Too many token refresh attempts, please try again later.',
+    code: 'TOKEN_REFRESH_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Token refresh rate limit exceeded for IP: ${req.ip}`);
+    res.status(429).json({
+      error: 'Too many token refresh attempts, please try again later.',
+      code: 'TOKEN_REFRESH_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
+// Create a rate limiter that checks user ID instead of IP (for logged-in users)
+const createUserRateLimiter = (windowMs, max, message) => {
+  const userRequests = new Map();
+
+  return (req, res, next) => {
+    const userId = req.user?.id || req.ip;
+    const now = Date.now();
+    const windowStart = now - windowMs;
+
+    // Clean up old entries
+    for (const [key, requests] of userRequests.entries()) {
+      userRequests.set(key, requests.filter(time => time > windowStart));
+      if (userRequests.get(key).length === 0) {
+        userRequests.delete(key);
+      }
+    }
+
+    // Get or create user request array
+    if (!userRequests.has(userId)) {
+      userRequests.set(userId, []);
+    }
+
+    const requests = userRequests.get(userId);
+
+    // Check if limit exceeded
+    if (requests.length >= max) {
+      logger.warn(`User rate limit exceeded for user: ${userId}, Path: ${req.path}`);
+      return res.status(429).json({
+        error: message,
+        code: 'USER_RATE_LIMIT_EXCEEDED',
+        retryAfter: Math.round((windowMs - (now - requests[0])) / 1000)
+      });
+    }
+
+    // Add current request
+    requests.push(now);
+    next();
+  };
+};
+
+// User-specific rate limiter for sensitive operations
+const userActionLimiter = createUserRateLimiter(
+  60 * 60 * 1000, // 1 hour
+  10, // 10 actions per hour
+  'Too many actions performed, please try again later.'
+);
+
+module.exports = {
+  generalLimiter,
+  authLimiter,
+  passwordResetLimiter,
+  tokenRefreshLimiter,
+  userActionLimiter
+};
