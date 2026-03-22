@@ -16,10 +16,8 @@ const Header = () => {
 
   // Determine the title based on current route
   const getHeaderTitle = () => {
-    if (location.pathname === '/calendar' || 
-        location.pathname === '/calendar-basic' || 
-        location.pathname === '/calendar-advanced' || 
-        location.pathname === '/calendar-system') {
+    // Check for all calendar routes
+    if (location.pathname.startsWith('/calendar')) {
       return 'Calendar';
     }
     if (location.pathname === '/home') {

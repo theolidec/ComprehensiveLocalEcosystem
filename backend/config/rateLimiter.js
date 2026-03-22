@@ -4,7 +4,7 @@ const logger = require('./logger');
 // General rate limiter for all requests
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 1000, // Limit each IP to 1000 requests per windowMs (increased from 100)
   message: {
     error: 'Too many requests from this IP, please try again later.',
     code: 'RATE_LIMIT_EXCEEDED'
@@ -24,7 +24,7 @@ const generalLimiter = rateLimit({
 // Strict rate limiter for authentication endpoints
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 auth requests per windowMs
+  max: 20, // Limit each IP to 20 auth requests per windowMs (increased from 5)
   message: {
     error: 'Too many authentication attempts, please try again later.',
     code: 'AUTH_RATE_LIMIT_EXCEEDED'
@@ -65,7 +65,7 @@ const passwordResetLimiter = rateLimit({
 // Token refresh rate limiter
 const tokenRefreshLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10, // Limit each IP to 10 token refresh requests per windowMs
+  max: 50, // Limit each IP to 50 token refresh requests per windowMs (increased from 10)
   message: {
     error: 'Too many token refresh attempts, please try again later.',
     code: 'TOKEN_REFRESH_RATE_LIMIT_EXCEEDED'
@@ -125,7 +125,7 @@ const createUserRateLimiter = (windowMs, max, message) => {
 // User-specific rate limiter for sensitive operations
 const userActionLimiter = createUserRateLimiter(
   60 * 60 * 1000, // 1 hour
-  10, // 10 actions per hour
+  50, // 50 actions per hour
   'Too many actions performed, please try again later.'
 );
 

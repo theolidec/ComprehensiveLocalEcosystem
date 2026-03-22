@@ -27,7 +27,7 @@ const eventSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ['work', 'personal', 'social', 'health', 'education', 'travel', 'other'],
+    required: [true, 'Event category is required'],
     default: 'work'
   },
   color: {

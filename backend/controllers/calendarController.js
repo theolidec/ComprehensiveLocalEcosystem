@@ -1,5 +1,12 @@
 const Event = require('../models/Event');
+const RecurringEventService = require('../services/recurringEventService');
 const logger = require('../config/logger');
+
+const extractOriginalEventId = (id) => {
+  if (!id) return id;
+  const match = id.match(/^([a-fA-F0-9]+)_\d{4}-\d{2}-\d{2}$/);
+  return match ? match[1] : id;
+};
 
 const createEvent = async (req, res) => {
   try {
@@ -57,16 +64,42 @@ const createEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
   try {
-    const { startDate, endDate, category, search } = req.query;
+    const { startDate, endDate, category, search, includeRecurring } = req.query;
     const userId = req.user._id;
 
     let query = { user: userId };
 
+    // For recurring events, we need to fetch all recurring events that might have
+    // instances in the date range, plus non-recurring events in the range
     if (startDate && endDate) {
-      query.date = {
-        $gte: new Date(startDate),
-        $lte: new Date(endDate)
-      };
+      const rangeStart = new Date(startDate);
+      const rangeEnd = new Date(endDate);
+
+      if (includeRecurring !== 'false') {
+        // Fetch both:
+        // 1. Non-recurring events within the date range
+        // 2. All recurring events (they might have instances in the range)
+        query.$or = [
+          {
+            // Non-recurring events in date range
+            isRecurring: false,
+            date: {
+              $gte: rangeStart,
+              $lte: rangeEnd
+            }
+          },
+          {
+            // Recurring events with start date on or before range end
+            isRecurring: true,
+            date: { $lte: rangeEnd }
+          }
+        ];
+      } else {
+        query.date = {
+          $gte: rangeStart,
+          $lte: rangeEnd
+        };
+      }
     }
 
     if (category && category !== 'all') {
@@ -74,16 +107,47 @@ const getEvents = async (req, res) => {
     }
 
     if (search) {
-      query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } }
-      ];
+      // If we already have $or for date filtering, we need to use $and
+      const searchQuery = {
+        $or: [
+          { title: { $regex: search, $options: 'i' } },
+          { description: { $regex: search, $options: 'i' } },
+          { location: { $regex: search, $options: 'i' } }
+        ]
+      };
+
+      if (query.$or) {
+        query = {
+          $and: [
+            { $or: query.$or },
+            searchQuery
+          ]
+        };
+        // Add other conditions
+        if (category && category !== 'all') {
+          query.$and.push({ category: category });
+        }
+        if (userId) {
+          query.$and.push({ user: userId });
+        }
+      } else {
+        query.$or = searchQuery.$or;
+      }
     }
 
     const events = await Event.find(query).sort({ date: 1, time: 1 });
 
-    res.status(200).json({ events });
+    // Expand recurring events if date range is provided
+    let finalEvents = events;
+    if (startDate && endDate && includeRecurring !== 'false') {
+      finalEvents = RecurringEventService.expandRecurringEvents(
+        events,
+        new Date(startDate),
+        new Date(endDate)
+      );
+    }
+
+    res.status(200).json({ events: finalEvents });
   } catch (error) {
     logger.error('Get events error:', error);
     res.status(500).json({
@@ -131,12 +195,14 @@ const updateEvent = async (req, res) => {
     const userId = req.user._id;
     const updates = req.body;
 
+    const originalEventId = extractOriginalEventId(id);
+
     if (updates.date) {
       updates.date = new Date(updates.date);
     }
 
     const event = await Event.findOneAndUpdate(
-      { _id: id, user: userId },
+      { _id: originalEventId, user: userId },
       updates,
       { new: true, runValidators: true }
     );
@@ -183,7 +249,9 @@ const deleteEvent = async (req, res) => {
     const { id } = req.params;
     const userId = req.user._id;
 
-    const event = await Event.findOneAndDelete({ _id: id, user: userId });
+    const originalEventId = extractOriginalEventId(id);
+
+    const event = await Event.findOneAndDelete({ _id: originalEventId, user: userId });
 
     if (!event) {
       return res.status(404).json({

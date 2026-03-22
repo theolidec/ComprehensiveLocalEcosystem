@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
+const Category = require('../models/Category');
 const { authenticateToken, verifyRefreshToken } = require('../middleware/auth');
 const { authLimiter, tokenRefreshLimiter } = require('../config/rateLimiter');
 const logger = require('../config/logger');
@@ -66,6 +67,14 @@ router.post('/register', authLimiter, [
     // Create new user
     const user = new User({ email, password, name });
     await user.save();
+
+    // Create default categories for the new user
+    try {
+      await Category.createDefaultCategories(user._id);
+    } catch (categoryError) {
+      logger.error('Failed to create default categories:', categoryError);
+      // Don't fail registration if categories fail to create
+    }
 
     logger.info(`New user registered: ${email}`);
 

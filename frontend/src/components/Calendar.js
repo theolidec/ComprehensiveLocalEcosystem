@@ -1,23 +1,52 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, Users, MapPin, Search, ChevronLeft, ChevronRight, Plus, Edit, Trash2, Download, ChevronDown } from 'lucide-react';
+import { Calendar, Clock, Users, MapPin, Search, ChevronLeft, ChevronRight, Plus, Edit, Trash2, Download, ChevronDown, Repeat } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
 import calendarAPI from '../services/calendarAPI';
+import categoryAPI from '../services/categoryAPI';
+import CategoryManager from './CategoryManager';
 import { useAuth } from '../contexts/AuthContext';
 
 const getEventId = (event) => event._id || event.id;
 
 const CalendarApp = () => {
   const { isAuthenticated } = useAuth();
+  const { view: urlView } = useParams();
+  const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [viewMode, setViewMode] = useState('month');
+  const [viewMode, setViewMode] = useState(urlView || 'month');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [editingEvent, setEditingEvent] = useState(null);
   const [showEventDetails, setShowEventDetails] = useState(null);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [categorySortOrder, setCategorySortOrder] = useState(() => {
+    // Load saved sort order from localStorage
+    return localStorage.getItem('categorySortOrder') || 'name-asc';
+  });
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Sync view mode with URL
+  useEffect(() => {
+    if (urlView && ['month', 'week', 'day'].includes(urlView)) {
+      setViewMode(urlView);
+    }
+  }, [urlView]);
+
+  // Save category sort order to localStorage
+  useEffect(() => {
+    localStorage.setItem('categorySortOrder', categorySortOrder);
+  }, [categorySortOrder]);
+
+  // Update URL when view mode changes
+  const handleViewModeChange = (newViewMode) => {
+    setViewMode(newViewMode);
+    navigate(`/calendar/${newViewMode}`);
+  };
 
   const fetchEvents = useCallback(async () => {
     if (!isAuthenticated) return;
@@ -52,15 +81,82 @@ const CalendarApp = () => {
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  const categories = [
-    { id: 'all', name: 'All Categories', color: '#6B7280', icon: '📅' },
-    { id: 'work', name: 'Work', color: '#3B82F6', icon: '💼' },
-    { id: 'personal', name: 'Personal', color: '#10B981', icon: '👤' },
-    { id: 'social', name: 'Social', color: '#F59E0B', icon: '🎉' },
-    { id: 'health', name: 'Health', color: '#EF4444', icon: '🏥' },
-    { id: 'education', name: 'Education', color: '#8B5CF6', icon: '📚' },
-    { id: 'travel', name: 'Travel', color: '#06B6D4', icon: '✈️' }
-  ];
+  const [categories, setCategories] = useState([
+    { id: 'all', name: 'All Categories', color: '#6B7280', icon: '📅' }
+  ]);
+
+  // Fetch categories
+  const fetchCategories = useCallback(async () => {
+    if (!isAuthenticated) return;
+    try {
+      console.log('Fetching categories...');
+      const fetchedCategories = await categoryAPI.getCategories();
+      console.log('Fetched categories:', fetchedCategories);
+      const allCategory = { id: 'all', name: 'All Categories', color: '#6B7280', icon: '📅' };
+      const formattedCategories = fetchedCategories.map(cat => ({
+        id: cat.name.toLowerCase(),
+        name: cat.name,
+        color: cat.color,
+        icon: cat.icon
+      }));
+      const finalCategories = [allCategory, ...formattedCategories];
+      console.log('Final categories:', finalCategories);
+      setCategories(finalCategories);
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+      setError(err.message);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showSortDropdown && !event.target.closest('.sort-dropdown')) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showSortDropdown]);
+
+  // Sort categories based on selected sort order
+  const sortCategories = (categoriesToSort) => {
+    const filteredCategories = categoriesToSort.filter(cat => cat.id !== 'all');
+    
+    switch (categorySortOrder) {
+      case 'name-asc':
+        return filteredCategories.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return filteredCategories.sort((a, b) => b.name.localeCompare(a.name));
+      case 'count-asc':
+        return filteredCategories.sort((a, b) => (stats.categoryCount[a.id] || 0) - (stats.categoryCount[b.id] || 0));
+      case 'count-desc':
+        return filteredCategories.sort((a, b) => (stats.categoryCount[b.id] || 0) - (stats.categoryCount[a.id] || 0));
+      default:
+        return filteredCategories;
+    }
+  };
+
+  // Custom dropdown helpers
+  const getSortLabel = () => {
+    switch (categorySortOrder) {
+      case 'name-asc': return 'Name (A-Z)';
+      case 'name-desc': return 'Name (Z-A)';
+      case 'count-desc': return 'Most Used';
+      case 'count-asc': return 'Least Used';
+      default: return 'Name (A-Z)';
+    }
+  };
+
+  const handleSortSelect = (value) => {
+    setCategorySortOrder(value);
+    setShowSortDropdown(false);
+  };
 
   const getDaysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
@@ -108,12 +204,22 @@ const CalendarApp = () => {
   const getEventsForDate = (day) => {
     if (!day) return [];
     const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    return events.filter(event => {
-      const eventDate = new Date(event.date);
-      return eventDate.toDateString() === date.toDateString() &&
-        (selectedCategory === 'all' || event.category === selectedCategory) &&
-        (searchTerm === '' || event.title.toLowerCase().includes(searchTerm.toLowerCase()));
-    });
+    return events
+      .filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.toDateString() === date.toDateString() &&
+          (selectedCategory === 'all' || event.category === selectedCategory) &&
+          (searchTerm === '' || event.title.toLowerCase().includes(searchTerm.toLowerCase()));
+      })
+      .sort((a, b) => {
+        // Sort by time (earliest first), all-day events last
+        if (!a.time && !b.time) return 0;
+        if (!a.time) return 1; // a is all-day, put it after b
+        if (!b.time) return -1; // b is all-day, put it after a
+        
+        // Both have times, compare them
+        return a.time.localeCompare(b.time);
+      });
   };
 
   const isToday = (day) => {
@@ -172,6 +278,78 @@ const CalendarApp = () => {
       } catch (err) {
         alert(err.message || 'Failed to delete event');
       }
+    }
+  };
+
+  const createDummyEvents = async () => {
+    try {
+      // Ensure "Testing" category exists
+      const testingCategory = categories.find(cat => cat.name === 'Testing');
+      if (!testingCategory) {
+        await categoryAPI.createCategory({
+          name: 'Testing',
+          color: '#EF4444',
+          icon: '🧪'
+        });
+        await fetchCategories();
+      }
+
+      const dummyEvents = [];
+      const today = new Date();
+      
+      for (let i = 0; i < 10; i++) {
+        const eventDate = new Date(today);
+        eventDate.setDate(today.getDate() + Math.floor(Math.random() * 30) - 15); // Random date within ±15 days
+        
+        const hours = Math.floor(Math.random() * 14) + 8; // 8 AM to 10 PM
+        const minutes = Math.floor(Math.random() * 4) * 15; // 0, 15, 30, 45 minutes
+        
+        const dummyEvent = {
+          title: `Test Event ${i + 1}`,
+          description: `This is a dummy test event for testing purposes ${i + 1}`,
+          time: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
+          location: `Test Location ${i + 1}`,
+          category: 'testing',
+          date: eventDate.toISOString(),
+          attendees: [`test${i + 1}@example.com`],
+          reminder: '15',
+          color: '#EF4444'
+        };
+        
+        dummyEvents.push(dummyEvent);
+      }
+
+      // Create all events
+      const createdEvents = await Promise.all(
+        dummyEvents.map(event => calendarAPI.createEvent(event))
+      );
+
+      setEvents(prev => [...prev, ...createdEvents]);
+      alert('10 dummy events created successfully under "Testing" category!');
+    } catch (err) {
+      alert(err.message || 'Failed to create dummy events');
+    }
+  };
+
+  const removeDummyEvents = async () => {
+    try {
+      const testingEvents = events.filter(event => event.category === 'testing');
+      
+      if (testingEvents.length === 0) {
+        alert('No dummy events found in "Testing" category');
+        return;
+      }
+
+      if (window.confirm(`Are you sure you want to delete ${testingEvents.length} dummy events from the "Testing" category?`)) {
+        await Promise.all(
+          testingEvents.map(event => calendarAPI.deleteEvent(getEventId(event)))
+        );
+        
+        setEvents(prev => prev.filter(event => event.category !== 'testing'));
+        alert(`${testingEvents.length} dummy events removed successfully!`);
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to remove dummy events');
     }
   };
 
@@ -234,6 +412,61 @@ const CalendarApp = () => {
     return weekDays;
   };
 
+  // Week navigation
+  const navigateWeek = (direction) => {
+    setCurrentDate(prev => {
+      const newDate = new Date(prev);
+      if (direction === 'prev') {
+        newDate.setDate(newDate.getDate() - 7);
+      } else {
+        newDate.setDate(newDate.getDate() + 7);
+      }
+      return newDate;
+    });
+  };
+
+  // Format week range for display
+  const getWeekRangeText = () => {
+    const weekDays = generateWeekDays();
+    const startOfWeek = weekDays[0];
+    const endOfWeek = weekDays[6];
+    
+    const startFormat = startOfWeek.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    });
+    const endFormat = endOfWeek.toLocaleDateString('en-US', { 
+      month: startOfWeek.getMonth() === endOfWeek.getMonth() ? 'short' : 'short',
+      day: 'numeric',
+      year: endOfWeek.getFullYear() !== startOfWeek.getFullYear() ? 'numeric' : undefined
+    }).replace(/,\s*$/, '');
+    
+    return `${startFormat} - ${endFormat}`;
+  };
+
+  // Unified navigation handler
+  const handleNavigation = (direction) => {
+    if (viewMode === 'week') {
+      navigateWeek(direction);
+    } else {
+      navigateMonth(direction);
+    }
+  };
+
+  // Navigate to today
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Get header text based on view mode
+  const getHeaderText = () => {
+    if (viewMode === 'week') {
+      return getWeekRangeText();
+    } else {
+      return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+    }
+  };
+
   // Day view hours
   const generateDayHours = () => {
     const hours = [];
@@ -258,7 +491,7 @@ const CalendarApp = () => {
           <div
             key={index}
             onClick={() => handleDateClick(day)}
-            className={`min-h-[100px] p-2 border-r border-b cursor-pointer hover:bg-gray-50 transition-colors ${
+            className={`min-h-[120px] p-2 border-r border-b cursor-pointer hover:bg-gray-50 transition-colors ${
               day ? '' : 'bg-gray-50 cursor-default'
             } ${isCurrentDay ? 'bg-blue-50' : ''}`}
           >
@@ -270,10 +503,10 @@ const CalendarApp = () => {
                   {day}
                 </div>
                 <div className="space-y-1">
-                  {dayEvents.slice(0, 2).map(event => (
+                  {dayEvents.slice(0, 3).map(event => (
                     <div
                       key={getEventId(event)}
-                      className="text-xs p-1 rounded truncate text-white cursor-pointer hover:opacity-80"
+                      className="text-xs p-1 rounded truncate text-white cursor-pointer hover:opacity-80 flex items-center"
                       style={{ backgroundColor: event.color }}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -281,12 +514,15 @@ const CalendarApp = () => {
                       }}
                     >
                       {event.time && <span className="font-medium">{event.time} </span>}
-                      {event.title}
+                      <span className="flex-1 truncate">{event.title}</span>
+                      {event.isRecurring && (
+                        <Repeat className="w-3 h-3 ml-1 opacity-80 flex-shrink-0" />
+                      )}
                     </div>
                   ))}
-                  {dayEvents.length > 2 && (
+                  {dayEvents.length > 3 && (
                     <div className="text-xs text-gray-500 font-medium">
-                      +{dayEvents.length - 2} more
+                      +{dayEvents.length - 3} more
                     </div>
                   )}
                 </div>
@@ -301,48 +537,118 @@ const CalendarApp = () => {
   const renderWeekView = () => {
     const weekDays = generateWeekDays();
     
+    // Get all-day events for the week
+    const getAllDayEvents = (date) => {
+      return events.filter(event => {
+        const eventDate = new Date(event.date);
+        return eventDate.toDateString() === date.toDateString() && !event.time;
+      });
+    };
+    
     return (
-      <div className="overflow-x-auto">
-        <div className="min-w-[800px]">
-          <div className="grid grid-cols-8 bg-gray-50 rounded-lg overflow-hidden">
-            <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r">Time</div>
-            {weekDays.map((date, index) => (
-              <div key={index} className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
-                <div>{weekDays[index]}</div>
-                <div className="text-xs text-gray-500">{date.getDate()}</div>
-              </div>
-            ))}
-          </div>
-          
-          {generateDayHours().map(hour => (
-            <div key={hour} className="grid grid-cols-8 border-b">
-              <div className="p-2 text-sm text-gray-600 border-r">
-                {hour.toString().padStart(2, '0')}:00
+      <div className="bg-white rounded-lg overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="w-full">
+            {/* Week header */}
+            <div className="grid grid-cols-8 bg-gray-50 border-b">
+              <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
+                Time
               </div>
               {weekDays.map((date, index) => {
-                const dayEvents = events.filter(event => {
-                  const eventDate = new Date(event.date);
-                  const eventHour = parseInt(event.time?.split(':')[0] || 0);
-                  return eventDate.toDateString() === date.toDateString() && eventHour === hour;
-                });
-                
+                const isToday = date.toDateString() === new Date().toDateString();
+                const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()];
                 return (
-                  <div key={index} className="p-2 border-r min-h-[60px] hover:bg-gray-50 cursor-pointer">
-                    {dayEvents.map(event => (
+                  <div 
+                    key={index} 
+                    className={`p-3 text-center border-r ${isToday ? 'bg-blue-50' : ''}`}
+                  >
+                    <div className="text-sm font-semibold text-gray-700">
+                      {dayName}
+                    </div>
+                    <div className={`text-lg font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                      {date.getDate()}
+                    </div>
+                    <div className="text-xs text-gray-500">
+                      {date.toLocaleDateString('en-US', { month: 'short' })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* All-day events section */}
+            <div className="grid grid-cols-8 border-b bg-yellow-50">
+              <div className="p-2 text-sm font-medium text-gray-700 border-r">
+                All-day
+              </div>
+              {weekDays.map((date, index) => {
+                const allDayEvents = getAllDayEvents(date);
+                return (
+                  <div key={index} className="p-2 border-r min-h-[40px]">
+                    {allDayEvents.map(event => (
                       <div
                         key={getEventId(event)}
-                        className="text-xs p-1 rounded truncate text-white mb-1 cursor-pointer hover:opacity-80"
+                        className="text-xs p-1 rounded mb-1 text-white cursor-pointer hover:opacity-80 shadow-sm transition-opacity"
                         style={{ backgroundColor: event.color }}
                         onClick={() => setShowEventDetails(event)}
                       >
-                        {event.title}
+                        <div className="font-medium truncate">{event.title}</div>
                       </div>
                     ))}
                   </div>
                 );
               })}
             </div>
-          ))}
+            
+            {/* Time slots */}
+            {generateDayHours().map(hour => (
+              <div key={hour} className="grid grid-cols-8 border-b hover:bg-gray-50">
+                <div className="p-3 text-sm text-gray-600 border-r font-medium border-l">
+                  {hour.toString().padStart(2, '0')}:00
+                </div>
+                {weekDays.map((date, index) => {
+                  const dayEvents = events.filter(event => {
+                    const eventDate = new Date(event.date);
+                    const eventHour = parseInt(event.time?.split(':')[0] || 0);
+                    return eventDate.toDateString() === date.toDateString() && 
+                           eventHour === hour && 
+                           event.time; // Exclude all-day events
+                  });
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className="p-2 border-r min-h-[60px] relative cursor-pointer hover:bg-gray-100 transition-colors"
+                      onClick={() => {
+                        const clickedDate = new Date(date);
+                        clickedDate.setHours(hour, 0, 0, 0);
+                        setSelectedDate(clickedDate);
+                        setShowEventForm(true);
+                      }}
+                    >
+                      {dayEvents.map(event => (
+                        <div
+                          key={getEventId(event)}
+                          className="text-xs p-2 rounded mb-1 text-white cursor-pointer hover:opacity-80 shadow-sm transition-opacity"
+                          style={{ backgroundColor: event.color }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setShowEventDetails(event);
+                          }}
+                        >
+                          <div className="font-medium truncate">{event.title}</div>
+                          <div className="text-xs opacity-90">{event.time}</div>
+                          {event.location && (
+                            <div className="text-xs opacity-90 truncate">{event.location}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -354,15 +660,63 @@ const CalendarApp = () => {
       return eventDate.toDateString() === selectedDate?.toDateString();
     });
 
+    // Navigate to previous/next day
+    const navigateDay = (direction) => {
+      if (!selectedDate) {
+        setSelectedDate(new Date());
+        return;
+      }
+      
+      const newDate = new Date(selectedDate);
+      if (direction === 'prev') {
+        newDate.setDate(newDate.getDate() - 1);
+      } else {
+        newDate.setDate(newDate.getDate() + 1);
+      }
+      setSelectedDate(newDate);
+    };
+
     return (
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
-            <h3 className="text-lg font-semibold">
-              {selectedDate?.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-            </h3>
+      <div className="w-full">
+        {/* Quick date selection */}
+        <div className="mb-4 bg-white rounded-lg shadow-sm p-4">
+          <div className="flex flex-wrap gap-2">
+            {/*<button
+              onClick={() => {
+                const today = new Date();
+                setSelectedDate(today);
+                setCurrentDate(today);
+              }}
+              className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+            >
+              Today
+            </button> */}
+            <button
+              onClick={() => {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                setSelectedDate(tomorrow);
+                setCurrentDate(tomorrow);
+              }}
+              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Tomorrow
+            </button>
+            <button
+              onClick={() => {
+                const nextWeek = new Date();
+                nextWeek.setDate(nextWeek.getDate() + 7);
+                setSelectedDate(nextWeek);
+                setCurrentDate(nextWeek);
+              }}
+              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Next Week
+            </button>
           </div>
-          
+        </div>
+
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           <div className="p-4">
             {generateDayHours().map(hour => {
               const hourEvents = dayEvents.filter(event => {
@@ -371,22 +725,68 @@ const CalendarApp = () => {
               });
 
               return (
-                <div key={hour} className="flex border-b">
-                  <div className="w-20 p-3 text-sm text-gray-600 border-r">
+                <div key={hour} className="flex border-b hover:bg-gray-50">
+                  <div className="w-20 p-3 text-sm text-gray-600 border-r font-medium">
                     {hour.toString().padStart(2, '0')}:00
                   </div>
-                  <div className="flex-1 p-3 min-h-[60px]">
+                  <div className="flex-1 p-3 min-h-[60px] cursor-pointer relative" onClick={() => {
+                    if (!selectedDate) setSelectedDate(new Date());
+                    const clickedDate = new Date(selectedDate);
+                    clickedDate.setHours(hour, 0, 0, 0);
+                    setSelectedDate(clickedDate);
+                    setShowEventForm(true);
+                  }}>
+                    {hourEvents.length === 0 && (
+                      <div className="text-gray-400 text-sm hover:text-gray-600 h-full flex items-center">
+                        Click to add event
+                      </div>
+                    )}
                     {hourEvents.map(event => (
                       <div
                         key={getEventId(event)}
-                        className="inline-block p-2 rounded text-white text-sm mr-2 mb-2 cursor-pointer hover:opacity-80"
+                        className="mb-2 p-3 rounded-lg text-white cursor-pointer hover:opacity-90 shadow-sm transition-all hover:shadow-md"
                         style={{ backgroundColor: event.color }}
-                        onClick={() => setShowEventDetails(event)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowEventDetails(event);
+                        }}
                       >
-                        <div className="font-medium">{event.title}</div>
-                        {event.location && (
-                          <div className="text-xs opacity-90">{event.location}</div>
-                        )}
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="font-semibold text-sm mb-1 flex items-center">
+                              {event.title}
+                              {event.isRecurring && (
+                                <Repeat className="w-3 h-3 ml-1 opacity-80" />
+                              )}
+                            </div>
+                            {event.location && (
+                              <div className="text-xs opacity-90 flex items-center">
+                                <MapPin className="w-3 h-3 mr-1" />
+                                {event.location}
+                              </div>
+                            )}
+                            {event.attendees && event.attendees.length > 0 && (
+                              <div className="text-xs opacity-90 flex items-center mt-1">
+                                <Users className="w-3 h-3 mr-1" />
+                                {event.attendees.length} attendees
+                              </div>
+                            )}
+                          </div>
+                          <div className="ml-3 text-right">
+                            <div className="text-sm font-medium">
+                              {event.time}
+                            </div>
+                            {event.reminder && event.reminder > 0 && (
+                              <div className="text-xs opacity-75">
+                                {event.reminder === 5 ? '5m' : 
+                                 event.reminder === 15 ? '15m' : 
+                                 event.reminder === 30 ? '30m' : 
+                                 event.reminder === 60 ? '1h' : 
+                                 event.reminder === 1440 ? '1d' : ''} before
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -400,8 +800,8 @@ const CalendarApp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
@@ -416,6 +816,20 @@ const CalendarApp = () => {
               >
                 <Download className="h-4 w-4" />
                 <span>Export</span>
+              </button>
+              <button
+                onClick={createDummyEvents}
+                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Create Test Events</span>
+              </button>
+              <button
+                onClick={removeDummyEvents}
+                className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span>Remove Test Events</span>
               </button>
               <button
                 onClick={() => {
@@ -477,36 +891,86 @@ const CalendarApp = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Main Calendar */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-9">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
               {/* Calendar Navigation */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <button
-                      onClick={() => navigateMonth('prev')}
+                      onClick={() => handleNavigation('prev')}
                       className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                     >
                       <ChevronLeft className="h-5 w-5" />
                     </button>
                     <h2 className="text-xl font-semibold">
-                      {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
+                      {getHeaderText()}
                     </h2>
                     <button
-                      onClick={() => navigateMonth('next')}
+                      onClick={() => handleNavigation('next')}
                       className="p-2 hover:bg-white/20 rounded-lg transition-colors"
                     >
                       <ChevronRight className="h-5 w-5" />
                     </button>
+                    <button
+                      onClick={goToToday}
+                      className="px-3 py-1 text-sm bg-white/20 hover:bg-white/30 rounded-lg transition-colors"
+                    >
+                      Today
+                    </button>
                   </div>
 
                   <div className="flex items-center space-x-2">
+                    {viewMode === 'day' && (
+                      <>
+                        <button
+                          onClick={() => {
+                            if (!selectedDate) {
+                              setSelectedDate(new Date());
+                              return;
+                            }
+                            const newDate = new Date(selectedDate);
+                            newDate.setDate(newDate.getDate() - 1);
+                            setSelectedDate(newDate);
+                            setCurrentDate(newDate);
+                          }}
+                          className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </button>
+                        <input
+                          type="date"
+                          value={selectedDate ? selectedDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                          onChange={(e) => {
+                            const newDate = new Date(e.target.value);
+                            setSelectedDate(newDate);
+                            setCurrentDate(newDate);
+                          }}
+                          className="px-3 py-2 rounded-lg text-gray-900 bg-white/90 border border-white/30 focus:outline-none focus:ring-2 focus:ring-white/50"
+                        />
+                        <button
+                          onClick={() => {
+                            if (!selectedDate) {
+                              setSelectedDate(new Date());
+                              return;
+                            }
+                            const newDate = new Date(selectedDate);
+                            newDate.setDate(newDate.getDate() + 1);
+                            setSelectedDate(newDate);
+                            setCurrentDate(newDate);
+                          }}
+                          className="p-2 hover:bg-white/20 rounded-lg transition-colors"
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </button>
+                      </>
+                    )}
                     {['month', 'week', 'day'].map(mode => (
                       <button
                         key={mode}
-                        onClick={() => setViewMode(mode)}
+                        onClick={() => handleViewModeChange(mode)}
                         className={`px-3 py-1 rounded-lg capitalize transition-colors ${
                           viewMode === mode ? 'bg-white text-blue-600' : 'hover:bg-white/20'
                         }`}
@@ -528,12 +992,74 @@ const CalendarApp = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             {/* Category Legend */}
             <div className="bg-white rounded-xl shadow-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Categories</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-semibold text-gray-900">Categories</h3>
+                <button
+                  onClick={() => setShowCategoryManager(true)}
+                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  Manage
+                </button>
+              </div>
+              
+              {/* Sorting Controls */}
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-xs text-gray-500">Sort by:</span>
+                <div className="relative sort-dropdown">
+                  <button
+                    onClick={() => setShowSortDropdown(!showSortDropdown)}
+                    className="flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+                  >
+                    <span>{getSortLabel()}</span>
+                    <ChevronDown className={`h-3 w-3 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {showSortDropdown && (
+                    <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                      <div className="py-1">
+                        <button
+                          onClick={() => handleSortSelect('name-asc')}
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
+                            categorySortOrder === 'name-asc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          }`}
+                        >
+                          Name (A-Z)
+                        </button>
+                        <button
+                          onClick={() => handleSortSelect('name-desc')}
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
+                            categorySortOrder === 'name-desc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          }`}
+                        >
+                          Name (Z-A)
+                        </button>
+                        <button
+                          onClick={() => handleSortSelect('count-desc')}
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
+                            categorySortOrder === 'count-desc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          }`}
+                        >
+                          Most Used
+                        </button>
+                        <button
+                          onClick={() => handleSortSelect('count-asc')}
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
+                            categorySortOrder === 'count-asc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          }`}
+                        >
+                          Least Used
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              
               <div className="space-y-2">
-                {categories.slice(1).map(category => (
+                {sortCategories(categories).map(category => (
                   <div key={category.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                       <div 
@@ -566,7 +1092,12 @@ const CalendarApp = () => {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: event.color }}
                         ></div>
-                        <h4 className="font-medium text-sm text-gray-900 truncate">{event.title}</h4>
+                        <h4 className="font-medium text-sm text-gray-900 truncate flex items-center">
+                          {event.title}
+                          {event.isRecurring && (
+                            <Repeat className="w-3 h-3 ml-1 text-gray-400" />
+                          )}
+                        </h4>
                       </div>
                       <div className="text-xs text-gray-500">
                         {new Date(event.date).toLocaleDateString()}
@@ -599,10 +1130,31 @@ const CalendarApp = () => {
       {showEventDetails && (
         <EventDetails
           event={showEventDetails}
+          categories={categories}
           onEdit={() => handleEditEvent(showEventDetails)}
           onDelete={() => handleDeleteEvent(getEventId(showEventDetails))}
           onClose={() => setShowEventDetails(null)}
         />
+      )}
+
+      {/* Category Manager Modal */}
+      {showCategoryManager && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h3 className="text-xl font-semibold text-gray-900">Manage Categories</h3>
+              <button
+                onClick={() => setShowCategoryManager(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </div>
+            <div className="p-6">
+              <CategoryManager onCategoryChange={fetchCategories} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -616,7 +1168,9 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
     location: editingEvent?.location || '',
     category: editingEvent?.category || 'work',
     attendees: editingEvent?.attendees?.join(', ') || '',
-    reminder: editingEvent?.reminder || '15'
+    reminder: editingEvent?.reminder || '15',
+    isRecurring: editingEvent?.isRecurring || false,
+    recurringPattern: editingEvent?.recurringPattern || 'daily'
   });
 
   const handleSubmit = (e) => {
@@ -759,6 +1313,48 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
             </select>
           </div>
 
+          {/* Recurring Event Options */}
+          <div className="border-t pt-4 mt-4">
+            <div className="flex items-center space-x-2 mb-3">
+              <input
+                type="checkbox"
+                id="isRecurring"
+                name="isRecurring"
+                checked={formData.isRecurring}
+                onChange={(e) => setFormData(prev => ({ ...prev, isRecurring: e.target.checked }))}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">
+                Repeat this event
+              </label>
+            </div>
+
+            {formData.isRecurring && (
+              <div className="ml-6">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Repeat pattern
+                </label>
+                <select
+                  name="recurringPattern"
+                  value={formData.recurringPattern}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="daily">Every day</option>
+                  <option value="weekly">Every week</option>
+                  <option value="monthly">Every month</option>
+                  <option value="yearly">Every year</option>
+                </select>
+                <p className="text-xs text-gray-500 mt-1">
+                  {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
+                  {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
+                  {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
+                  {formData.recurringPattern === 'yearly' && 'Event will repeat on the same date every year'}
+                </p>
+              </div>
+            )}
+          </div>
+
           <div className="flex space-x-3 pt-4">
             <button
               type="submit"
@@ -780,17 +1376,8 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
   );
 };
 
-const EventDetails = ({ event, onEdit, onDelete, onClose }) => {
-  const categoryData = {
-    work: { icon: '💼', name: 'Work' },
-    personal: { icon: '👤', name: 'Personal' },
-    social: { icon: '🎉', name: 'Social' },
-    health: { icon: '🏥', name: 'Health' },
-    education: { icon: '📚', name: 'Education' },
-    travel: { icon: '✈️', name: 'Travel' }
-  };
-
-  const category = categoryData[event.category] || { icon: '📅', name: 'Other' };
+const EventDetails = ({ event, categories, onEdit, onDelete, onClose }) => {
+  const category = categories.find(cat => cat.id === event.category) || { icon: '📅', name: 'Other' };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -846,6 +1433,18 @@ const EventDetails = ({ event, onEdit, onDelete, onClose }) => {
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <Users className="h-4 w-4" />
                 <span>{event.attendees.length} attendees</span>
+              </div>
+            )}
+
+            {event.isRecurring && (
+              <div className="flex items-center space-x-2 text-sm text-blue-600">
+                <Repeat className="h-4 w-4" />
+                <span className="capitalize">
+                  {event.recurringPattern === 'daily' && 'Repeats daily'}
+                  {event.recurringPattern === 'weekly' && 'Repeats weekly'}
+                  {event.recurringPattern === 'monthly' && 'Repeats monthly'}
+                  {event.recurringPattern === 'yearly' && 'Repeats yearly'}
+                </span>
               </div>
             )}
           </div>

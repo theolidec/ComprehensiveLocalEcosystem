@@ -30,7 +30,8 @@ function App() {
                 </div>
               </ProtectedRoute>
             } />
-            <Route path="/calendar" element={
+            <Route path="/calendar" element={<Navigate to="/calendar/month" replace />} />
+            <Route path="/calendar/:view" element={
               <ProtectedRoute>
                 <div>
                   <Header />
