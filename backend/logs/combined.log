@@ -2487,3 +2487,4 @@
 {"level":"info","message":"User authenticated successfully: admin@example.com","service":"auth-service","timestamp":"2026-03-24 14:34:48"}
 {"level":"info","message":"::1 - - [24/Mar/2026:13:34:48 +0000] \"GET /api/calendar/events?startDate=2026-02-28T23%3A00%3A00.000Z&endDate=2026-03-30T22%3A00%3A00.000Z HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-24 14:34:48"}
 {"level":"info","message":"::1 - - [24/Mar/2026:13:34:48 +0000] \"GET /api/categories HTTP/1.1\" 304 - \"http://localhost:3000/\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36\"","service":"auth-service","timestamp":"2026-03-24 14:34:48"}
+{"level":"info","message":"SIGINT received, shutting down gracefully","service":"auth-service","timestamp":"2026-03-24 14:42:59"}

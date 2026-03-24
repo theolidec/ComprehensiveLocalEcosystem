@@ -587,8 +587,8 @@ const [error, setError] = useState(null);
 
 **View Modes:**
 - **Month View**: Traditional monthly calendar grid
-- **Week View**: Weekly timeline view (planned)
-- **Day View**: Daily schedule view (planned)
+- **Week View**: Weekly timeline view
+- **Day View**: Daily schedule view
 
 **Search & Filtering:**
 - Real-time search by event title
@@ -782,7 +782,6 @@ server.js
 | `AUTH_RATE_LIMIT_MAX_REQUESTS` | Authentication rate limit | 5 | No |
 | `LOG_LEVEL` | Logging level | debug | No |
 | `REACT_APP_API_URL` | Frontend API URL | http://localhost:3001 | No |
-| `SOCKET_CORS_ORIGIN` | Socket.io CORS origin | http://localhost:3000 | No |
 
 ### Database Schema
 

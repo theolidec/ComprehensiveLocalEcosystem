@@ -266,11 +266,9 @@ git checkout -b new-branch-name
 ComprehensiveLocalEcosystem/
 ├── backend/          # Node.js/Express backend
 ├── frontend/         # React frontend
-├── docs/            # Documentation files
-├── .github/         # GitHub workflows and templates
 ├── .gitignore        # Git ignore rules
-├── package.json     # Root package configuration
-└── README.md        # Main project documentation
+├── package.json      # Root package configuration
+└── README.md         # Main project documentation
 ```
 
 ## 🔐 Security Considerations
