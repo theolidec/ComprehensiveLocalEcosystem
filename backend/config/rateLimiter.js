@@ -129,10 +129,31 @@ const userActionLimiter = createUserRateLimiter(
   'Too many actions performed, please try again later.'
 );
 
+// Settings rate limiter
+const settingsLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 settings requests per windowMs
+  message: {
+    error: 'Too many settings requests, please try again later.',
+    code: 'SETTINGS_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Settings rate limit exceeded for IP: ${req.ip}, Path: ${req.path}`);
+    res.status(429).json({
+      error: 'Too many settings requests, please try again later.',
+      code: 'SETTINGS_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
 module.exports = {
   generalLimiter,
   authLimiter,
   passwordResetLimiter,
   tokenRefreshLimiter,
-  userActionLimiter
+  userActionLimiter,
+  settingsLimiter
 };

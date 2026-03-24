@@ -108,6 +108,9 @@ const Footer = () => {
               © 2024 Proton AG. All rights reserved. Based in Switzerland.
             </p>
             <div className="flex items-center space-x-6 text-sm">
+              <a href="/settings" className="text-gray-400 hover:text-white transition-colors">
+                Settings
+              </a>
               <a href="/privacy" className="text-gray-400 hover:text-white transition-colors">
                 Privacy Policy
               </a>

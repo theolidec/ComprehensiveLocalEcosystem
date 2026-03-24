@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useState, useRef, useEffect } from 'react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const profileRef = useRef(null);
   const { user, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const navigation = [
     { name: 'Home', href: '/home' },
@@ -22,6 +34,9 @@ const Header = () => {
     }
     if (location.pathname === '/home') {
       return 'Home';
+    }
+    if (location.pathname === '/settings') {
+      return 'Settings';
     }
     return 'Proton';
   };
@@ -53,19 +68,35 @@ const Header = () => {
 
           <div className="hidden md:flex items-center space-x-4">
             {isAuthenticated ? (
-              <>
-                <div className="flex items-center space-x-2">
-                  <User className="h-4 w-4 text-gray-500" />
-                  <span className="text-sm text-gray-700">Welcome, {user?.name}</span>
-                </div>
+              <div className="relative" ref={profileRef}>
                 <button 
-                  onClick={logout}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-colors"
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-blue-600 px-3 py-2 text-sm font-medium transition-colors"
                 >
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm font-medium">{user?.name?.charAt(0).toUpperCase()}</span>
+                  </div>
+                  <span>{user?.name}</span>
                 </button>
-              </>
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <button
+                      onClick={() => { navigate('/settings'); setIsProfileOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>Settings</span>
+                    </button>
+                    <button 
+                      onClick={() => { logout(); setIsProfileOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <>
                 <button className="text-gray-700 hover:text-blue-600 px-4 py-2 text-sm font-medium transition-colors">

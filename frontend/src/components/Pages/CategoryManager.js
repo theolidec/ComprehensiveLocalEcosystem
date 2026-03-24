@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Edit2, Trash2, Save, X, Palette } from 'lucide-react';
-import categoryAPI from '../services/categoryAPI';
+import categoryAPI from '../../services/categoryAPI';
 
 const CategoryManager = ({ onCategoryChange }) => {
   const [categories, setCategories] = useState([]);

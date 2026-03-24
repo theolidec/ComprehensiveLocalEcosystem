@@ -25,6 +25,10 @@ const API_ENDPOINTS = {
 
   // Categories endpoints
   CATEGORIES: '/api/categories',
+
+  // Settings endpoints
+  SETTINGS: '/api/settings',
+  SETTINGS_SESSIONS: '/api/settings/sessions',
 };
 
 // Create full URLs for endpoints
@@ -47,4 +51,5 @@ export const API_URLS = {
   CALENDAR_STATS: createApiUrl(API_ENDPOINTS.CALENDAR.STATS),
   CALENDAR_EXPORT: createApiUrl(API_ENDPOINTS.CALENDAR.EXPORT),
   CATEGORIES: createApiUrl(API_ENDPOINTS.CATEGORIES),
+  SETTINGS: createApiUrl(API_ENDPOINTS.SETTINGS),
 };

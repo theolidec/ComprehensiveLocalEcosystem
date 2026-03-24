@@ -1,34 +1,51 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar, Clock, Users, MapPin, Search, ChevronLeft, ChevronRight, Plus, Edit, Trash2, Download, ChevronDown, Repeat } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
-import calendarAPI from '../services/calendarAPI';
-import categoryAPI from '../services/categoryAPI';
+import calendarAPI from '../../services/calendarAPI';
+import categoryAPI from '../../services/categoryAPI';
 import CategoryManager from './CategoryManager';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { useSettings } from '../../contexts/SettingsContext';
 
 const getEventId = (event) => event._id || event.id;
 
 const CalendarApp = () => {
   const { isAuthenticated } = useAuth();
+  const { settings, loading: settingsLoading } = useSettings();
   const { view: urlView } = useParams();
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [viewMode, setViewMode] = useState(urlView || 'month');
+  const [viewMode, setViewMode] = useState(urlView || settings?.calendar?.defaultView || 'month');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [editingEvent, setEditingEvent] = useState(null);
   const [showEventDetails, setShowEventDetails] = useState(null);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [categorySortOrder, setCategorySortOrder] = useState(() => {
-    // Load saved sort order from localStorage
     return localStorage.getItem('categorySortOrder') || 'name-asc';
   });
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Update view mode when settings load
+  useEffect(() => {
+    if (!settingsLoading && settings?.calendar?.defaultView && !urlView) {
+      setViewMode(settings.calendar.defaultView);
+    }
+  }, [settingsLoading, settings?.calendar?.defaultView, urlView]);
+
+  // Get week start from settings (0 = Sunday, 1 = Monday, etc.)
+  const weekStartsOn = settings?.calendar?.weekStartsOn ?? 0;
+  const showWeekNumbers = settings?.calendar?.showWeekNumbers ?? false;
+  const defaultEventDuration = settings?.calendar?.defaultEventDuration ?? 60;
+  const workingHours = settings?.calendar?.workingHours || { start: '09:00', end: '17:00' };
+  
+  const workingStartHour = parseInt(workingHours.start.split(':')[0]);
+  const workingEndHour = parseInt(workingHours.end.split(':')[0]);
 
   // Sync view mode with URL
   useEffect(() => {
@@ -80,6 +97,18 @@ const CalendarApp = () => {
   ];
 
   const weekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  
+  // Get reordered week days based on settings
+  const getWeekDays = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const reordered = [];
+    for (let i = 0; i < 7; i++) {
+      reordered.push(days[(weekStartsOn + i) % 7]);
+    }
+    return reordered;
+  };
+  
+  const orderedWeekDays = getWeekDays();
 
   const [categories, setCategories] = useState([
     { id: 'all', name: 'All Categories', color: '#6B7280', icon: '📅' }
@@ -169,9 +198,11 @@ const CalendarApp = () => {
   const generateCalendarDays = () => {
     const daysInMonth = getDaysInMonth(currentDate);
     const firstDay = getFirstDayOfMonth(currentDate);
+    // Adjust for weekStartsOn setting
+    const adjustedFirstDay = (firstDay - weekStartsOn + 7) % 7;
     const days = [];
 
-    for (let i = 0; i < firstDay; i++) {
+    for (let i = 0; i < adjustedFirstDay; i++) {
       days.push(null);
     }
 
@@ -400,7 +431,8 @@ const CalendarApp = () => {
   const generateWeekDays = () => {
     const startOfWeek = new Date(currentDate);
     const day = startOfWeek.getDay();
-    const diff = startOfWeek.getDate() - day;
+    // Adjust for weekStartsOn setting
+    const diff = startOfWeek.getDate() - day + weekStartsOn;
     startOfWeek.setDate(diff);
     
     const weekDays = [];
@@ -463,76 +495,120 @@ const CalendarApp = () => {
     if (viewMode === 'week') {
       return getWeekRangeText();
     } else {
-      return `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+      const monthYear = `${monthNames[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+      if (showWeekNumbers) {
+        const weekNumber = getWeekNumber(currentDate);
+        return `Week ${weekNumber} - ${monthYear}`;
+      }
+      return monthYear;
     }
   };
 
-  // Day view hours
+  // Calculate week number
+  const getWeekNumber = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  // Day view hours - use working hours
   const generateDayHours = () => {
     const hours = [];
-    for (let i = 0; i < 24; i++) {
+    for (let i = workingStartHour; i <= workingEndHour; i++) {
       hours.push(i);
     }
     return hours;
   };
 
-  const renderMonthView = () => (
-    <div className="grid grid-cols-7 bg-gray-50 rounded-lg overflow-hidden">
-      {weekDays.map(day => (
-        <div key={day} className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
-          {day}
-        </div>
-      ))}
-      {generateCalendarDays().map((day, index) => {
-        const dayEvents = getEventsForDate(day);
-        const isCurrentDay = isToday(day);
-        
-        return (
-          <div
-            key={index}
-            onClick={() => handleDateClick(day)}
-            className={`min-h-[120px] p-2 border-r border-b cursor-pointer hover:bg-gray-50 transition-colors ${
-              day ? '' : 'bg-gray-50 cursor-default'
-            } ${isCurrentDay ? 'bg-blue-50' : ''}`}
-          >
-            {day && (
-              <>
-                <div className={`text-sm font-medium mb-1 ${
-                  isCurrentDay ? 'text-blue-600' : 'text-gray-900'
-                }`}>
-                  {day}
-                </div>
-                <div className="space-y-1">
-                  {dayEvents.slice(0, 3).map(event => (
-                    <div
-                      key={getEventId(event)}
-                      className="text-xs p-1 rounded truncate text-white cursor-pointer hover:opacity-80 flex items-center"
-                      style={{ backgroundColor: event.color }}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowEventDetails(event);
-                      }}
-                    >
-                      {event.time && <span className="font-medium">{event.time} </span>}
-                      <span className="flex-1 truncate">{event.title}</span>
-                      {event.isRecurring && (
-                        <Repeat className="w-3 h-3 ml-1 opacity-80 flex-shrink-0" />
-                      )}
-                    </div>
-                  ))}
-                  {dayEvents.length > 3 && (
-                    <div className="text-xs text-gray-500 font-medium">
-                      +{dayEvents.length - 3} more
-                    </div>
+  const renderMonthView = () => {
+    const calendarDays = generateCalendarDays();
+    const weeks = [];
+    for (let i = 0; i < calendarDays.length; i += 7) {
+      weeks.push(calendarDays.slice(i, i + 7));
+    }
+
+    return (
+      <div className={`bg-gray-50 rounded-lg overflow-hidden ${showWeekNumbers ? 'grid grid-cols-8' : 'grid grid-cols-7'}`}>
+        {showWeekNumbers && (
+          <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r bg-gray-100">
+            Week
+          </div>
+        )}
+        {orderedWeekDays.map(day => (
+          <div key={day} className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
+            {day}
+          </div>
+        ))}
+        {weeks.map((week, weekIndex) => (
+          <React.Fragment key={weekIndex}>
+            {showWeekNumbers && (
+              <div className="p-2 text-center text-xs text-gray-500 border-r border-b bg-gray-100 flex items-center justify-center">
+                {getWeekNumberForWeek(week, weekIndex)}
+              </div>
+            )}
+            {week.map((day, dayIndex) => {
+              const dayEvents = getEventsForDate(day);
+              const isCurrentDay = isToday(day);
+              const globalIndex = weekIndex * 7 + dayIndex;
+              
+              return (
+                <div
+                  key={dayIndex}
+                  onClick={() => handleDateClick(day)}
+                  className={`min-h-[120px] p-2 border-r border-b cursor-pointer hover:bg-gray-50 transition-colors ${day ? '' : 'bg-gray-50 cursor-default'} ${isCurrentDay ? 'bg-blue-50' : ''}`}
+                >
+                  {day && (
+                    <>
+                      <div className={`text-sm font-medium mb-1 ${isCurrentDay ? 'text-blue-600' : 'text-gray-900'}`}>
+                        {day}
+                      </div>
+                      <div className="space-y-1">
+                        {dayEvents.slice(0, 3).map(event => (
+                          <div
+                            key={getEventId(event)}
+                            className="text-xs p-1 rounded truncate text-white cursor-pointer hover:opacity-80 flex items-center"
+                            style={{ backgroundColor: event.color }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setShowEventDetails(event);
+                            }}
+                          >
+                            {event.time && <span className="font-medium">{event.time} </span>}
+                            <span className="flex-1 truncate">{event.title}</span>
+                            {event.isRecurring && (
+                              <Repeat className="w-3 h-3 ml-1 opacity-80 flex-shrink-0" />
+                            )}
+                          </div>
+                        ))}
+                        {dayEvents.length > 3 && (
+                          <div className="text-xs text-gray-500 font-medium">
+                            +{dayEvents.length - 3} more
+                          </div>
+                        )}
+                      </div>
+                    </>
                   )}
                 </div>
-              </>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+              );
+            })}
+          </React.Fragment>
+        ))}
+      </div>
+    );
+  };
+
+  // Get week number for a specific week
+  const getWeekNumberForWeek = (week, weekIndex) => {
+    const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+    const firstSunday = new Date(firstDayOfMonth);
+    firstSunday.setDate(firstSunday.getDate() - firstDayOfMonth.getDay() + weekStartsOn);
+    
+    const targetWeek = new Date(firstSunday);
+    targetWeek.setDate(targetWeek.getDate() + weekIndex * 7);
+    return getWeekNumber(targetWeek);
+  };
 
   const renderWeekView = () => {
     const weekDays = generateWeekDays();
@@ -1118,6 +1194,7 @@ const CalendarApp = () => {
           selectedDate={selectedDate}
           categories={categories}
           editingEvent={editingEvent}
+          defaultDuration={defaultEventDuration}
           onSubmit={editingEvent ? handleUpdateEvent : handleAddEvent}
           onClose={() => {
             setShowEventForm(false);
@@ -1160,7 +1237,7 @@ const CalendarApp = () => {
   );
 };
 
-const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }) => {
+const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, onSubmit, onClose }) => {
   const [formData, setFormData] = useState({
     title: editingEvent?.title || '',
     description: editingEvent?.description || '',
@@ -1168,7 +1245,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
     location: editingEvent?.location || '',
     category: editingEvent?.category || 'work',
     attendees: editingEvent?.attendees?.join(', ') || '',
-    reminder: editingEvent?.reminder || '15',
+    reminder: editingEvent?.reminder || String(defaultDuration || 15),
     isRecurring: editingEvent?.isRecurring || false,
     recurringPattern: editingEvent?.recurringPattern || 'daily'
   });
