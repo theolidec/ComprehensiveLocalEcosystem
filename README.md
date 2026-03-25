@@ -21,6 +21,8 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Data Persistence**: Local storage with export functionality
 - **Statistics Dashboard**: Event tracking and analytics
 - **Backend Integration**: RESTful API for calendar data management
+- **Category Manager**: Custom category creation and management
+- **Settings Page**: User preferences and account settings
 
 ### 🎨 Frontend Features
 - **React 19.2.4**: Latest React version with modern hooks
@@ -30,6 +32,8 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Responsive Design**: Mobile-first responsive UI
 - **Component Architecture**: Modular, reusable components
 - **Real-time Updates**: Dynamic UI updates with state management
+- **Category Manager**: Custom event category management UI
+- **Settings Page**: User preferences and account settings
 
 ### ⚙️ Backend Features
 - **MongoDB Integration**: Scalable database with Mongoose ODM
@@ -39,6 +43,8 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Health Monitoring**: Built-in health check endpoints
 - **Security Middleware**: Helmet, CORS, rate limiting
 - **Calendar API**: RESTful endpoints for calendar operations
+- **Category API**: Custom event category management
+- **Settings API**: User preferences and account management
 
 ## 🚀 Quick Start
 
@@ -122,6 +128,22 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 | `PUT` | `/events/:id` | Update existing event | Yes |
 | `DELETE` | `/events/:id` | Delete event | Yes |
 | `GET` | `/events/:id` | Get specific event | Yes |
+
+### Category Routes (`/api/categories`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | Get all categories | Yes |
+| `POST` | `/` | Create new category | Yes |
+| `PUT` | `/:id` | Update category | Yes |
+| `DELETE` | `/:id` | Delete category | Yes |
+
+### Settings Routes (`/api/settings`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | Get user settings | Yes |
+| `PUT` | `/` | Update user settings | Yes |
 
 ### System Routes
 
@@ -211,20 +233,25 @@ ComprehensiveLocalEcosystem/
 │   │   ├── logger.js        # Winston logging configuration
 │   │   └── rateLimiter.js   # Rate limiting configuration
 │   ├── controllers/
-│   │   └── calendarController.js  # Calendar API logic
+│   │   ├── calendarController.js  # Calendar API logic
+│   │   ├── categoryController.js  # Category management
+│   │   └── settingsController.js  # User settings management
 │   ├── middleware/
 │   │   └── auth.js          # Authentication middleware
 │   ├── models/
 │   │   ├── User.js          # User model with security features
 │   │   ├── RefreshToken.js  # Refresh token model
-│   │   └── CalendarEvent.js # Calendar event model
+│   │   ├── CalendarEvent.js # Calendar event model (Event.js)
+│   │   ├── Category.js      # Event category model
+│   │   └── Settings.js      # User settings model
 │   ├── routes/
 │   │   ├── auth.js          # Authentication routes
-│   │   └── calendar.js       # Calendar API routes
-│   ├── src/
-│   │   └── types/           # TypeScript type definitions
+│   │   ├── calendar.js      # Calendar API routes
+│   │   ├── categories.js    # Category routes
+│   │   └── settings.js      # Settings routes
+│   ├── services/            # Business logic services
+│   ├── src/                 # TypeScript type definitions
 │   ├── logs/                # Log files directory
-│   ├── data/                # Data storage directory
 │   ├── .env.example         # Environment variables template
 │   ├── package.json
 │   ├── server.js            # Express server setup
@@ -234,33 +261,43 @@ ComprehensiveLocalEcosystem/
 │   │   └── index.html       # Main HTML file
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── ProtectedRoute.js    # Route protection wrapper
-│   │   │   ├── AuthPage.js          # Login/Register container
-│   │   │   ├── Login.js             # Login form with validation
-│   │   │   ├── Register.js          # Registration form with validation
-│   │   │   ├── Header.js            # Navigation header
-│   │   │   ├── Hero.js              # Landing page hero section
-│   │   │   ├── ProductGrid.js       # Product showcase component
-│   │   │   ├── Features.js          # Features display component
-│   │   │   ├── Footer.js            # Page footer
-│   │   │   └── Calendar.js          # Full calendar system
+│   │   │   ├── Auth/
+│   │   │   │   ├── AuthPage.js          # Login/Register container
+│   │   │   │   ├── Login.js             # Login form with validation
+│   │   │   │   ├── Register.js          # Registration form with validation
+│   │   │   │   └── ProtectedRoute.js    # Route protection wrapper
+│   │   │   ├── Layout/
+│   │   │   │   ├── Header.js            # Navigation header
+│   │   │   │   └── Footer.js            # Page footer
+│   │   │   └── Pages/
+│   │   │       ├── Calendar.js          # Full calendar system
+│   │   │       ├── CategoryManager.js   # Category management UI
+│   │   │       ├── Features.js          # Features display component
+│   │   │       ├── Hero.js              # Landing page hero section
+│   │   │       ├── ProductGrid.js       # Product showcase component
+│   │   │       └── Settings.js          # User settings page
 │   │   ├── contexts/
-│   │   │   └── AuthContext.js       # Authentication state management
+│   │   │   └── AuthContext.js           # Authentication state management
+│   │   ├── services/
+│   │   │   ├── calendarAPI.js           # Calendar API client
+│   │   │   ├── categoryAPI.js           # Category API client
+│   │   │   └── settingsAPI.js           # Settings API client
 │   │   ├── config/
-│   │   │   └── api.js               # API endpoint configuration
+│   │   │   └── api.js                   # API endpoint configuration
 │   │   ├── types/
-│   │   │   └── auth.ts              # TypeScript type definitions
-│   │   ├── App.js                   # Main routing and app structure
-│   │   └── index.js                 # Application entry point
+│   │   │   └── auth.ts                  # TypeScript type definitions
+│   │   ├── App.js                       # Main routing and app structure
+│   │   ├── index.js                     # Application entry point
+│   │   └── index.css                    # Global styles
 │   ├── package.json
-│   └── tailwind.config.js           # Tailwind CSS configuration
-├── DOCUMENTATION.md                  # Comprehensive technical documentation
-├── README.md                         # This file
-├── GITHUB_WORKFLOW.md                # GitHub workflow documentation
-├── IMPROVEMENTS.md                   # Future improvements and enhancements
-├── LICENSE                           # MIT License
-├── package.json                      # Root package configuration
-└── setup.sh                          # Setup script
+│   └── tailwind.config.js               # Tailwind CSS configuration
+├── DOCUMENTATION.md                      # Comprehensive technical documentation
+├── README.md                             # This file
+├── GITHUB_WORKFLOW.md                    # GitHub workflow documentation
+├── SECURITY.md                           # Security policy
+├── LICENSE                               # MIT License
+├── package.json                          # Root package configuration
+└── setup.sh                              # Setup script
 ```
 
 ## 🧪 Testing
@@ -399,6 +436,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: 2026-03-22  
+**Last Updated**: 2026-03-25  
 **Status**: Production Ready  
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

@@ -52,6 +52,7 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 | Password Reset | 3 requests | 1 hour |
 | Token Refresh | 50 requests | 15 minutes |
 | User Actions | 50 actions | 1 hour |
+| Categories | 100 requests | 15 minutes |
 | Settings | 100 requests | 15 minutes |
 
 ### Security Headers

@@ -265,10 +265,22 @@ git checkout -b new-branch-name
 ```
 ComprehensiveLocalEcosystem/
 ├── backend/          # Node.js/Express backend
+│   ├── config/       # Database, logger, rate limiter
+│   ├── controllers/  # API controllers
+│   ├── models/       # Mongoose models
+│   ├── routes/       # Express routes
+│   └── middleware/   # Auth middleware
 ├── frontend/         # React frontend
+│   ├── src/
+│   │   ├── components/  # React components
+│   │   ├── services/    # API clients
+│   │   └── contexts/    # React contexts
 ├── .gitignore        # Git ignore rules
 ├── package.json      # Root package configuration
-└── README.md         # Main project documentation
+├── README.md         # Main project documentation
+├── DOCUMENTATION.md  # Technical documentation
+├── SECURITY.md       # Security policy
+└── GITHUB_WORKFLOW.md # This file
 ```
 
 ## 🔐 Security Considerations

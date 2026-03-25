@@ -33,6 +33,8 @@ This is a full-featured web application ecosystem combining robust authenticatio
 - **Loading States**: Comprehensive loading indicators and disabled states
 - **Error Handling**: User-friendly error messages and recovery options
 - **Component Architecture**: Modular, reusable components
+- **Category Manager**: Custom category creation and management UI
+- **Settings Page**: User preferences and account settings
 
 ### Backend Features
 - **MongoDB Integration**: Scalable database with Mongoose ODM
@@ -42,6 +44,8 @@ This is a full-featured web application ecosystem combining robust authenticatio
 - **Session Management**: Logout from all devices functionality
 - **Health Monitoring**: Built-in health check endpoints
 - **Security Middleware**: Helmet, CORS, rate limiting
+- **Category API**: Custom event category management
+- **Settings API**: User preferences and account management
 
 ## 📋 Prerequisites
 
@@ -396,6 +400,147 @@ Get a specific calendar event.
 }
 ```
 
+### Category Endpoints
+
+#### GET `/api/categories`
+Get all categories for the authenticated user.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "categories": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "name": "Work",
+      "color": "#3B82F6",
+      "user": "64f8a1b2c3d4e5f6a7b8c9d1"
+    }
+  ]
+}
+```
+
+#### POST `/api/categories`
+Create a new category.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "name": "Custom Category",
+  "color": "#FF5733"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "message": "Category created successfully",
+  "category": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "name": "Custom Category",
+    "color": "#FF5733",
+    "user": "64f8a1b2c3d4e5f6a7b8c9d1"
+  }
+}
+```
+
+#### PUT `/api/categories/:id`
+Update a category.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "name": "Updated Category",
+  "color": "#00FF00"
+}
+```
+
+#### DELETE `/api/categories/:id`
+Delete a category.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Category deleted successfully"
+}
+```
+
+### Settings Endpoints
+
+#### GET `/api/settings`
+Get user settings.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "settings": {
+    "user": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "theme": "light",
+    "language": "en",
+    "notifications": {
+      "email": true,
+      "push": false
+    },
+    "preferences": {
+      "defaultView": "month",
+      "weekStart": "monday"
+    }
+  }
+}
+```
+
+#### PUT `/api/settings`
+Update user settings.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "theme": "dark",
+  "notifications": {
+    "email": true,
+    "push": true
+  },
+  "preferences": {
+    "defaultView": "week",
+    "weekStart": "sunday"
+  }
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Settings updated successfully",
+  "settings": {
+    "theme": "dark",
+    "notifications": {
+      "email": true,
+      "push": true
+    },
+    "preferences": {
+      "defaultView": "week",
+      "weekStart": "sunday"
+    }
+  }
+}
+```
+
 ### System Endpoints
 
 #### GET `/health`
@@ -460,18 +605,24 @@ backend/
 │   ├── logger.js        # Winston logging configuration
 │   └── rateLimiter.js   # Rate limiting configuration
 ├── controllers/
-│   └── calendarController.js  # Calendar API logic
+│   ├── calendarController.js  # Calendar API logic
+│   ├── categoryController.js  # Category management
+│   └── settingsController.js  # User settings management
 ├── middleware/
 │   └── auth.js          # Authentication middleware
 ├── models/
 │   ├── User.js          # User model with security features
 │   ├── RefreshToken.js  # Refresh token model
-│   └── CalendarEvent.js # Calendar event model
+│   ├── Event.js         # Calendar event model
+│   ├── Category.js      # Event category model
+│   └── Settings.js      # User settings model
 ├── routes/
 │   ├── auth.js          # Authentication routes
-│   └── calendar.js       # Calendar API routes
-├── src/
-│   └── types/           # TypeScript type definitions
+│   ├── calendar.js      # Calendar API routes
+│   ├── categories.js    # Category routes
+│   └── settings.js      # Settings routes
+├── services/            # Business logic services
+├── src/                 # TypeScript type definitions
 ├── logs/                # Log files directory
 ├── server.js            # Express server setup
 ├── .env.example         # Environment variables template
@@ -482,23 +633,32 @@ backend/
 ```
 frontend/src/
 ├── components/
-│   ├── ProtectedRoute.js    # Route protection wrapper
-│   ├── AuthPage.js          # Login/Register container
-│   ├── Login.js             # Login form with validation
-│   ├── Register.js          # Registration form with validation
-│   ├── Header.js            # Navigation header
-│   ├── Hero.js              # Landing page hero section
-│   ├── ProductGrid.js       # Product showcase component
-│   ├── Features.js          # Features display component
-│   ├── Footer.js            # Page footer
-│   └── Calendar.js          # Full calendar system
+│   ├── Auth/
+│   │   ├── AuthPage.js          # Login/Register container
+│   │   ├── Login.js             # Login form with validation
+│   │   ├── Register.js          # Registration form with validation
+│   │   └── ProtectedRoute.js    # Route protection wrapper
+│   ├── Layout/
+│   │   ├── Header.js            # Navigation header
+│   │   └── Footer.js            # Page footer
+│   └── Pages/
+│       ├── Calendar.js          # Full calendar system
+│       ├── CategoryManager.js   # Category management UI
+│       ├── Features.js          # Features display component
+│       ├── Hero.js              # Landing page hero section
+│       ├── ProductGrid.js       # Product showcase component
+│       └── Settings.js          # User settings page
 ├── contexts/
-│   └── AuthContext.js       # Authentication state management
+│   └── AuthContext.js           # Authentication state management
+├── services/
+│   ├── calendarAPI.js           # Calendar API client
+│   ├── categoryAPI.js           # Category API client
+│   └── settingsAPI.js           # Settings API client
 ├── config/
-│   └── api.js               # API endpoint configuration
+│   └── api.js                   # API endpoint configuration
 ├── types/
-│   └── auth.ts              # TypeScript type definitions
-└── App.js                   # Main routing and app structure
+│   └── auth.ts                  # TypeScript type definitions
+└── App.js                       # Main routing and app structure
 ```
 
 ## 📅 Calendar System Architecture
@@ -831,6 +991,34 @@ server.js
 }
 ```
 
+#### Category Model
+```javascript
+{
+  name: String (required),
+  color: String (required),
+  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### Settings Model
+```javascript
+{
+  user: ObjectId (ref: User, required),
+  theme: String (enum: ['light', 'dark'], default: 'light'),
+  language: String (default: 'en'),
+  notifications: {
+    email: Boolean,
+    push: Boolean
+  },
+  preferences: {
+    defaultView: String (enum: ['month', 'week', 'day']),
+    weekStart: String (enum: ['sunday', 'monday'])
+  },
+  timestamps: true
+}
+```
+
 ## 🚀 Deployment
 
 ### Production Considerations
@@ -1039,6 +1227,6 @@ For technical support or questions:
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: 2026-03-22  
+**Last Updated**: 2026-03-25  
 **Status**: Production Ready  
-**Features**: Authentication, Calendar Management, Real-time Updates
+**Features**: Authentication, Calendar Management, Category Management, User Settings, Real-time Updates
