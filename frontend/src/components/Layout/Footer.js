@@ -1,7 +1,18 @@
 import React from 'react';
 import { Shield, Github, Twitter, Linkedin, Facebook } from 'lucide-react';
+import axios from 'axios';
+import { API_URLS } from '../../config/api';
 
 const Footer = () => {
+  const handleDebugTimeout = async () => {
+    try {
+      await axios.post(API_URLS.LOGOUT);
+    } catch (e) {
+      // Ignore logout errors
+    }
+    window.location.reload();
+  };
+
   const products = [
     { name: 'Proton Mail', href: '/mail' },
     { name: 'Proton Calendar', href: '/calendar' },
@@ -108,6 +119,9 @@ const Footer = () => {
               © 2024 Proton AG. All rights reserved. Based in Switzerland.
             </p>
             <div className="flex items-center space-x-6 text-sm">
+              <button onClick={handleDebugTimeout} className="text-red-400 hover:text-red-300 transition-colors">
+                [DEBUG: Timeout]
+              </button>
               <a href="/settings" className="text-gray-400 hover:text-white transition-colors">
                 Settings
               </a>

@@ -18,7 +18,11 @@ const CalendarApp = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [events, setEvents] = useState([]);
   const [showEventForm, setShowEventForm] = useState(false);
-  const [viewMode, setViewMode] = useState(urlView || settings?.calendar?.defaultView || 'month');
+  const [viewMode, setViewMode] = useState(urlView || 'month');
+  const [weekStartsOn, setWeekStartsOn] = useState(() => {
+    const saved = localStorage.getItem('weekStartsOn');
+    return saved ? parseInt(saved) : 0;
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [editingEvent, setEditingEvent] = useState(null);
@@ -28,18 +32,28 @@ const CalendarApp = () => {
     return localStorage.getItem('categorySortOrder') || 'name-asc';
   });
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [showAllHours, setShowAllHours] = useState(() => {
+    const saved = localStorage.getItem('showAllHours');
+    return saved === 'true';
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Update view mode when settings load
+  // Update view mode and week start day when settings load
   useEffect(() => {
-    if (!settingsLoading && settings?.calendar?.defaultView && !urlView) {
-      setViewMode(settings.calendar.defaultView);
+    if (!settingsLoading && settings?.calendar) {
+      if (settings.calendar.defaultView && !urlView) {
+        setViewMode(settings.calendar.defaultView);
+      }
+      const savedWeekStart = settings.calendar.weekStartsOn;
+      if (typeof savedWeekStart === 'number') {
+        setWeekStartsOn(savedWeekStart);
+        localStorage.setItem('weekStartsOn', savedWeekStart.toString());
+      }
     }
-  }, [settingsLoading, settings?.calendar?.defaultView, urlView]);
+  }, [settingsLoading, settings, urlView]);
 
-  // Get week start from settings (0 = Sunday, 1 = Monday, etc.)
-  const weekStartsOn = settings?.calendar?.weekStartsOn ?? 0;
+  // Get week start from state (updated when settings load)
   const showWeekNumbers = settings?.calendar?.showWeekNumbers ?? false;
   const defaultEventDuration = settings?.calendar?.defaultEventDuration ?? 60;
   const workingHours = settings?.calendar?.workingHours || { start: '09:00', end: '17:00' };
@@ -58,6 +72,11 @@ const CalendarApp = () => {
   useEffect(() => {
     localStorage.setItem('categorySortOrder', categorySortOrder);
   }, [categorySortOrder]);
+
+  // Save showAllHours to localStorage
+  useEffect(() => {
+    localStorage.setItem('showAllHours', showAllHours.toString());
+  }, [showAllHours]);
 
   // Update URL when view mode changes
   const handleViewModeChange = (newViewMode) => {
@@ -429,10 +448,11 @@ const CalendarApp = () => {
 
   // Week view generation
   const generateWeekDays = () => {
+    const effectiveWeekStart = settings?.calendar?.weekStartsOn ?? weekStartsOn;
     const startOfWeek = new Date(currentDate);
     const day = startOfWeek.getDay();
     // Adjust for weekStartsOn setting
-    const diff = startOfWeek.getDate() - day + weekStartsOn;
+    const diff = startOfWeek.getDate() - day + effectiveWeekStart;
     startOfWeek.setDate(diff);
     
     const weekDays = [];
@@ -513,11 +533,17 @@ const CalendarApp = () => {
     return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
   };
 
-  // Day view hours - use working hours
+  // Day view hours - use working hours or all 24 hours based on toggle
   const generateDayHours = () => {
     const hours = [];
-    for (let i = workingStartHour; i <= workingEndHour; i++) {
-      hours.push(i);
+    if (showAllHours) {
+      for (let i = 0; i < 24; i++) {
+        hours.push(i);
+      }
+    } else {
+      for (let i = workingStartHour; i <= workingEndHour; i++) {
+        hours.push(i);
+      }
     }
     return hours;
   };
@@ -623,6 +649,16 @@ const CalendarApp = () => {
     
     return (
       <div className="bg-white rounded-lg overflow-hidden">
+        <div className="p-3 flex justify-end">
+          <button
+            onClick={() => setShowAllHours(!showAllHours)}
+            className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+              showAllHours ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {showAllHours ? 'All Hours' : 'Working Hours'}
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <div className="w-full">
             {/* Week header */}
@@ -788,6 +824,14 @@ const CalendarApp = () => {
               className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
               Next Week
+            </button>
+            <button
+              onClick={() => setShowAllHours(!showAllHours)}
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                showAllHours ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              {showAllHours ? 'All Hours' : 'Working Hours'}
             </button>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { API_URLS } from '../config/api';
 
 const AuthContext = createContext();
@@ -68,6 +68,7 @@ axios.defaults.withCredentials = true;
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     // Check authentication status on mount
@@ -102,8 +103,12 @@ export const AuthProvider = ({ children }) => {
         payload: { user: response.data.user }
       });
       
-      // Redirect to home after successful login
-      navigate('/home');
+      // Check for return URL from session expiry redirect
+      const searchParams = new URLSearchParams(location.search);
+      const from = searchParams.get('from');
+      
+      // Redirect to original protected route or home
+      navigate(from && from !== '/login' ? from : '/home');
       
       return { success: true };
     } catch (error) {

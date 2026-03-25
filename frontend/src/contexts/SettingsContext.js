@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { useAuth } from './AuthContext';
 import settingsAPI from '../services/settingsAPI';
 
 const SettingsContext = createContext();
@@ -28,7 +29,8 @@ const defaultSettings = {
     timezone: 'UTC',
     showWeekNumbers: false,
     defaultEventDuration: 60,
-    workingHours: { start: '09:00', end: '17:00' }
+    workingHours: { start: '09:00', end: '17:00' },
+    showAllHours: false
   },
   notifications: {
     emailReminders: true,
@@ -56,10 +58,13 @@ const initialState = {
 
 export const SettingsProvider = ({ children }) => {
   const [state, dispatch] = useReducer(settingsReducer, initialState);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    loadSettings();
-  }, []);
+    if (isAuthenticated) {
+      loadSettings();
+    }
+  }, [isAuthenticated]);
 
   const loadSettings = async () => {
     dispatch({ type: 'SET_LOADING', payload: true });
