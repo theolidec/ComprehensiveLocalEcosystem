@@ -530,10 +530,10 @@ const CalendarApp = () => {
     }
 
     return (
-      <div className={`bg-gray-50 rounded-lg overflow-hidden ${showWeekNumbers ? 'grid grid-cols-8' : 'grid grid-cols-7'}`}>
+      <div className={`bg-gray-50 rounded-lg overflow-hidden ${showWeekNumbers ? 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))]' : 'grid grid-cols-7'}`}>
         {showWeekNumbers && (
           <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r bg-gray-100">
-            Week
+            
           </div>
         )}
         {orderedWeekDays.map(day => (
@@ -545,7 +545,7 @@ const CalendarApp = () => {
           <React.Fragment key={weekIndex}>
             {showWeekNumbers && (
               <div className="p-2 text-center text-xs text-gray-500 border-r border-b bg-gray-100 flex items-center justify-center">
-                {getWeekNumberForWeek(week, weekIndex)}
+                {getWeekNumberForWeek(week, weekIndex) -1}
               </div>
             )}
             {week.map((day, dayIndex) => {
