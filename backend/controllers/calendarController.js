@@ -361,6 +361,64 @@ const exportEvents = async (req, res) => {
   }
 };
 
+const importEvents = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const { events } = req.body;
+
+    if (!events || !Array.isArray(events) || events.length === 0) {
+      return res.status(400).json({
+        error: 'No events found in import data',
+        code: 'IMPORT_NO_EVENTS'
+      });
+    }
+
+    const importedEvents = [];
+    const errors = [];
+
+    for (let i = 0; i < events.length; i++) {
+      const eventData = events[i];
+      try {
+        const event = new Event({
+          title: eventData.title,
+          description: eventData.description || '',
+          date: new Date(eventData.date),
+          time: eventData.time || null,
+          location: eventData.location || '',
+          category: eventData.category || 'work',
+          color: eventData.color || '#3B82F6',
+          attendees: eventData.attendees || [],
+          reminder: eventData.reminder || 15,
+          isRecurring: eventData.isRecurring || false,
+          recurringPattern: eventData.recurringPattern || null,
+          isCompleted: eventData.isCompleted || false,
+          user: userId
+        });
+
+        await event.save();
+        importedEvents.push(event);
+      } catch (eventError) {
+        errors.push({ index: i, title: eventData.title, error: eventError.message });
+      }
+    }
+
+    logger.info(`Imported ${importedEvents.length} events for ${req.user.email}`);
+
+    res.status(201).json({
+      message: `Successfully imported ${importedEvents.length} events`,
+      importedCount: importedEvents.length,
+      errorCount: errors.length,
+      errors: errors.length > 0 ? errors : undefined
+    });
+  } catch (error) {
+    logger.error('Import events error:', error);
+    res.status(500).json({
+      error: 'Failed to import events',
+      code: 'EVENT_IMPORT_ERROR'
+    });
+  }
+};
+
 module.exports = {
   createEvent,
   getEvents,
@@ -369,5 +427,6 @@ module.exports = {
   deleteEvent,
   getUpcomingEvents,
   getEventStats,
-  exportEvents
+  exportEvents,
+  importEvents
 };

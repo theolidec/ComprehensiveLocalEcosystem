@@ -17,6 +17,7 @@ const ProductGrid = () => {
       description: 'Organize your schedule privately with encrypted calendar.',
       features: ['Encrypted events', 'Shared calendars', 'Privacy by default'],
       cta: 'Explore Calendar',
+      link: '/calendar',
       color: 'bg-indigo-600'
     },
     {
@@ -105,9 +106,15 @@ const ProductGrid = () => {
                   </li>
                 ))}
               </ul>
-              <button className={`w-full ${product.color} text-white hover:opacity-90 px-4 py-2 rounded-lg font-medium transition-opacity`}>
-                {product.cta}
-              </button>
+              {product.link ? (
+                <a href={product.link} className={`w-full ${product.color} text-white hover:opacity-90 px-4 py-2 rounded-lg font-medium transition-opacity block text-center`}>
+                  {product.cta}
+                </a>
+              ) : (
+                <button className={`w-full ${product.color} text-white hover:opacity-90 px-4 py-2 rounded-lg font-medium transition-opacity`}>
+                  {product.cta}
+                </button>
+              )}
             </div>
           ))}
         </div>

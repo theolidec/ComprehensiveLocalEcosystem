@@ -118,6 +118,21 @@ export const calendarAPI = {
     } catch (error) {
       handleApiError(error);
     }
+  },
+
+  importEvents: async (file) => {
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      
+      const response = await axios.post(API_URLS.CALENDAR_IMPORT, {
+        events: data.events || []
+      });
+      
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 };
 

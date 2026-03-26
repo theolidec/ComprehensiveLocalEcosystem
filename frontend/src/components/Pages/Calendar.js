@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Calendar, Clock, Users, MapPin, Search, ChevronLeft, ChevronRight, Plus, Edit, Trash2, Download, ChevronDown, Repeat } from 'lucide-react';
+import { Calendar, Clock, Users, MapPin, Search, ChevronLeft, ChevronRight, Plus, Edit, Trash2, Download, ChevronDown, Repeat, Upload } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import calendarAPI from '../../services/calendarAPI';
 import categoryAPI from '../../services/categoryAPI';
@@ -418,6 +418,24 @@ const CalendarApp = () => {
     }
   };
 
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importCalendar(file);
+      e.target.value = '';
+    }
+  };
+
+  const importCalendar = async (file) => {
+    try {
+      const result = await calendarAPI.importEvents(file);
+      alert(result.message);
+      fetchEvents();
+    } catch (err) {
+      alert(err.message || 'Failed to import events');
+    }
+  };
+
   const getUpcomingEvents = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -825,6 +843,7 @@ const CalendarApp = () => {
             >
               Next Week
             </button>
+            <div className="flex-grow"></div>
             <button
               onClick={() => setShowAllHours(!showAllHours)}
               className={`px-3 py-1 text-sm rounded-lg transition-colors ${
@@ -930,6 +949,20 @@ const CalendarApp = () => {
               <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
             </div>
             <div className="flex items-center space-x-3">
+              <input
+                type="file"
+                accept=".json"
+                onChange={handleImportFile}
+                className="hidden"
+                id="import-file"
+              />
+              <label
+                htmlFor="import-file"
+                className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
+              >
+                <Upload className="h-4 w-4" />
+                <span>Import</span>
+              </label>
               <button
                 onClick={exportCalendar}
                 className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
@@ -937,6 +970,7 @@ const CalendarApp = () => {
                 <Download className="h-4 w-4" />
                 <span>Export</span>
               </button>
+              <div className="w-px h-8 bg-gray-300 mx-2"></div>
               <button
                 onClick={createDummyEvents}
                 className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
@@ -951,6 +985,7 @@ const CalendarApp = () => {
                 <Trash2 className="h-4 w-4" />
                 <span>Remove Test Events</span>
               </button>
+              <div className="w-px h-8 bg-gray-300 mx-2"></div>
               <button
                 onClick={() => {
                   if (!selectedDate) {

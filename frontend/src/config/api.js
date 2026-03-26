@@ -21,6 +21,7 @@ const API_ENDPOINTS = {
     UPCOMING: '/api/calendar/events/upcoming',
     STATS: '/api/calendar/events/stats',
     EXPORT: '/api/calendar/events/export',
+    IMPORT: '/api/calendar/events/import',
   },
 
   // Categories endpoints
@@ -50,6 +51,7 @@ export const API_URLS = {
   CALENDAR_UPCOMING: createApiUrl(API_ENDPOINTS.CALENDAR.UPCOMING),
   CALENDAR_STATS: createApiUrl(API_ENDPOINTS.CALENDAR.STATS),
   CALENDAR_EXPORT: createApiUrl(API_ENDPOINTS.CALENDAR.EXPORT),
+  CALENDAR_IMPORT: createApiUrl(API_ENDPOINTS.CALENDAR.IMPORT),
   CATEGORIES: createApiUrl(API_ENDPOINTS.CATEGORIES),
   SETTINGS: createApiUrl(API_ENDPOINTS.SETTINGS),
 };

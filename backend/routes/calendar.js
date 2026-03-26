@@ -9,7 +9,8 @@ const {
   deleteEvent,
   getUpcomingEvents,
   getEventStats,
-  exportEvents
+  exportEvents,
+  importEvents
 } = require('../controllers/calendarController');
 
 router.use(authenticateToken);
@@ -19,6 +20,8 @@ router.post('/events', createEvent);
 router.get('/events', getEvents);
 
 router.get('/events/export', exportEvents);
+
+router.post('/events/import', importEvents);
 
 router.get('/events/upcoming', getUpcomingEvents);
 
