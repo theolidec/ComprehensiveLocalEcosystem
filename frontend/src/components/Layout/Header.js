@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -23,7 +23,8 @@ const Header = () => {
 
   const navigation = [
     { name: 'Home', href: '/home' },
-    { name: 'Calendar', href: '/calendar' }
+    { name: 'Calendar', href: '/calendar' },
+    { name: 'Passwords', href: '/passwords' }
   ];
 
   // Determine the title based on current route
@@ -46,6 +47,9 @@ const Header = () => {
     }
     if (location.pathname === '/cookies') {
       return 'Cookie Policy';
+    }
+    if (location.pathname === '/passwords') {
+      return 'Password Manager';
     }
     return 'Proton';
   };
@@ -89,6 +93,13 @@ const Header = () => {
                 </button>
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                    <button
+                      onClick={() => { navigate('/passwords'); setIsProfileOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <Key className="h-4 w-4" />
+                      <span>Passwords</span>
+                    </button>
                     <button
                       onClick={() => { navigate('/settings'); setIsProfileOpen(false); }}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"

@@ -28,3 +28,4 @@ yarn-error.log*
 # Backend (for monorepo)
 ../backend/logs/
 ../uploads/
+

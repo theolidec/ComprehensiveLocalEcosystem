@@ -30,6 +30,9 @@ const API_ENDPOINTS = {
   // Settings endpoints
   SETTINGS: '/api/settings',
   SETTINGS_SESSIONS: '/api/settings/sessions',
+
+  // Password endpoints
+  PASSWORDS: '/api/passwords',
 };
 
 // Create full URLs for endpoints
@@ -54,4 +57,5 @@ export const API_URLS = {
   CALENDAR_IMPORT: createApiUrl(API_ENDPOINTS.CALENDAR.IMPORT),
   CATEGORIES: createApiUrl(API_ENDPOINTS.CATEGORIES),
   SETTINGS: createApiUrl(API_ENDPOINTS.SETTINGS),
+  PASSWORDS: createApiUrl(API_ENDPOINTS.PASSWORDS),
 };

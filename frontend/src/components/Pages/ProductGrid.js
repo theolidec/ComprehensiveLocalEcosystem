@@ -50,6 +50,7 @@ const ProductGrid = () => {
       description: 'Defend your digital life from hackers with a secure password manager.',
       features: ['Password generator', '2FA support', 'Secure sharing'],
       cta: 'Get Pass',
+      link: '/passwords',
       color: 'bg-red-600'
     },
     {

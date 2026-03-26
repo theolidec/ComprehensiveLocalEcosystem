@@ -15,6 +15,7 @@ import Privacy from './components/Pages/Privacy';
 import Terms from './components/Pages/Terms';
 import Cookies from './components/Pages/Cookies';
 import CookiePopup from './components/Pages/CookiePopup';
+import PasswordManager from './components/Pages/PasswordManager';
 import './App.css';
 
 function App() {
@@ -56,6 +57,15 @@ function App() {
                   <div>
                     <Header />
                     <Settings />
+                    <Footer />
+                  </div>
+                </ProtectedRoute>
+              } />
+              <Route path="/passwords" element={
+                <ProtectedRoute>
+                  <div>
+                    <Header />
+                    <PasswordManager />
                     <Footer />
                   </div>
                 </ProtectedRoute>
