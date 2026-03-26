@@ -11,6 +11,10 @@ import Features from './components/Pages/Features';
 import Footer from './components/Layout/Footer';
 import CalendarApp from './components/Pages/Calendar';
 import Settings from './components/Pages/Settings';
+import Privacy from './components/Pages/Privacy';
+import Terms from './components/Pages/Terms';
+import Cookies from './components/Pages/Cookies';
+import CookiePopup from './components/Pages/CookiePopup';
 import './App.css';
 
 function App() {
@@ -19,8 +23,12 @@ function App() {
       <AuthProvider>
         <SettingsProvider>
           <div className="App">
+            <CookiePopup />
             <Routes>
               <Route path="/login" element={<AuthPage />} />
+              <Route path="/privacy" element={<><Header /><Privacy /><Footer /></>} />
+              <Route path="/terms" element={<><Header /><Terms /><Footer /></>} />
+              <Route path="/cookies" element={<><Header /><Cookies /><Footer /></>} />
               <Route path="/" element={<Navigate to="/home" replace />} />
               <Route path="/home" element={
                 <ProtectedRoute>

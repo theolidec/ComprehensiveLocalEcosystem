@@ -38,6 +38,15 @@ const Header = () => {
     if (location.pathname === '/settings') {
       return 'Settings';
     }
+    if (location.pathname === '/privacy') {
+      return 'Privacy Policy';
+    }
+    if (location.pathname === '/terms') {
+      return 'Terms of Service';
+    }
+    if (location.pathname === '/cookies') {
+      return 'Cookie Policy';
+    }
     return 'Proton';
   };
 
