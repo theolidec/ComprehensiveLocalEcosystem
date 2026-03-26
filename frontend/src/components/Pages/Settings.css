@@ -235,3 +235,74 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Dark mode styles */
+[data-theme="dark"] .settings-container {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .settings-header h1 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .settings-message.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+[data-theme="dark"] .settings-message.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .settings-tabs {
+  border-bottom-color: var(--border-color);
+}
+
+[data-theme="dark"] .settings-tab {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .settings-tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .settings-tab.active {
+  color: #60a5fa;
+  border-bottom-color: #60a5fa;
+}
+
+[data-theme="dark"] .settings-content {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .settings-form h2 {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-light);
+}
+
+[data-theme="dark"] .form-group label {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-group input[type="text"],
+[data-theme="dark"] .form-group input[type="email"],
+[data-theme="dark"] .form-group input[type="password"],
+[data-theme="dark"] .form-group input[type="time"],
+[data-theme="dark"] .form-group textarea,
+[data-theme="dark"] .form-group select {
+  background: var(--bg-primary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .settings-footer {
+  border-top-color: var(--border-light);
+}
+
+[data-theme="dark"] .settings-loading {
+  color: var(--text-muted);
+}

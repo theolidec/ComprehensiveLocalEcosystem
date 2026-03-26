@@ -14,6 +14,7 @@ This is a full-featured web application ecosystem combining robust authenticatio
 - **Password Security**: bcrypt hashing with 12 salt rounds
 - **CORS Protection**: Configured for secure cross-origin requests
 - **Security Headers**: Helmet middleware for additional security
+- **Password Reset**: Email-based password reset functionality
 
 ### Calendar System
 - **Full Calendar Management**: Create, edit, delete events with rich details
@@ -249,6 +250,44 @@ Logout from all devices.
 ```json
 {
   "message": "Logged out from all devices successfully"
+}
+```
+
+#### POST `/api/auth/forgot-password`
+Request password reset email.
+
+**Authentication Required:** No
+
+**Request Body:**
+```json
+{
+  "email": "user@example.com"
+}
+```
+
+**Response (200):**
+```json
+{
+  "message": "If an account exists with this email, a password reset link has been sent"
+}
+```
+
+#### POST `/api/auth/reset-password/:token`
+Reset password using reset token.
+
+**Authentication Required:** No
+
+**Request Body:**
+```json
+{
+  "password": "newPassword123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "message": "Password reset successful"
 }
 ```
 
@@ -607,11 +646,13 @@ backend/
 ├── controllers/
 │   ├── calendarController.js  # Calendar API logic
 │   ├── categoryController.js  # Category management
+│   ├── passwordController.js  # Password reset functionality
 │   └── settingsController.js  # User settings management
 ├── middleware/
 │   └── auth.js          # Authentication middleware
 ├── models/
 │   ├── User.js          # User model with security features
+│   ├── Password.js      # Password reset token model
 │   ├── RefreshToken.js  # Refresh token model
 │   ├── Event.js         # Calendar event model
 │   ├── Category.js      # Event category model
@@ -620,6 +661,7 @@ backend/
 │   ├── auth.js          # Authentication routes
 │   ├── calendar.js      # Calendar API routes
 │   ├── categories.js    # Category routes
+│   ├── passwords.js     # Password reset routes
 │   └── settings.js      # Settings routes
 ├── services/            # Business logic services
 ├── src/                 # TypeScript type definitions

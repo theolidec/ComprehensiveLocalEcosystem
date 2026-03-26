@@ -61,15 +61,17 @@ const Settings = () => {
   const handleDisplaySave = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const newTheme = formData.get('theme');
     const result = await updateDisplaySettings({
-      theme: formData.get('theme'),
+      theme: newTheme,
       language: formData.get('language'),
       compactMode: formData.get('compactMode') === 'true',
       showCompletedEvents: formData.get('showCompletedEvents') === 'true'
     });
     if (result.success) {
       showMessage('Display settings updated');
-      document.documentElement.setAttribute('data-theme', formData.get('theme'));
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
     } else showMessage(result.error, 'error');
   };
 

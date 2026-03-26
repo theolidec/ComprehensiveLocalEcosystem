@@ -44,6 +44,16 @@ const eventSchema = new mongoose.Schema({
     default: 15,
     enum: [0, 5, 15, 30, 60, 1440]
   },
+  isAllDay: {
+    type: Boolean,
+    default: false
+  },
+  duration: {
+    type: Number, // Duration in minutes
+    default: null,
+    min: [0, 'Duration cannot be negative'],
+    max: [1440, 'Duration cannot exceed 24 hours']
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

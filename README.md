@@ -12,6 +12,7 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Password Security**: bcrypt hashing with 12 salt rounds
 - **Session Management**: Individual and bulk logout capabilities
 - **Device Tracking**: Monitor and manage login sessions across devices
+- **Password Reset**: Email-based password reset functionality
 
 ### 📅 Calendar System
 - **Full Calendar Management**: Create, edit, delete events with rich details
@@ -117,7 +118,9 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 | `POST` | `/refresh` | Refresh access token | No (uses refresh token) |
 | `GET` | `/me` | Get current user info | Yes |
 | `POST` | `/logout` | Logout current session | Yes |
-| `POST` | `/logout-all` | Logout from all devices | Yes |
+│ `POST` | `/logout-all` | Logout from all devices | Yes |
+| `POST` | `/forgot-password` | Request password reset | No |
+| `POST` | `/reset-password/:token` | Reset password with token | No |
 
 ### Calendar Routes (`/api/calendar`)
 
@@ -235,11 +238,13 @@ ComprehensiveLocalEcosystem/
 │   ├── controllers/
 │   │   ├── calendarController.js  # Calendar API logic
 │   │   ├── categoryController.js  # Category management
+│   │   ├── passwordController.js  # Password reset functionality
 │   │   └── settingsController.js  # User settings management
 │   ├── middleware/
 │   │   └── auth.js          # Authentication middleware
 │   ├── models/
 │   │   ├── User.js          # User model with security features
+│   │   ├── Password.js      # Password reset token model
 │   │   ├── RefreshToken.js  # Refresh token model
 │   │   ├── CalendarEvent.js # Calendar event model (Event.js)
 │   │   ├── Category.js      # Event category model
@@ -248,6 +253,7 @@ ComprehensiveLocalEcosystem/
 │   │   ├── auth.js          # Authentication routes
 │   │   ├── calendar.js      # Calendar API routes
 │   │   ├── categories.js    # Category routes
+│   │   ├── passwords.js     # Password reset routes
 │   │   └── settings.js      # Settings routes
 │   ├── services/            # Business logic services
 │   ├── src/                 # TypeScript type definitions
@@ -436,6 +442,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Version**: 1.0.0  
-**Last Updated**: 2026-03-25  
+**Last Updated**: 2026-03-26  
 **Status**: Production Ready  
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

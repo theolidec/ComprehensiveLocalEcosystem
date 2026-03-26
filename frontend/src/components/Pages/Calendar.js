@@ -6,12 +6,14 @@ import categoryAPI from '../../services/categoryAPI';
 import CategoryManager from './CategoryManager';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
+import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 
 const getEventId = (event) => event._id || event.id;
 
 const CalendarApp = () => {
   const { isAuthenticated } = useAuth();
   const { settings, loading: settingsLoading } = useSettings();
+  const { registerActions, clearActions, setIsCalendarPage } = useCalendarActions();
   const { view: urlView } = useParams();
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -463,6 +465,28 @@ const CalendarApp = () => {
   };
 
   const stats = getEventStats();
+
+  // Register calendar actions with context for Header to use
+  useEffect(() => {
+    setIsCalendarPage(true);
+    registerActions({
+      onImport: handleImportFile,
+      onExport: exportCalendar,
+      onCreateTestEvents: createDummyEvents,
+      onRemoveTestEvents: removeDummyEvents,
+      onAddEvent: () => {
+        if (!selectedDate) {
+          setSelectedDate(new Date());
+        }
+        setShowEventForm(true);
+      }
+    });
+
+    return () => {
+      setIsCalendarPage(false);
+      clearActions();
+    };
+  }, [registerActions, clearActions, setIsCalendarPage, handleImportFile, exportCalendar, createDummyEvents, removeDummyEvents, selectedDate, setSelectedDate, setShowEventForm]);
 
   // Week view generation
   const generateWeekDays = () => {
@@ -943,63 +967,6 @@ const CalendarApp = () => {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
-            <div className="flex items-center space-x-3 mb-4 lg:mb-0">
-              <Calendar className="h-8 w-8 text-blue-600" />
-              <h1 className="text-3xl font-bold text-gray-900">Calendar</h1>
-            </div>
-            <div className="flex items-center space-x-3">
-              <input
-                type="file"
-                accept=".json"
-                onChange={handleImportFile}
-                className="hidden"
-                id="import-file"
-              />
-              <label
-                htmlFor="import-file"
-                className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors cursor-pointer"
-              >
-                <Upload className="h-4 w-4" />
-                <span>Import</span>
-              </label>
-              <button
-                onClick={exportCalendar}
-                className="flex items-center space-x-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                <Download className="h-4 w-4" />
-                <span>Export</span>
-              </button>
-              <div className="w-px h-8 bg-gray-300 mx-2"></div>
-              <button
-                onClick={createDummyEvents}
-                className="flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                <span>Create Test Events</span>
-              </button>
-              <button
-                onClick={removeDummyEvents}
-                className="flex items-center space-x-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-              >
-                <Trash2 className="h-4 w-4" />
-                <span>Remove Test Events</span>
-              </button>
-              <div className="w-px h-8 bg-gray-300 mx-2"></div>
-              <button
-                onClick={() => {
-                  if (!selectedDate) {
-                    setSelectedDate(new Date());
-                  }
-                  setShowEventForm(true);
-                }}
-                className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="h-5 w-5" />
-                <span>Add Event</span>
-              </button>
-            </div>
-          </div>
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">

@@ -3,14 +3,14 @@ import { ArrowRight, Shield, Lock, Users } from 'lucide-react';
 
 const Hero = () => {
   return (
-    <section className="bg-gradient-to-br from-blue-50 to-indigo-100 py-20">
+    <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6">
             A better internet starts with
-            <span className="text-blue-600"> privacy and freedom</span>
+            <span className="text-blue-600 dark:text-blue-400"> privacy and freedom</span>
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
             Over 100 million people use Proton to stay private and secure online. 
             Get a free Proton account and take back your privacy.
           </p>
@@ -19,36 +19,36 @@ const Hero = () => {
               Get Proton for free
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
-            <button className="bg-white text-gray-700 hover:bg-gray-50 px-8 py-3 rounded-lg font-medium border border-gray-300 transition-colors">
+            <button className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-3 rounded-lg font-medium border border-gray-300 dark:border-gray-600 transition-colors">
               Explore all products
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
-            <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
               <div className="flex justify-center mb-4">
-                <Shield className="h-12 w-12 text-blue-600" />
+                <Shield className="h-12 w-12 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">End-to-end encryption</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">End-to-end encryption</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Our end-to-end encryption means no one (not even Proton) can access your data without your permission.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
               <div className="flex justify-center mb-4">
-                <Lock className="h-12 w-12 text-blue-600" />
+                <Lock className="h-12 w-12 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Swiss privacy</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Swiss privacy</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Based in Switzerland, your data stays under the protection of the world's strongest privacy laws.
               </p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm">
               <div className="flex justify-center mb-4">
-                <Users className="h-12 w-12 text-blue-600" />
+                <Users className="h-12 w-12 text-blue-600 dark:text-blue-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">100 million users</h3>
-              <p className="text-gray-600 text-sm">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">100 million users</h3>
+              <p className="text-gray-600 dark:text-gray-300 text-sm">
                 Join millions worldwide who trust Proton for their privacy and security needs.
               </p>
             </div>
