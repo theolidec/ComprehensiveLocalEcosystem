@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { CalendarActionsProvider } from './contexts/CalendarActionsContext';
@@ -26,66 +26,75 @@ const getInitialTheme = () => {
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-function App() {
+function AppContent() {
+  const location = useLocation();
+  
   useEffect(() => {
     const theme = getInitialTheme();
     document.documentElement.setAttribute('data-theme', theme);
   }, []);
+
+  return (
+    <div className="App">
+      <CookiePopup />
+      <Routes>
+        <Route path="/login" element={<AuthPage />} />
+        <Route path="/privacy" element={<><Header /><Privacy /><Footer /></>} />
+        <Route path="/terms" element={<><Header /><Terms /><Footer /></>} />
+        <Route path="/cookies" element={<><Header /><Cookies /><Footer /></>} />
+        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/home" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Hero />
+              <ProductGrid />
+              <Features />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/calendar" element={<Navigate to="/calendar/month" replace />} />
+        <Route path="/calendar/:view" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <CalendarApp />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/settings" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Settings />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/passwords" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <PasswordManager />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </div>
+  );
+}
+
+function App() {
   return (
     <Router>
       <AuthProvider>
         <SettingsProvider>
           <CalendarActionsProvider>
-            <div className="App">
-              <CookiePopup />
-              <Routes>
-                <Route path="/login" element={<AuthPage />} />
-                <Route path="/privacy" element={<><Header /><Privacy /><Footer /></>} />
-                <Route path="/terms" element={<><Header /><Terms /><Footer /></>} />
-                <Route path="/cookies" element={<><Header /><Cookies /><Footer /></>} />
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="/home" element={
-                  <ProtectedRoute>
-                    <div>
-                      <Header />
-                      <Hero />
-                      <ProductGrid />
-                      <Features />
-                      <Footer />
-                    </div>
-                  </ProtectedRoute>
-                } />
-                <Route path="/calendar" element={<Navigate to="/calendar/month" replace />} />
-                <Route path="/calendar/:view" element={
-                  <ProtectedRoute>
-                    <div>
-                      <Header />
-                      <CalendarApp />
-                      <Footer />
-                    </div>
-                  </ProtectedRoute>
-                } />
-                <Route path="/settings" element={
-                  <ProtectedRoute>
-                    <div>
-                      <Header />
-                      <Settings />
-                      <Footer />
-                    </div>
-                  </ProtectedRoute>
-                } />
-                <Route path="/passwords" element={
-                  <ProtectedRoute>
-                    <div>
-                      <Header />
-                      <PasswordManager />
-                      <Footer />
-                    </div>
-                  </ProtectedRoute>
-                } />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </div>
+            <AppContent />
           </CalendarActionsProvider>
         </SettingsProvider>
       </AuthProvider>

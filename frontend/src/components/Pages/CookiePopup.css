@@ -102,3 +102,37 @@
     flex-direction: column;
   }
 }
+
+/* Dark mode styles */
+[data-theme="dark"] .cookie-popup {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .cookie-popup-header h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .cookie-popup-content p {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cookie-popup-info {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .cookie-popup-content a {
+  color: #818cf8;
+}
+
+[data-theme="dark"] .cookie-popup-content a:hover {
+  color: #a5b4fc;
+}
+
+[data-theme="dark"] .cookie-btn-decline {
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .cookie-btn-decline:hover {
+  background: var(--border-color);
+}

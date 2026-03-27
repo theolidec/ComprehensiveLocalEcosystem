@@ -301,6 +301,44 @@
   }
 }
 
+/* Dark mode for Policy Pages */
+[data-theme="dark"] .policy-page {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .policy-container {
+  background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .policy-container h1 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .policy-container .last-updated {
+  color: var(--text-muted);
+}
+
+[data-theme="dark"] .policy-container section {
+  border-bottom-color: var(--border-light);
+}
+
+[data-theme="dark"] .policy-container h2 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .policy-container h3 {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .policy-container p,
+[data-theme="dark"] .policy-container li {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .policy-container strong {
+  color: var(--text-primary);
+}
+
 /* Password Manager Styles */
 .pm-container {
   padding: 24px;
@@ -454,13 +492,13 @@
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
-  background: white;
-  border: 2px solid #e5e7eb;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-color);
   border-radius: 10px;
   cursor: pointer;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--text-muted);
   transition: all 0.2s ease;
 }
 
@@ -473,6 +511,12 @@
   background: #fef3c7;
   border-color: #f59e0b;
   color: #d97706;
+}
+
+[data-theme="dark"] .pm-favorites-btn.active {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #f59e0b;
+  color: #f59e0b;
 }
 
 .pm-error {

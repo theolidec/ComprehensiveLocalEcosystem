@@ -105,9 +105,9 @@ const CategoryManager = ({ onCategoryChange }) => {
   const defaultCategories = categories.filter(cat => cat.isDefault);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Category Management</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Category Management</h3>
         <button
           onClick={() => setShowAddForm(true)}
           className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -118,20 +118,20 @@ const CategoryManager = ({ onCategoryChange }) => {
       </div>
 
       {error && (
-        <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
+        <div className="mb-4 p-3 bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-lg">
           {error}
         </div>
       )}
 
       {/* Add/Edit Form */}
       {showAddForm && (
-        <div className="mb-6 p-4 border border-gray-200 rounded-lg bg-gray-50">
-          <h4 className="font-medium text-gray-900 mb-4">
+        <div className="mb-6 p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700">
+          <h4 className="font-medium text-gray-900 dark:text-white mb-4">
             {editingCategory ? 'Edit Category' : 'Add New Category'}
           </h4>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category Name *
               </label>
               <input
@@ -139,13 +139,13 @@ const CategoryManager = ({ onCategoryChange }) => {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter category name"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Color
               </label>
               <div className="flex items-center space-x-2">
@@ -155,7 +155,7 @@ const CategoryManager = ({ onCategoryChange }) => {
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, color }))}
                     className={`w-8 h-8 rounded-full border-2 ${
-                      formData.color === color ? 'border-gray-900' : 'border-gray-300'
+                      formData.color === color ? 'border-gray-900 dark:border-white' : 'border-gray-300 dark:border-gray-600'
                     }`}
                     style={{ backgroundColor: color }}
                   />
@@ -164,7 +164,7 @@ const CategoryManager = ({ onCategoryChange }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Icon
               </label>
               <div className="grid grid-cols-10 gap-2">
@@ -174,7 +174,7 @@ const CategoryManager = ({ onCategoryChange }) => {
                     type="button"
                     onClick={() => setFormData(prev => ({ ...prev, icon }))}
                     className={`p-2 text-lg border rounded ${
-                      formData.icon === icon ? 'border-blue-500 bg-blue-50' : 'border-gray-300'
+                      formData.icon === icon ? 'border-blue-500 bg-blue-50 dark:bg-blue-900' : 'border-gray-300 dark:border-gray-600'
                     }`}
                   >
                     {icon}
@@ -195,7 +195,7 @@ const CategoryManager = ({ onCategoryChange }) => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex items-center space-x-2 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300"
+                className="flex items-center space-x-2 bg-gray-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-500"
               >
                 <X className="h-4 w-4" />
                 <span>Cancel</span>
@@ -207,18 +207,18 @@ const CategoryManager = ({ onCategoryChange }) => {
 
       {/* Default Categories */}
       <div className="mb-6">
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Default Categories</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Default Categories</h4>
         <div className="space-y-2">
           {defaultCategories.map(category => (
-            <div key={category._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div key={category._id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
               <div className="flex items-center space-x-3">
                 <div 
                   className="w-4 h-4 rounded-full"
                   style={{ backgroundColor: category.color }}
                 />
-                <span className="text-sm text-gray-700">{category.icon} {category.name}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">{category.icon} {category.name}</span>
               </div>
-              <span className="text-xs text-gray-500">Built-in</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">Built-in</span>
             </div>
           ))}
         </div>
@@ -226,30 +226,30 @@ const CategoryManager = ({ onCategoryChange }) => {
 
       {/* Custom Categories */}
       <div>
-        <h4 className="text-sm font-medium text-gray-700 mb-3">Custom Categories</h4>
+        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Custom Categories</h4>
         {filteredCategories.length === 0 ? (
-          <p className="text-gray-500 text-sm text-center py-4">No custom categories yet</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No custom categories yet</p>
         ) : (
           <div className="space-y-2">
             {filteredCategories.map(category => (
-              <div key={category._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+              <div key={category._id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
                 <div className="flex items-center space-x-3">
                   <div 
                     className="w-4 h-4 rounded-full"
                     style={{ backgroundColor: category.color }}
                   />
-                  <span className="text-sm text-gray-700">{category.icon} {category.name}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">{category.icon} {category.name}</span>
                 </div>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={() => handleEdit(category)}
-                    className="p-1 text-blue-600 hover:bg-blue-100 rounded"
+                    className="p-1 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900 rounded"
                   >
                     <Edit2 className="h-4 w-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(category._id)}
-                    className="p-1 text-red-600 hover:bg-red-100 rounded"
+                    className="p-1 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900 rounded"
                   >
                     <Trash2 className="h-4 w-4" />
                   </button>

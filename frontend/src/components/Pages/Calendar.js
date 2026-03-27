@@ -598,21 +598,21 @@ const CalendarApp = () => {
     }
 
     return (
-      <div className={`bg-gray-50 rounded-lg overflow-hidden ${showWeekNumbers ? 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))]' : 'grid grid-cols-7'}`}>
+      <div className={`bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden ${showWeekNumbers ? 'grid grid-cols-[2rem_repeat(7,minmax(0,1fr))]' : 'grid grid-cols-7'}`}>
         {showWeekNumbers && (
-          <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r bg-gray-100">
+          <div className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-r dark:border-gray-700 bg-gray-100 dark:bg-gray-700">
             
           </div>
         )}
         {orderedWeekDays.map(day => (
-          <div key={day} className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
+          <div key={day} className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-r dark:border-gray-700">
             {day}
           </div>
         ))}
         {weeks.map((week, weekIndex) => (
           <React.Fragment key={weekIndex}>
             {showWeekNumbers && (
-              <div className="p-2 text-center text-xs text-gray-500 border-r border-b bg-gray-100 flex items-center justify-center">
+              <div className="p-2 text-center text-xs text-gray-500 dark:text-gray-400 border-r border-b dark:border-gray-700 bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
                 {getWeekNumberForWeek(week, weekIndex) -1}
               </div>
             )}
@@ -625,11 +625,11 @@ const CalendarApp = () => {
                 <div
                   key={dayIndex}
                   onClick={() => handleDateClick(day)}
-                  className={`min-h-[120px] p-2 border-r border-b cursor-pointer hover:bg-gray-50 transition-colors ${day ? '' : 'bg-gray-50 cursor-default'} ${isCurrentDay ? 'bg-blue-50' : ''}`}
+                  className={`min-h-[120px] p-2 border-r border-b dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${day ? '' : 'bg-gray-50 dark:bg-gray-800 cursor-default'} ${isCurrentDay ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
                 >
                   {day && (
                     <>
-                      <div className={`text-sm font-medium mb-1 ${isCurrentDay ? 'text-blue-600' : 'text-gray-900'}`}>
+                      <div className={`text-sm font-medium mb-1 ${isCurrentDay ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
                         {day}
                       </div>
                       <div className="space-y-1">
@@ -651,7 +651,7 @@ const CalendarApp = () => {
                           </div>
                         ))}
                         {dayEvents.length > 3 && (
-                          <div className="text-xs text-gray-500 font-medium">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">
                             +{dayEvents.length - 3} more
                           </div>
                         )}
@@ -690,12 +690,12 @@ const CalendarApp = () => {
     };
     
     return (
-      <div className="bg-white rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 rounded-lg overflow-hidden">
         <div className="p-3 flex justify-end">
           <button
             onClick={() => setShowAllHours(!showAllHours)}
             className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-              showAllHours ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              showAllHours ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             {showAllHours ? 'All Hours' : 'Working Hours'}
@@ -704,8 +704,8 @@ const CalendarApp = () => {
         <div className="overflow-x-auto">
           <div className="w-full">
             {/* Week header */}
-            <div className="grid grid-cols-8 bg-gray-50 border-b">
-              <div className="p-3 text-center text-sm font-semibold text-gray-700 border-r">
+            <div className="grid grid-cols-8 bg-gray-50 dark:bg-gray-800 border-b dark:border-gray-700">
+              <div className="p-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300 border-r dark:border-gray-700">
                 Time
               </div>
               {weekDays.map((date, index) => {
@@ -714,15 +714,15 @@ const CalendarApp = () => {
                 return (
                   <div 
                     key={index} 
-                    className={`p-3 text-center border-r ${isToday ? 'bg-blue-50' : ''}`}
+                    className={`p-3 text-center border-r dark:border-gray-700 ${isToday ? 'bg-blue-50 dark:bg-blue-900' : ''}`}
                   >
-                    <div className="text-sm font-semibold text-gray-700">
+                    <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                       {dayName}
                     </div>
-                    <div className={`text-lg font-medium ${isToday ? 'text-blue-600' : 'text-gray-900'}`}>
+                    <div className={`text-lg font-medium ${isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}`}>
                       {date.getDate()}
                     </div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
                       {date.toLocaleDateString('en-US', { month: 'short' })}
                     </div>
                   </div>
@@ -731,14 +731,14 @@ const CalendarApp = () => {
             </div>
             
             {/* All-day events section */}
-            <div className="grid grid-cols-8 border-b bg-yellow-50">
-              <div className="p-2 text-sm font-medium text-gray-700 border-r">
+            <div className="grid grid-cols-8 border-b dark:border-gray-700 bg-yellow-50 dark:bg-yellow-900">
+              <div className="p-2 text-sm font-medium text-gray-700 dark:text-gray-300 border-r dark:border-gray-700">
                 All-day
               </div>
               {weekDays.map((date, index) => {
                 const allDayEvents = getAllDayEvents(date);
                 return (
-                  <div key={index} className="p-2 border-r min-h-[40px]">
+                  <div key={index} className="p-2 border-r dark:border-gray-700 min-h-[40px]">
                     {allDayEvents.map(event => (
                       <div
                         key={getEventId(event)}
@@ -756,8 +756,8 @@ const CalendarApp = () => {
             
             {/* Time slots */}
             {generateDayHours().map(hour => (
-              <div key={hour} className="grid grid-cols-8 border-b hover:bg-gray-50">
-                <div className="p-3 text-sm text-gray-600 border-r font-medium border-l">
+              <div key={hour} className="grid grid-cols-8 border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800">
+                <div className="p-3 text-sm text-gray-600 dark:text-gray-400 border-r dark:border-gray-700 font-medium border-l dark:border-gray-700">
                   {hour.toString().padStart(2, '0')}:00
                 </div>
                 {weekDays.map((date, index) => {
@@ -772,7 +772,7 @@ const CalendarApp = () => {
                   return (
                     <div 
                       key={index} 
-                      className="p-2 border-r min-h-[60px] relative cursor-pointer hover:bg-gray-100 transition-colors"
+                      className="p-2 border-r dark:border-gray-700 min-h-[60px] relative cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
                       onClick={() => {
                         const clickedDate = new Date(date);
                         clickedDate.setHours(hour, 0, 0, 0);
@@ -833,7 +833,7 @@ const CalendarApp = () => {
     return (
       <div className="w-full">
         {/* Quick date selection */}
-        <div className="mb-4 bg-white rounded-lg shadow-sm p-4">
+        <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
           <div className="flex flex-wrap gap-2">
             {/*<button
               onClick={() => {
@@ -852,7 +852,7 @@ const CalendarApp = () => {
                 setSelectedDate(tomorrow);
                 setCurrentDate(tomorrow);
               }}
-              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
               Tomorrow
             </button>
@@ -863,7 +863,7 @@ const CalendarApp = () => {
                 setSelectedDate(nextWeek);
                 setCurrentDate(nextWeek);
               }}
-              className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
               Next Week
             </button>
@@ -871,7 +871,7 @@ const CalendarApp = () => {
             <button
               onClick={() => setShowAllHours(!showAllHours)}
               className={`px-3 py-1 text-sm rounded-lg transition-colors ${
-                showAllHours ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                showAllHours ? 'bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
               {showAllHours ? 'All Hours' : 'Working Hours'}
@@ -879,7 +879,7 @@ const CalendarApp = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
           <div className="p-4">
             {generateDayHours().map(hour => {
               const hourEvents = dayEvents.filter(event => {
@@ -888,8 +888,8 @@ const CalendarApp = () => {
               });
 
               return (
-                <div key={hour} className="flex border-b hover:bg-gray-50">
-                  <div className="w-20 p-3 text-sm text-gray-600 border-r font-medium">
+                <div key={hour} className="flex border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                  <div className="w-20 p-3 text-sm text-gray-600 dark:text-gray-400 border-r dark:border-gray-700 font-medium">
                     {hour.toString().padStart(2, '0')}:00
                   </div>
                   <div className="flex-1 p-3 min-h-[60px] cursor-pointer relative" onClick={() => {
@@ -900,7 +900,7 @@ const CalendarApp = () => {
                     setShowEventForm(true);
                   }}>
                     {hourEvents.length === 0 && (
-                      <div className="text-gray-400 text-sm hover:text-gray-600 h-full flex items-center">
+                      <div className="text-gray-400 dark:text-gray-500 text-sm hover:text-gray-600 dark:hover:text-gray-300 h-full flex items-center">
                         Click to add event
                       </div>
                     )}
@@ -963,10 +963,10 @@ const CalendarApp = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 mb-6">
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -993,14 +993,14 @@ const CalendarApp = () => {
                 placeholder="Search events..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             <div className="relative">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="appearance-none bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg px-4 py-2 pr-8 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {categories.map(category => (
                   <option key={category.id} value={category.id}>
@@ -1016,7 +1016,7 @@ const CalendarApp = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Main Calendar */}
           <div className="lg:col-span-9">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden">
               {/* Calendar Navigation */}
               <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
                 <div className="flex items-center justify-between">
@@ -1116,12 +1116,12 @@ const CalendarApp = () => {
           {/* Sidebar */}
           <div className="lg:col-span-3 space-y-6">
             {/* Category Legend */}
-            <div className="bg-white rounded-xl shadow-lg p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-semibold text-gray-900">Categories</h3>
+                <h3 className="font-semibold text-gray-900 dark:text-white">Categories</h3>
                 <button
                   onClick={() => setShowCategoryManager(true)}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
                 >
                   Manage
                 </button>
@@ -1129,47 +1129,47 @@ const CalendarApp = () => {
               
               {/* Sorting Controls */}
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs text-gray-500">Sort by:</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Sort by:</span>
                 <div className="relative sort-dropdown">
                   <button
                     onClick={() => setShowSortDropdown(!showSortDropdown)}
-                    className="flex items-center space-x-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg transition-colors"
+                    className="flex items-center space-x-1 text-xs bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 px-3 py-1.5 rounded-lg transition-colors"
                   >
                     <span>{getSortLabel()}</span>
                     <ChevronDown className={`h-3 w-3 transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
                   </button>
                   
                   {showSortDropdown && (
-                    <div className="absolute right-0 top-full mt-1 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                    <div className="absolute right-0 top-full mt-1 w-40 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-10">
                       <div className="py-1">
                         <button
                           onClick={() => handleSortSelect('name-asc')}
-                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
-                            categorySortOrder === 'name-asc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                            categorySortOrder === 'name-asc' ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
                           }`}
                         >
                           Name (A-Z)
                         </button>
                         <button
                           onClick={() => handleSortSelect('name-desc')}
-                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
-                            categorySortOrder === 'name-desc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                            categorySortOrder === 'name-desc' ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
                           }`}
                         >
                           Name (Z-A)
                         </button>
                         <button
                           onClick={() => handleSortSelect('count-desc')}
-                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
-                            categorySortOrder === 'count-desc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                            categorySortOrder === 'count-desc' ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
                           }`}
                         >
                           Most Used
                         </button>
                         <button
                           onClick={() => handleSortSelect('count-asc')}
-                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 transition-colors ${
-                            categorySortOrder === 'count-asc' ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
+                          className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
+                            categorySortOrder === 'count-asc' ? 'bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400' : 'text-gray-700 dark:text-gray-300'
                           }`}
                         >
                           Least Used
@@ -1188,25 +1188,25 @@ const CalendarApp = () => {
                         className="w-3 h-3 rounded-full"
                         style={{ backgroundColor: category.color }}
                       ></div>
-                      <span className="text-sm text-gray-700">{category.icon} {category.name}</span>
+                      <span className="text-sm text-gray-700 dark:text-gray-300">{category.icon} {category.name}</span>
                     </div>
-                    <span className="text-sm text-gray-500">{stats.categoryCount[category.id] || 0}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">{stats.categoryCount[category.id] || 0}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Upcoming Events */}
-            <div className="bg-white rounded-xl shadow-lg p-4">
-              <h3 className="font-semibold text-gray-900 mb-3">Upcoming Events</h3>
+            <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Upcoming Events</h3>
               <div className="space-y-3">
                 {getUpcomingEvents().length === 0 ? (
-                  <p className="text-gray-500 text-sm text-center py-4">No upcoming events</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm text-center py-4">No upcoming events</p>
                 ) : (
                   getUpcomingEvents().map(event => (
                     <div
                       key={getEventId(event)}
-                      className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors"
+                      className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors"
                       onClick={() => setShowEventDetails(event)}
                     >
                       <div className="flex items-center space-x-2 mb-1">
@@ -1214,14 +1214,14 @@ const CalendarApp = () => {
                           className="w-2 h-2 rounded-full"
                           style={{ backgroundColor: event.color }}
                         ></div>
-                        <h4 className="font-medium text-sm text-gray-900 truncate flex items-center">
+                        <h4 className="font-medium text-sm text-gray-900 dark:text-white truncate flex items-center">
                           {event.title}
                           {event.isRecurring && (
-                            <Repeat className="w-3 h-3 ml-1 text-gray-400" />
+                            <Repeat className="w-3 h-3 ml-1 text-gray-400 dark:text-gray-500" />
                           )}
                         </h4>
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(event.date).toLocaleDateString()}
                         {event.time && ` • ${event.time}`}
                       </div>
