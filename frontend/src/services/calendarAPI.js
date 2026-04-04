@@ -49,7 +49,12 @@ export const calendarAPI = {
         attendees: eventData.attendees || [],
         reminder: eventData.reminder || 15,
         isRecurring: eventData.isRecurring || false,
-        recurringPattern: eventData.recurringPattern || null
+        recurringPattern: eventData.recurringPattern || null,
+        recurringEndDate: eventData.recurringEndDate || null,
+        recurringOccurrences: eventData.recurringOccurrences || null,
+        timezone: eventData.timezone || null,
+        isAllDay: eventData.isAllDay || false,
+        duration: eventData.duration || null
       });
       return response.data.event;
     } catch (error) {

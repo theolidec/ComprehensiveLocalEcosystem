@@ -149,11 +149,32 @@ const settingsLimiter = rateLimit({
   }
 });
 
+// Public wishlist reservation rate limiter (stricter for public endpoints)
+const publicReservationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each IP to 10 reservations per hour
+  message: {
+    error: 'Too many reservation attempts, please try again later.',
+    code: 'RESERVATION_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`Public reservation rate limit exceeded for IP: ${req.ip}, Item: ${req.params?.id}`);
+    res.status(429).json({
+      error: 'Too many reservation attempts, please try again later.',
+      code: 'RESERVATION_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
 module.exports = {
   generalLimiter,
   authLimiter,
   passwordResetLimiter,
   tokenRefreshLimiter,
   userActionLimiter,
-  settingsLimiter
+  settingsLimiter,
+  publicReservationLimiter
 };

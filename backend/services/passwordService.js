@@ -16,15 +16,17 @@ const getMasterKey = () => {
   return masterKey;
 };
 
-const deriveKey = (masterKey, salt) => {
-  return crypto.pbkdf2Sync(masterKey, salt, ITERATIONS, KEY_LENGTH, 'sha256');
+const deriveKey = (userSalt, additionalSalt = null) => {
+  const masterKey = getMasterKey();
+  const combinedSalt = userSalt + (additionalSalt || '');
+  return crypto.pbkdf2Sync(masterKey, combinedSalt, ITERATIONS, KEY_LENGTH, 'sha256');
 };
 
-const encrypt = (plaintext) => {
+const encrypt = (plaintext, userSalt) => {
   try {
     const salt = crypto.randomBytes(SALT_LENGTH);
     const iv = crypto.randomBytes(IV_LENGTH);
-    const key = deriveKey(getMasterKey(), salt);
+    const key = deriveKey(userSalt, salt.toString('hex'));
 
     const cipher = crypto.createCipheriv(ALGORITHM, key, iv);
     
@@ -41,19 +43,19 @@ const encrypt = (plaintext) => {
   }
 };
 
-const decrypt = (encryptedData) => {
+const decrypt = (encryptedData, userSalt) => {
   try {
     const parts = encryptedData.split(':');
     if (parts.length !== 4) {
       throw new Error('Invalid encrypted data format');
     }
 
-    const salt = Buffer.from(parts[0], 'hex');
+    const salt = parts[0];
     const iv = Buffer.from(parts[1], 'hex');
     const authTag = Buffer.from(parts[2], 'hex');
     const encrypted = parts[3];
 
-    const key = deriveKey(getMasterKey(), salt);
+    const key = deriveKey(userSalt, salt);
 
     const decipher = crypto.createDecipheriv(ALGORITHM, key, iv);
     decipher.setAuthTag(authTag);

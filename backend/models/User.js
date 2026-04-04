@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const logger = require('../config/logger');
 
@@ -37,6 +38,10 @@ const userSchema = new mongoose.Schema({
   },
   lockUntil: {
     type: Date
+  },
+  passwordSalt: {
+    type: String,
+    select: false
   }
 }, {
   timestamps: true,
@@ -60,6 +65,7 @@ userSchema.pre('save', async function(next) {
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
+    this.passwordSalt = crypto.randomBytes(32).toString('hex');
     next();
   } catch (error) {
     logger.error('Password hashing error:', error);

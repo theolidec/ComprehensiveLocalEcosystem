@@ -20,7 +20,12 @@ const createEvent = async (req, res) => {
       attendees,
       reminder,
       isRecurring,
-      recurringPattern
+      recurringPattern,
+      recurringEndDate,
+      recurringOccurrences,
+      timezone,
+      isAllDay,
+      duration
     } = req.body;
 
     const event = new Event({
@@ -34,6 +39,11 @@ const createEvent = async (req, res) => {
       reminder: reminder || 15,
       isRecurring: isRecurring || false,
       recurringPattern: recurringPattern || null,
+      recurringEndDate: recurringEndDate ? new Date(recurringEndDate) : null,
+      recurringOccurrences: recurringOccurrences || null,
+      timezone: timezone || null,
+      isAllDay: isAllDay || false,
+      duration: duration || null,
       user: req.user._id
     });
 

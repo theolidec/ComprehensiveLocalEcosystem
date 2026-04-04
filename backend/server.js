@@ -12,6 +12,11 @@ const calendarRoutes = require('./routes/calendar');
 const categoryRoutes = require('./routes/categories');
 const settingsRoutes = require('./routes/settings');
 const passwordRoutes = require('./routes/passwords');
+const passwordCategoryRoutes = require('./routes/passwordCategories');
+const wishlistRoutes = require('./routes/wishlist');
+const wishlistCategoryRoutes = require('./routes/wishlistCategories');
+const wishlistsRoutes = require('./routes/wishlists');
+const followRoutes = require('./routes/follow');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -83,6 +88,11 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/passwords', passwordRoutes);
+app.use('/api/password-categories', passwordCategoryRoutes);
+app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/wishlist-categories', wishlistCategoryRoutes);
+app.use('/api/wishlists', wishlistsRoutes);
+app.use('/api/follow', followRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

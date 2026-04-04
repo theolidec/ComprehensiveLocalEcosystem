@@ -17,6 +17,8 @@ import Terms from './components/Pages/Terms';
 import Cookies from './components/Pages/Cookies';
 import CookiePopup from './components/Pages/CookiePopup';
 import PasswordManager from './components/Pages/PasswordManager';
+import Wishlist from './components/Wishlist/Wishlist';
+import PublicWishlistItem from './components/Wishlist/PublicWishlistItem';
 import './App.css';
 
 const getInitialTheme = () => {
@@ -82,6 +84,16 @@ function AppContent() {
             </div>
           </ProtectedRoute>
         } />
+        <Route path="/wishlist" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Wishlist />
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </div>

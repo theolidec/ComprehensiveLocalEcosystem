@@ -26,11 +26,18 @@ class RecurringEventService {
     // Maximum number of instances to prevent infinite loops
     const MAX_INSTANCES = 100;
 
+    // Respect recurringEndDate if set
+    const eventEndDate = event.recurringEndDate ? new Date(event.recurringEndDate) : null;
+    const maxOccurrences = event.recurringOccurrences || MAX_INSTANCES;
+    
+    // Use the earlier of rangeEnd or recurringEndDate
+    const effectiveEndDate = eventEndDate && eventEndDate < endRange ? eventEndDate : endRange;
+
     let currentDate = new Date(eventDate);
     let instanceCount = 0;
 
-    // If the event start date is after the range end, skip
-    if (currentDate > endRange) {
+    // If the event start date is after the effective end, skip
+    if (currentDate > effectiveEndDate) {
       return [];
     }
 
@@ -39,7 +46,7 @@ class RecurringEventService {
       currentDate = this.findFirstOccurrenceInRange(event, startRange);
     }
 
-    while (currentDate <= endRange && instanceCount < MAX_INSTANCES) {
+    while (currentDate <= effectiveEndDate && instanceCount < maxOccurrences && instanceCount < MAX_INSTANCES) {
       const instance = this.createEventInstance(event, currentDate);
       instances.push(instance);
       instanceCount++;

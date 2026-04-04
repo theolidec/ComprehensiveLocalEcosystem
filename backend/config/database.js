@@ -16,8 +16,27 @@ const connectDB = async () => {
 };
 
 // Handle connection events
-mongoose.connection.on('connected', () => {
+mongoose.connection.on('connected', async () => {
   logger.info('Mongoose connected to MongoDB');
+  
+  // Clean up problematic indexes
+  try {
+    const db = mongoose.connection.db;
+    const collection = db.collection('wishlistitems');
+    const indexes = await collection.indexes();
+    
+    // Drop user_1_productId_1 index if it exists
+    const productIdIndex = indexes.find(idx => idx.name === 'user_1_productId_1');
+    if (productIdIndex) {
+      await collection.dropIndex('user_1_productId_1');
+      logger.info('Dropped problematic user_1_productId_1 index from wishlistitems');
+    }
+  } catch (err) {
+    // Index might not exist, which is fine
+    if (err.code !== 27) { // 27 = index not found
+      logger.warn('Error cleaning up indexes:', err.message);
+    }
+  }
 });
 
 mongoose.connection.on('error', (err) => {

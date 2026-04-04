@@ -68,6 +68,20 @@ const eventSchema = new mongoose.Schema({
     enum: ['daily', 'weekly', 'monthly', 'yearly', null],
     default: null
   },
+  recurringEndDate: {
+    type: Date,
+    default: null
+  },
+  recurringOccurrences: {
+    type: Number,
+    default: null,
+    min: [1, 'Must occur at least once'],
+    max: [365, 'Cannot exceed 365 occurrences']
+  },
+  timezone: {
+    type: String,
+    default: null
+  },
   isCompleted: {
     type: Boolean,
     default: false

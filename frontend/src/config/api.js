@@ -33,6 +33,24 @@ const API_ENDPOINTS = {
 
   // Password endpoints
   PASSWORDS: '/api/passwords',
+  PASSWORD_CATEGORIES: '/api/password-categories',
+
+  // Wishlist endpoints
+  WISHLIST: {
+    ITEMS: '/api/wishlist',
+    STATS: '/api/wishlist/stats',
+    ANALYTICS: '/api/wishlist/analytics',
+    PUBLIC: '/api/wishlist/public',
+  },
+
+  // Wishlist categories endpoints
+  WISHLIST_CATEGORIES: '/api/wishlist-categories',
+  
+  // Multiple wishlists endpoints
+  WISHLISTS: '/api/wishlists',
+  
+  // Follow/social endpoints
+  FOLLOW: '/api/follow',
 };
 
 // Create full URLs for endpoints
@@ -58,4 +76,12 @@ export const API_URLS = {
   CATEGORIES: createApiUrl(API_ENDPOINTS.CATEGORIES),
   SETTINGS: createApiUrl(API_ENDPOINTS.SETTINGS),
   PASSWORDS: createApiUrl(API_ENDPOINTS.PASSWORDS),
+  PASSWORD_CATEGORIES: createApiUrl(API_ENDPOINTS.PASSWORD_CATEGORIES),
+  WISHLIST_ITEMS: createApiUrl(API_ENDPOINTS.WISHLIST.ITEMS),
+  WISHLIST_STATS: createApiUrl(API_ENDPOINTS.WISHLIST.STATS),
+  WISHLIST_ANALYTICS: createApiUrl(API_ENDPOINTS.WISHLIST.ANALYTICS),
+  WISHLIST_PUBLIC: createApiUrl(API_ENDPOINTS.WISHLIST.PUBLIC),
+  WISHLIST_CATEGORIES: createApiUrl(API_ENDPOINTS.WISHLIST_CATEGORIES),
+  WISHLISTS: createApiUrl(API_ENDPOINTS.WISHLISTS),
+  FOLLOW: createApiUrl(API_ENDPOINTS.FOLLOW),
 };

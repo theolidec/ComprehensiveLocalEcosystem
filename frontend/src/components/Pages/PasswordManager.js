@@ -1,6 +1,53 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Search, X, Copy, Check, Lock, User, Globe, FileText, Shield, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Search, X, Copy, Check, Lock, User, Globe, FileText, Shield, Sparkles, RefreshCw, Settings, Download, Upload } from 'lucide-react';
 import passwordAPI from '../../services/passwordAPI';
+
+const calculatePasswordStrength = (password) => {
+  if (!password) return { score: 0, label: 'Enter password', color: '#6B7280', width: '0%' };
+  
+  let entropy = 0;
+  const length = password.length;
+  
+  if (password.match(/[a-z]/)) entropy += 26;
+  if (password.match(/[A-Z]/)) entropy += 26;
+  if (password.match(/[0-9]/)) entropy += 10;
+  if (password.match(/[^a-zA-Z0-9]/)) entropy += 32;
+  
+  const bits = Math.log2(Math.pow(entropy, length));
+  
+  let score, label, color, width;
+  if (bits < 28) {
+    score = 1; label = 'Very Weak'; color = '#EF4444'; width = '20%';
+  } else if (bits < 36) {
+    score = 2; label = 'Weak'; color = '#F97316'; width = '40%';
+  } else if (bits < 60) {
+    score = 3; label = 'Fair'; color = '#EAB308'; width = '60%';
+  } else if (bits < 80) {
+    score = 4; label = 'Strong'; color = '#22C55E'; width = '80%';
+  } else {
+    score = 5; label = 'Very Strong'; color = '#10B981'; width = '100%';
+  }
+  
+  return { score, label, color, width, bits: Math.round(bits) };
+};
+
+const generatePassword = (length = 16, options = {}) => {
+  const { uppercase = true, lowercase = true, numbers = true, symbols = true } = options;
+  let charset = '';
+  if (uppercase) charset += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  if (lowercase) charset += 'abcdefghijklmnopqrstuvwxyz';
+  if (numbers) charset += '0123456789';
+  if (symbols) charset += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+  if (!charset) charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  
+  const array = new Uint32Array(length);
+  crypto.getRandomValues(array);
+  let password = '';
+  for (let i = 0; i < length; i++) {
+    password += charset[array[i] % charset.length];
+  }
+  return password;
+};
 
 const PasswordManager = () => {
   const [passwords, setPasswords] = useState([]);
@@ -13,6 +60,23 @@ const PasswordManager = () => {
   const [visiblePasswords, setVisiblePasswords] = useState({});
   const [copiedId, setCopiedId] = useState(null);
   const [showFavorites, setShowFavorites] = useState(false);
+  const [showGenerator, setShowGenerator] = useState(false);
+  const [generatorOptions, setGeneratorOptions] = useState({
+    length: 16,
+    uppercase: true,
+    lowercase: true,
+    numbers: true,
+    symbols: true
+  });
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: 'Enter password', color: '#6B7280', width: '0%', bits: 0 });
+  const [autoLockTimeout, setAutoLockTimeout] = useState(5);
+  const [lastActivity, setLastActivity] = useState(Date.now());
+  const [isLocked, setIsLocked] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importData, setImportData] = useState(null);
+  const [customCategories, setCustomCategories] = useState([]);
+  const [showCategoryManager, setShowCategoryManager] = useState(false);
+  const [newCategory, setNewCategory] = useState({ name: '', icon: '📁', color: '#6B7280' });
 
   const [formData, setFormData] = useState({
     title: '',
@@ -24,18 +88,52 @@ const PasswordManager = () => {
     isFavorite: false
   });
 
-  const categories = [
-    { value: 'social', label: 'Social', icon: '👥', color: '#3B82F6', gradient: 'from-blue-500 to-blue-600' },
-    { value: 'finance', label: 'Finance', icon: '💳', color: '#10B981', gradient: 'from-emerald-500 to-emerald-600' },
-    { value: 'work', label: 'Work', icon: '💼', color: '#F59E0B', gradient: 'from-amber-500 to-amber-600' },
-    { value: 'shopping', label: 'Shopping', icon: '🛒', color: '#EF4444', gradient: 'from-red-500 to-red-600' },
-    { value: 'entertainment', label: 'Entertainment', icon: '🎮', color: '#8B5CF6', gradient: 'from-violet-500 to-violet-600' },
-    { value: 'other', label: 'Other', icon: '📁', color: '#6B7280', gradient: 'from-gray-500 to-gray-600' }
-  ];
+  const categories = customCategories.length > 0 
+    ? customCategories.map(c => ({ 
+        value: c.name.toLowerCase(), 
+        label: c.name, 
+        icon: c.icon, 
+        color: c.color,
+        gradient: `linear-gradient(135deg, ${c.color} 0%, ${c.color}dd 100%)`
+      }))
+    : [
+        { value: 'social', label: 'Social', icon: '👥', color: '#3B82F6', gradient: 'from-blue-500 to-blue-600' },
+        { value: 'finance', label: 'Finance', icon: '💳', color: '#10B981', gradient: 'from-emerald-500 to-emerald-600' },
+        { value: 'work', label: 'Work', icon: '💼', color: '#F59E0B', gradient: 'from-amber-500 to-amber-600' },
+        { value: 'shopping', label: 'Shopping', icon: '🛒', color: '#EF4444', gradient: 'from-red-500 to-red-600' },
+        { value: 'entertainment', label: 'Entertainment', icon: '🎮', color: '#8B5CF6', gradient: 'from-violet-500 to-violet-600' },
+        { value: 'other', label: 'Other', icon: '📁', color: '#6B7280', gradient: 'from-gray-500 to-gray-600' }
+      ];
 
   useEffect(() => {
     fetchPasswords();
+    fetchCategories();
   }, [categoryFilter, searchTerm, showFavorites]);
+
+  useEffect(() => {
+    const checkLock = () => {
+      const inactiveMinutes = (Date.now() - lastActivity) / 1000 / 60;
+      if (inactiveMinutes >= autoLockTimeout && !isLocked) {
+        setIsLocked(true);
+        setVisiblePasswords({});
+      }
+    };
+    
+    const interval = setInterval(checkLock, 10000);
+    const activityEvents = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    
+    const updateActivity = () => setLastActivity(Date.now());
+    activityEvents.forEach(event => window.addEventListener(event, updateActivity));
+    
+    return () => {
+      clearInterval(interval);
+      activityEvents.forEach(event => window.removeEventListener(event, updateActivity));
+    };
+  }, [lastActivity, autoLockTimeout, isLocked]);
+
+  useEffect(() => {
+    setPasswordStrength(calculatePasswordStrength(formData.password));
+  }, [formData.password]);
 
   const fetchPasswords = async () => {
     try {
@@ -51,6 +149,36 @@ const PasswordManager = () => {
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const data = await passwordAPI.getCategories();
+      setCustomCategories(data);
+    } catch (err) {
+      console.error('Failed to fetch categories:', err);
+    }
+  };
+
+  const handleCreateCategory = async () => {
+    if (!newCategory.name.trim()) return;
+    try {
+      await passwordAPI.createCategory(newCategory);
+      setNewCategory({ name: '', icon: '📁', color: '#6B7280' });
+      fetchCategories();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleDeleteCategory = async (id) => {
+    if (!window.confirm('Delete this category?')) return;
+    try {
+      await passwordAPI.deleteCategory(id);
+      fetchCategories();
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -118,6 +246,51 @@ const PasswordManager = () => {
       setTimeout(() => setCopiedId(null), 2000);
     } catch (err) {
       setError(err.message);
+    }
+  };
+
+  const handleExport = async () => {
+    try {
+      await passwordAPI.exportPasswords();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (data.passwords && Array.isArray(data.passwords)) {
+          setImportData(data);
+        } else {
+          setError('Invalid backup file format');
+        }
+      } catch (err) {
+        setError('Failed to parse backup file');
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const handleImport = async () => {
+    if (!importData) return;
+    setLoading(true);
+    try {
+      const result = await passwordAPI.importPasswords({ passwords: importData.passwords });
+      setError('');
+      setShowImportModal(false);
+      setImportData(null);
+      fetchPasswords();
+      alert(result.message);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -214,6 +387,17 @@ const PasswordManager = () => {
           <Plus size={20} />
           Add Password
         </button>
+        <div className="pm-hero-actions">
+          <button className="pm-export-btn" onClick={handleExport} title="Export passwords">
+            <Download size={18} />
+            Export
+          </button>
+          <label className="pm-import-btn">
+            <Upload size={18} />
+            Import
+            <input type="file" accept=".json" onChange={handleImportFile} style={{ display: 'none' }} />
+          </label>
+        </div>
       </div>
 
       <div className="pm-filters">
@@ -252,8 +436,60 @@ const PasswordManager = () => {
             <Star size={18} fill={showFavorites ? '#F59E0B' : 'none'} />
             Favorites
           </button>
+
+          <button 
+            className="pm-category-manage-btn"
+            onClick={() => setShowCategoryManager(!showCategoryManager)}
+            title="Manage categories"
+          >
+            <Settings size={16} />
+          </button>
         </div>
       </div>
+
+      {showCategoryManager && (
+        <div className="pm-category-manager">
+          <h3>Manage Categories</h3>
+          <div className="pm-category-list">
+            {customCategories.map(cat => (
+              <div key={cat._id} className="pm-category-item">
+                <span>{cat.icon} {cat.name}</span>
+                {!cat.isDefault && (
+                  <button onClick={() => handleDeleteCategory(cat._id)} className="pm-category-delete">
+                    <Trash2 size={14} />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="pm-category-create">
+            <input
+              type="text"
+              placeholder="New category name"
+              value={newCategory.name}
+              onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
+              className="pm-input"
+            />
+            <input
+              type="text"
+              placeholder="Icon"
+              value={newCategory.icon}
+              onChange={(e) => setNewCategory({ ...newCategory, icon: e.target.value })}
+              className="pm-category-icon-input"
+              maxLength={2}
+            />
+            <input
+              type="color"
+              value={newCategory.color}
+              onChange={(e) => setNewCategory({ ...newCategory, color: e.target.value })}
+              className="pm-category-color-input"
+            />
+            <button onClick={handleCreateCategory} className="pm-add-category-btn">
+              <Plus size={16} />
+            </button>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="pm-error">
@@ -434,14 +670,100 @@ const PasswordManager = () => {
                   <Lock size={14} />
                   Password {editingPassword ? '(leave empty to keep current)' : '*'}
                 </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="pm-input"
-                  placeholder={editingPassword ? '••••••••' : 'Enter password'}
-                  required={!editingPassword}
-                />
+                <div className="pm-password-input-wrapper">
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="pm-input"
+                    placeholder={editingPassword ? '••••••••' : 'Enter password'}
+                    required={!editingPassword}
+                  />
+                  <button
+                    type="button"
+                    className="pm-generator-toggle"
+                    onClick={() => setShowGenerator(!showGenerator)}
+                    title="Generate password"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+                {formData.password && (
+                  <div className="pm-strength-meter">
+                    <div className="pm-strength-bar">
+                      <div 
+                        className="pm-strength-fill" 
+                        style={{ width: passwordStrength.width, backgroundColor: passwordStrength.color }}
+                      />
+                    </div>
+                    <div className="pm-strength-info">
+                      <span className="pm-strength-label" style={{ color: passwordStrength.color }}>
+                        {passwordStrength.label}
+                      </span>
+                      <span className="pm-strength-bits">{passwordStrength.bits} bits</span>
+                    </div>
+                  </div>
+                )}
+                {showGenerator && (
+                  <div className="pm-generator-panel">
+                    <div className="pm-generator-header">
+                      <Settings size={14} />
+                      <span>Password Generator</span>
+                    </div>
+                    <div className="pm-generator-length">
+                      <label>Length: {generatorOptions.length}</label>
+                      <input
+                        type="range"
+                        min="8"
+                        max="32"
+                        value={generatorOptions.length}
+                        onChange={(e) => setGeneratorOptions({ ...generatorOptions, length: parseInt(e.target.value) })}
+                      />
+                    </div>
+                    <div className="pm-generator-options">
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={generatorOptions.uppercase}
+                          onChange={(e) => setGeneratorOptions({ ...generatorOptions, uppercase: e.target.checked })}
+                        />
+                        Uppercase (A-Z)
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={generatorOptions.lowercase}
+                          onChange={(e) => setGeneratorOptions({ ...generatorOptions, lowercase: e.target.checked })}
+                        />
+                        Lowercase (a-z)
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={generatorOptions.numbers}
+                          onChange={(e) => setGeneratorOptions({ ...generatorOptions, numbers: e.target.checked })}
+                        />
+                        Numbers (0-9)
+                      </label>
+                      <label>
+                        <input
+                          type="checkbox"
+                          checked={generatorOptions.symbols}
+                          onChange={(e) => setGeneratorOptions({ ...generatorOptions, symbols: e.target.checked })}
+                        />
+                        Symbols (!@#$...)
+                      </label>
+                    </div>
+                    <button
+                      type="button"
+                      className="pm-generate-btn"
+                      onClick={() => setFormData({ ...formData, password: generatePassword(generatorOptions.length, generatorOptions) })}
+                    >
+                      <RefreshCw size={14} />
+                      Generate
+                    </button>
+                  </div>
+                )}
               </div>
 
               <div className="pm-form-row">

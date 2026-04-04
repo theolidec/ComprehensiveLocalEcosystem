@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2 } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -77,6 +77,9 @@ const Header = () => {
     }
     if (location.pathname === '/passwords') {
       return 'Password Manager';
+    }
+    if (location.pathname === '/wishlist') {
+      return 'My Wishlist';
     }
     return 'Proton';
   };
@@ -178,6 +181,13 @@ const Header = () => {
                       <Key className="h-4 w-4 text-orange-600" />
                       <span>Password Manager</span>
                     </button>
+                    <button
+                      onClick={() => window.location.href = '/wishlist'}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Gift className="h-4 w-4 text-purple-600" />
+                      <span>Wishlist</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -201,6 +211,13 @@ const Header = () => {
                     >
                       <Key className="h-4 w-4" />
                       <span>Passwords</span>
+                    </button>
+                    <button
+                      onClick={() => { window.location.href = '/wishlist'; setIsProfileOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Gift className="h-4 w-4" />
+                      <span>Wishlist</span>
                     </button>
                     <button
                       onClick={() => { window.location.href = '/settings'; setIsProfileOpen(false); }}

@@ -1293,14 +1293,29 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
     attendees: editingEvent?.attendees?.join(', ') || '',
     reminder: editingEvent?.reminder || String(defaultDuration || 15),
     isRecurring: editingEvent?.isRecurring || false,
-    recurringPattern: editingEvent?.recurringPattern || 'daily'
+    recurringPattern: editingEvent?.recurringPattern || 'daily',
+    recurringEndDate: editingEvent?.recurringEndDate ? new Date(editingEvent.recurringEndDate).toISOString().split('T')[0] : '',
+    recurringOccurrences: editingEvent?.recurringOccurrences || '',
+    timezone: editingEvent?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+    isAllDay: editingEvent?.isAllDay || false,
+    duration: editingEvent?.duration || ''
   });
+
+  const commonTimezones = [
+    'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+    'America/Anchorage', 'Pacific/Honolulu', 'Europe/London', 'Europe/Paris',
+    'Europe/Berlin', 'Asia/Tokyo', 'Asia/Shanghai', 'Asia/Singapore',
+    'Australia/Sydney', 'Pacific/Auckland'
+  ];
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const eventData = {
       ...formData,
-      attendees: formData.attendees ? formData.attendees.split(',').map(email => email.trim()).filter(email => email) : []
+      attendees: formData.attendees ? formData.attendees.split(',').map(email => email.trim()).filter(email => email) : [],
+      recurringEndDate: formData.recurringEndDate || null,
+      recurringOccurrences: formData.recurringOccurrences ? parseInt(formData.recurringOccurrences) : null,
+      duration: formData.duration ? parseInt(formData.duration) : null
     };
     
     if (editingEvent) {
@@ -1374,20 +1389,62 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Time
-              </label>
+          {/* All-day toggle and Time */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="flex items-center space-x-2 pt-6">
               <input
-                type="time"
-                name="time"
-                value={formData.time}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                type="checkbox"
+                id="isAllDay"
+                name="isAllDay"
+                checked={formData.isAllDay}
+                onChange={(e) => setFormData(prev => ({ ...prev, isAllDay: e.target.checked, time: e.target.checked ? '' : prev.time }))}
+                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
+              <label htmlFor="isAllDay" className="text-sm font-medium text-gray-700">
+                All-day event
+              </label>
             </div>
 
+            {!formData.isAllDay && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Start Time
+                </label>
+                <input
+                  type="time"
+                  name="time"
+                  value={formData.time}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                />
+              </div>
+            )}
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Duration (minutes)
+              </label>
+              <select
+                name="duration"
+                value={formData.duration}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                <option value="">Default (60 min)</option>
+                <option value="15">15 minutes</option>
+                <option value="30">30 minutes</option>
+                <option value="45">45 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="90">1.5 hours</option>
+                <option value="120">2 hours</option>
+                <option value="180">3 hours</option>
+                <option value="240">4 hours</option>
+                <option value="480">8 hours</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Location
@@ -1400,6 +1457,22 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter location"
               />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Timezone
+              </label>
+              <select
+                name="timezone"
+                value={formData.timezone}
+                onChange={handleChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                {commonTimezones.map(tz => (
+                  <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
+                ))}
+              </select>
             </div>
           </div>
 
@@ -1453,27 +1526,63 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
             </div>
 
             {formData.isRecurring && (
-              <div className="ml-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Repeat pattern
-                </label>
-                <select
-                  name="recurringPattern"
-                  value={formData.recurringPattern}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="daily">Every day</option>
-                  <option value="weekly">Every week</option>
-                  <option value="monthly">Every month</option>
-                  <option value="yearly">Every year</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
-                  {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
-                  {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
-                  {formData.recurringPattern === 'yearly' && 'Event will repeat on the same date every year'}
-                </p>
+              <div className="ml-6 space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Repeat pattern
+                  </label>
+                  <select
+                    name="recurringPattern"
+                    value={formData.recurringPattern}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="daily">Every day</option>
+                    <option value="weekly">Every week</option>
+                    <option value="monthly">Every month</option>
+                    <option value="yearly">Every year</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
+                    {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
+                    {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
+                    {formData.recurringPattern === 'yearly' && 'Event will repeat on the same date every year'}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      End date (optional)
+                    </label>
+                    <input
+                      type="date"
+                      name="recurringEndDate"
+                      value={formData.recurringEndDate}
+                      onChange={handleChange}
+                      min={selectedDate ? selectedDate.toISOString().split('T')[0] : ''}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Leave empty to repeat forever</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Or number of occurrences
+                    </label>
+                    <input
+                      type="number"
+                      name="recurringOccurrences"
+                      value={formData.recurringOccurrences}
+                      onChange={handleChange}
+                      min="1"
+                      max="365"
+                      placeholder="e.g., 10"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">1-365 occurrences</p>
+                  </div>
+                </div>
               </div>
             )}
           </div>

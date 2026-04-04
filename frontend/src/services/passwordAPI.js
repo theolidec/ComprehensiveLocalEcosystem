@@ -95,6 +95,69 @@ export const passwordAPI = {
     } catch (error) {
       handleApiError(error);
     }
+  },
+
+  exportPasswords: async () => {
+    try {
+      const response = await axios.get(`${API_URLS.PASSWORDS}/export`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data, null, 2)]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'passwords-backup.json');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return true;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  importPasswords: async (data) => {
+    try {
+      const response = await axios.post(`${API_URLS.PASSWORDS}/import`, data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  getCategories: async () => {
+    try {
+      const response = await axios.get(API_URLS.PASSWORD_CATEGORIES);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  createCategory: async (data) => {
+    try {
+      const response = await axios.post(API_URLS.PASSWORD_CATEGORIES, data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  updateCategory: async (id, data) => {
+    try {
+      const response = await axios.put(`${API_URLS.PASSWORD_CATEGORIES}/${id}`, data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  deleteCategory: async (id) => {
+    try {
+      const response = await axios.delete(`${API_URLS.PASSWORD_CATEGORIES}/${id}`);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 };
 

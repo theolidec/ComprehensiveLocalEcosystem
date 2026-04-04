@@ -6,6 +6,8 @@ const passwordController = require('../controllers/passwordController');
 router.use(authenticateToken);
 
 router.get('/', passwordController.getAllPasswords);
+router.get('/export', passwordController.exportPasswords);
+router.post('/import', passwordController.importPasswords);
 router.get('/:id', passwordController.getPasswordById);
 router.post('/', passwordController.createPassword);
 router.put('/:id', passwordController.updatePassword);
