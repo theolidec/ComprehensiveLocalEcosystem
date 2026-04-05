@@ -607,6 +607,149 @@ Server information.
 }
 ```
 
+### Password Endpoints
+
+#### GET `/api/passwords`
+Get all password entries for the authenticated user.
+
+**Authentication Required:** Yes
+
+**Query Parameters:**
+- `category` - Filter by password category ID
+- `search` - Search in title, username, website, notes
+- `favoritesOnly` - Filter to favorites only (true/false)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "passwords": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Gmail Account",
+      "username": "user@gmail.com",
+      "website": "https://gmail.com",
+      "encryptedPassword": "aes256encrypted...",
+      "category": "64f8a1b2c3d4e5f6a7b8c9d1",
+      "notes": "Personal email account",
+      "isFavorite": true,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+#### POST `/api/passwords`
+Create a new password entry.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "title": "Gmail Account",
+  "username": "user@gmail.com",
+  "password": "mySecurePassword123!",
+  "website": "https://gmail.com",
+  "category": "64f8a1b2c3d4e5f6a7b8c9d1",
+  "notes": "Personal email account"
+}
+```
+
+#### GET `/api/passwords/:id/decrypt`
+Decrypt and view the actual password value.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "password": "mySecurePassword123!"
+}
+```
+
+### Wishlist Endpoints
+
+#### GET `/api/wishlist`
+Get all wishlist items with pagination and filtering.
+
+**Authentication Required:** Yes
+
+**Query Parameters:**
+- `category` - Filter by category (birthday, christmas, other)
+- `status` - Filter by status (active, purchased, archived)
+- `priority` - Filter by priority (low, medium, high, must-have)
+- `search` - Search in title and description
+- `page` - Page number (default: 1)
+- `limit` - Items per page (default: 20, max: 50)
+
+**Response (200):**
+```json
+{
+  "items": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Nintendo Switch",
+      "description": "OLED model with extra controllers",
+      "url": "https://example.com/switch",
+      "price": 349.99,
+      "currency": "USD",
+      "priority": "high",
+      "category": "birthday",
+      "isPublic": true,
+      "shareToken": "abc123...",
+      "status": "active",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 20,
+    "total": 50,
+    "totalPages": 3
+  }
+}
+```
+
+#### GET `/api/wishlist/public/:token`
+Get a public wishlist item by share token (no authentication required).
+
+**Authentication Required:** No
+
+### Follow Endpoints
+
+#### POST `/api/follow/follow/:userId`
+Follow a user.
+
+**Authentication Required:** Yes
+
+**Response (201):**
+```json
+{
+  "message": "Successfully followed user"
+}
+```
+
+#### GET `/api/follow/public/:userId`
+Get public profile of a user with their public wishlists.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "user": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "name": "Jane Doe"
+  },
+  "publicItemCount": 15,
+  "items": [...],
+  "isFollowing": true
+}
+```
+
 ## 🔒 Security Implementation
 
 ### Token Management
@@ -640,35 +783,51 @@ Server information.
 ```
 backend/
 ├── config/
-│   ├── database.js      # MongoDB connection
-│   ├── logger.js        # Winston logging configuration
-│   └── rateLimiter.js   # Rate limiting configuration
+│   ├── database.js          # MongoDB connection
+│   ├── logger.js            # Winston logging configuration
+│   └── rateLimiter.js       # Rate limiting configuration
 ├── controllers/
-│   ├── calendarController.js  # Calendar API logic
-│   ├── categoryController.js  # Category management
-│   ├── passwordController.js  # Password reset functionality
-│   └── settingsController.js  # User settings management
+│   ├── calendarController.js      # Calendar API logic
+│   ├── categoryController.js      # Category management
+│   ├── passwordController.js      # Password management
+│   ├── passwordCategoryController.js  # Password categories
+│   ├── settingsController.js      # User settings management
+│   ├── wishlistController.js      # Wishlist management
+│   └── followController.js        # User following management
 ├── middleware/
-│   └── auth.js          # Authentication middleware
+│   └── auth.js              # Authentication middleware
 ├── models/
-│   ├── User.js          # User model with security features
-│   ├── Password.js      # Password reset token model
-│   ├── RefreshToken.js  # Refresh token model
-│   ├── Event.js         # Calendar event model
-│   ├── Category.js      # Event category model
-│   └── Settings.js      # User settings model
+│   ├── User.js              # User model with security features
+│   ├── Password.js          # Password reset token model
+│   ├── RefreshToken.js      # Refresh token model
+│   ├── Event.js             # Calendar event model
+│   ├── Category.js          # Event category model
+│   ├── Settings.js          # User settings model
+│   ├── Wishlist.js          # Wishlist model
+│   ├── WishlistItem.js      # Wishlist item model
+│   ├── WishlistCategory.js  # Wishlist category model
+│   ├── WishlistReservation.js # Reservation model
+│   ├── UserFollow.js        # User following model
+│   └── PasswordCategory.js  # Password category model
 ├── routes/
-│   ├── auth.js          # Authentication routes
-│   ├── calendar.js      # Calendar API routes
-│   ├── categories.js    # Category routes
-│   ├── passwords.js     # Password reset routes
-│   └── settings.js      # Settings routes
-├── services/            # Business logic services
-├── src/                 # TypeScript type definitions
-├── logs/                # Log files directory
-├── server.js            # Express server setup
-├── .env.example         # Environment variables template
-└── tsconfig.json        # TypeScript configuration
+│   ├── auth.js              # Authentication routes
+│   ├── calendar.js          # Calendar API routes
+│   ├── categories.js        # Category routes
+│   ├── passwords.js         # Password routes
+│   ├── passwordCategories.js  # Password category routes
+│   ├── wishlist.js          # Wishlist routes
+│   ├── wishlistCategories.js    # Wishlist category routes
+│   ├── wishlists.js         # Wishlist management routes
+│   ├── follow.js            # User following routes
+│   └── settings.js          # Settings routes
+├── services/                # Business logic services
+│   ├── passwordService.js   # Password encryption service
+│   └── wishlistService.js   # Wishlist business logic
+├── logs/                    # Log files directory
+├── uploads/                 # File uploads directory
+├── server.js                # Express server setup
+├── .env.example             # Environment variables template
+└── tsconfig.json            # TypeScript configuration
 ```
 
 ### Frontend Structure
@@ -678,28 +837,52 @@ frontend/src/
 │   ├── Auth/
 │   │   ├── AuthPage.js          # Login/Register container
 │   │   ├── Login.js             # Login form with validation
-│   │   ├── Register.js          # Registration form with validation
-│   │   └── ProtectedRoute.js    # Route protection wrapper
+│   │   ├── Register.js          # Registration form
+│   │   └── ProtectedRoute.js  # Route protection wrapper
 │   ├── Layout/
 │   │   ├── Header.js            # Navigation header
-│   │   └── Footer.js            # Page footer
-│   └── Pages/
-│       ├── Calendar.js          # Full calendar system
-│       ├── CategoryManager.js   # Category management UI
-│       ├── Features.js          # Features display component
-│       ├── Hero.js              # Landing page hero section
-│       ├── ProductGrid.js       # Product showcase component
-│       └── Settings.js          # User settings page
+│   │   ├── Footer.js            # Page footer
+│   │   ├── Sidebar.js           # Navigation sidebar
+│   │   └── Row.js               # Layout row component
+│   ├── Pages/
+│   │   ├── Calendar.js          # Full calendar system
+│   │   ├── CategoryManager.js   # Category management UI
+│   │   ├── PasswordManager.js   # Password management UI
+│   │   ├── Settings.js          # User settings page
+│   │   ├── Hero.js              # Landing page hero
+│   │   ├── ProductGrid.js       # Product showcase
+│   │   ├── Features.js          # Features display
+│   │   ├── Privacy.js           # Privacy policy page
+│   │   ├── Terms.js             # Terms of service page
+│   │   ├── Cookies.js           # Cookie policy page
+│   │   ├── CookiePopup.js       # Cookie consent popup
+│   │   └── LinkNotFound.js      # 404 placeholder page
+│   ├── Wishlist/
+│   │   ├── Wishlist.js          # Main wishlist component
+│   │   ├── WishlistItemModal.js # Item create/edit modal
+│   │   ├── ReservationModal.js  # Reservation modal
+│   │   ├── WishlistShareModal.js # Share link modal
+│   │   └── PublicWishlistItem.js # Public item view
+│   ├── CalendarHeader.js      # Calendar header component
+│   ├── CalendarSidebar.js     # Calendar sidebar component
+│   ├── EventForm.js           # Event creation form
+│   └── EventDetails.js        # Event details display
 ├── contexts/
-│   └── AuthContext.js           # Authentication state management
+│   ├── AuthContext.js         # Authentication state management
+│   ├── SettingsContext.js     # Settings state management
+│   ├── CalendarActionsContext.js  # Calendar actions
+│   └── PageActionsContext.js  # Page actions
 ├── services/
-│   ├── calendarAPI.js           # Calendar API client
-│   ├── categoryAPI.js           # Category API client
-│   └── settingsAPI.js           # Settings API client
+│   ├── calendarAPI.js         # Calendar API client
+│   ├── categoryAPI.js         # Category API client
+│   ├── passwordAPI.js         # Password API client
+│   ├── settingsAPI.js         # Settings API client
+│   ├── wishlistAPI.js         # Wishlist API client
+│   └── wishlistCategoryAPI.js   # Wishlist category API client
 ├── config/
-│   └── api.js                   # API endpoint configuration
+│   └── api.js                 # API endpoint configuration
 ├── types/
-│   └── auth.ts                  # TypeScript type definitions
+│   └── auth.ts                # TypeScript type definitions
 └── App.js                       # Main routing and app structure
 ```
 
@@ -982,8 +1165,7 @@ server.js
 | `RATE_LIMIT_WINDOW_MS` | Rate limit window duration | 900000 | No |
 | `RATE_LIMIT_MAX_REQUESTS` | General rate limit max requests | 100 | No |
 | `AUTH_RATE_LIMIT_MAX_REQUESTS` | Authentication rate limit | 5 | No |
-| `LOG_LEVEL` | Logging level | debug | No |
-| `REACT_APP_API_URL` | Frontend API URL | http://localhost:3001 | No |
+| `PASSWORD_MASTER_KEY` | Master key for password encryption | - | Yes |
 
 ### Database Schema
 
@@ -997,6 +1179,89 @@ server.js
   lastLogin: Date,
   loginAttempts: Number (default: 0),
   lockUntil: Date,
+  avatar: String,  // URL to avatar image
+  timestamps: true
+}
+```
+
+#### PasswordEntry Model
+```javascript
+{
+  title: String (required),
+  username: String,
+  encryptedPassword: String (required),
+  website: String,
+  notes: String,
+  category: ObjectId (ref: PasswordCategory),
+  isFavorite: Boolean (default: false),
+  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### PasswordCategory Model
+```javascript
+{
+  name: String (required),
+  color: String,
+  icon: String,
+  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### WishlistItem Model
+```javascript
+{
+  title: String (required),
+  description: String,
+  url: String,
+  price: Number,
+  currency: String (enum: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NOK', 'SEK', 'DKK']),
+  priority: String (enum: ['low', 'medium', 'high', 'must-have']),
+  category: String (required),
+  imageUrl: String,
+  isPublic: Boolean (default: false),
+  shareToken: String (unique, sparse),
+  status: String (enum: ['active', 'purchased', 'archived']),
+  reservations: [ObjectId (ref: WishlistReservation)],
+  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### WishlistReservation Model
+```javascript
+{
+  wishlistItem: ObjectId (ref: WishlistItem, required),
+  reservedBy: {
+    name: String (required),
+    email: String
+  },
+  message: String,
+  status: String (enum: ['reserved', 'purchased'], default: 'reserved'),
+  reservedAt: Date (default: now),
+  timestamps: true
+}
+```
+
+#### WishlistCategory Model
+```javascript
+{
+  name: String (required),
+  color: String,
+  icon: String,
+  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### UserFollow Model
+```javascript
+{
+  follower: ObjectId (ref: User, required),
+  following: ObjectId (ref: User, required),
+  followedAt: Date (default: now),
   timestamps: true
 }
 ```
@@ -1268,7 +1533,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2026-03-25  
-**Status**: Production Ready  
-**Features**: Authentication, Calendar Management, Category Management, User Settings, Real-time Updates
+**Version**: 2.0.0
+**Last Updated**: 2026-04-05
+**Status**: Production Ready
+**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings
