@@ -110,6 +110,10 @@ const settingsSchema = new mongoose.Schema({
     showBusyStatus: {
       type: Boolean,
       default: true
+    },
+    allowThemeCookie: {
+      type: Boolean,
+      default: true
     }
   }
 }, {

@@ -46,7 +46,8 @@ const defaultSettings = {
   },
   privacy: {
     shareCalendar: false,
-    showBusyStatus: true
+    showBusyStatus: true,
+    allowThemeCookie: true
   }
 };
 
@@ -71,6 +72,12 @@ export const SettingsProvider = ({ children }) => {
     try {
       const data = await settingsAPI.getSettings();
       dispatch({ type: 'LOAD_SETTINGS', payload: data.settings });
+      // Sync theme to cookie for login page support (if user allows)
+      const theme = data.settings?.display?.theme;
+      const allowCookie = data.settings?.privacy?.allowThemeCookie;
+      if (theme && allowCookie !== false && typeof document !== 'undefined') {
+        document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.response?.data?.error || 'Failed to load settings' });
     }

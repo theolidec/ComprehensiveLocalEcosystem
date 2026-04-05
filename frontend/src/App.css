@@ -2,6 +2,47 @@
   min-height: 100vh;
 }
 
+/* Login Page Dark Mode Styles */
+[data-theme="dark"] .min-h-screen.flex.items-center.justify-center.bg-gray-50 {
+  background: var(--bg-primary) !important;
+}
+
+[data-theme="dark"] .min-h-screen .text-gray-900,
+[data-theme="dark"] .min-h-screen h2 {
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .min-h-screen .text-gray-600,
+[data-theme="dark"] .min-h-screen .text-gray-400 {
+  color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .min-h-screen .bg-blue-100 {
+  background: rgba(59, 130, 246, 0.2) !important;
+}
+
+[data-theme="dark"] .min-h-screen input {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .min-h-screen input::placeholder {
+  color: var(--text-muted) !important;
+}
+
+[data-theme="dark"] .min-h-screen .border-gray-300 {
+  border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .min-h-screen .bg-red-50 {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+[data-theme="dark"] .min-h-screen .text-red-800 {
+  color: #fca5a5 !important;
+}
+
 /* Dark mode styles */
 [data-theme="dark"] .pm-container {
   background: var(--bg-primary);
@@ -342,7 +383,6 @@
 /* Password Manager Styles */
 .pm-container {
   padding: 24px;
-  max-width: 1200px;
   margin: 0 auto;
   min-height: calc(100vh - 200px);
 }

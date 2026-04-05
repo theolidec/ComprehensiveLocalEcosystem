@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -83,11 +83,14 @@ const Header = () => {
     if (location.pathname === '/wishlist') {
       return 'My Wishlist';
     }
+    if (location.pathname === '/files') {
+      return 'My Files';
+    }
     return 'Proton';
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 sticky top-0 z-50">
+    <header className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 sticky top-0 z-50">
       <nav className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
@@ -189,6 +192,13 @@ const Header = () => {
                     >
                       <Gift className="h-4 w-4 text-purple-600" />
                       <span>Wishlist</span>
+                    </button>
+                    <button
+                      onClick={() => window.location.href = '/files'}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <FolderOpen className="h-4 w-4 text-teal-600" />
+                      <span>Files</span>
                     </button>
                   </div>
                 )}

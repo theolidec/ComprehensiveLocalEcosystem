@@ -20,6 +20,8 @@ import CookiePopup from './components/Pages/CookiePopup';
 import PasswordManager from './components/Pages/PasswordManager';
 import Wishlist from './components/Wishlist/Wishlist';
 import PublicWishlistItem from './components/Wishlist/PublicWishlistItem';
+import FileManager from './components/Pages/FileManager';
+import DocumentViewer from './components/Pages/DocumentViewer';
 import LinkNotFound from './components/Pages/LinkNotFound';
 import Sidebar from './components/Layout/Sidebar';
 import Row from './components/Layout/Row';
@@ -27,6 +29,14 @@ import './App.css';
 
 const getInitialTheme = () => {
   if (typeof window === 'undefined') return 'light';
+  // Check cookies first (for login page support)
+  const cookies = document.cookie.split(';');
+  const themeCookie = cookies.find(c => c.trim().startsWith('theme='));
+  if (themeCookie) {
+    const cookieTheme = themeCookie.split('=')[1];
+    if (cookieTheme) return cookieTheme;
+  }
+  // Fallback to localStorage
   const savedTheme = localStorage.getItem('theme');
   if (savedTheme) return savedTheme;
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -46,6 +56,7 @@ function AppContent() {
       <Routes>
         {/* Route redirects */}
         <Route path="/pass" element={<Navigate to="/passwords" replace />} />
+        <Route path="/drive" element={<Navigate to="/files" replace />} />
 
         {/* Auth routes */}
         <Route path="/login" element={<AuthPage />} />
@@ -129,6 +140,39 @@ function AppContent() {
               <Footer />
             </div>
           </ProtectedRoute>
+        } />
+        <Route path="/files" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <FileManager />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/files/document/:fileId" element={
+          <ProtectedRoute>
+            <DocumentViewer />
+          </ProtectedRoute>
+        } />
+        <Route path="/files/document/new" element={
+          <ProtectedRoute>
+            <DocumentViewer />
+          </ProtectedRoute>
+        } />
+        <Route path="/files/shared/:token" element={
+          <div key={location.pathname}>
+            <Header />
+            <div style={{ flex: 1, padding: '24px' }}>
+              <FileManager />
+            </div>
+            <Footer />
+          </div>
         } />
         <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
         <Route path="/placeholder" element={

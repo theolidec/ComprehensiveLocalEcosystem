@@ -19,6 +19,9 @@ const wishlistRoutes = require('./routes/wishlist');
 const wishlistCategoryRoutes = require('./routes/wishlistCategories');
 const wishlistsRoutes = require('./routes/wishlists');
 const followRoutes = require('./routes/follow');
+const filesRoutes = require('./routes/files');
+const fileFoldersRoutes = require('./routes/fileFolders');
+const wopiRoutes = require('./routes/wopi');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -104,6 +107,9 @@ app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/wishlist-categories', wishlistCategoryRoutes);
 app.use('/api/wishlists', wishlistsRoutes);
 app.use('/api/follow', followRoutes);
+app.use('/api/files', filesRoutes);
+app.use('/api/file-folders', fileFoldersRoutes);
+app.use('/wopi', wopiRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

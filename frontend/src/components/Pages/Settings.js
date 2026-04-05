@@ -117,17 +117,35 @@ const Settings = () => {
       showMessage('Display settings updated');
       document.documentElement.setAttribute('data-theme', newTheme);
       localStorage.setItem('theme', newTheme);
+      // Only save to cookie if user allows
+      if (settings.privacy?.allowThemeCookie !== false) {
+        document.cookie = `theme=${newTheme};path=/;max-age=31536000;SameSite=Lax`;
+      }
     } else showMessage(result.error, 'error');
   };
 
   const handlePrivacySave = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
+    const allowThemeCookie = formData.get('allowThemeCookie') === 'true';
     const result = await updatePrivacySettings({
       shareCalendar: formData.get('shareCalendar') === 'true',
-      showBusyStatus: formData.get('showBusyStatus') === 'true'
+      showBusyStatus: formData.get('showBusyStatus') === 'true',
+      allowThemeCookie
     });
-    if (result.success) showMessage('Privacy settings updated');
+    if (result.success) {
+      showMessage('Privacy settings updated');
+      // Delete theme cookie if user disabled it
+      if (!allowThemeCookie) {
+        document.cookie = 'theme=;path=/;max-age=0;SameSite=Lax';
+      } else {
+        // Re-save current theme to cookie if enabling
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        if (currentTheme) {
+          document.cookie = `theme=${currentTheme};path=/;max-age=31536000;SameSite=Lax`;
+        }
+      }
+    }
     else showMessage(result.error, 'error');
   };
 
@@ -444,6 +462,20 @@ const Settings = () => {
                   value="true"
                 />
                 Show Busy Status
+              </label>
+            </div>
+            <div className="form-group checkbox-group">
+              <label>
+                <input
+                  type="checkbox"
+                  name="allowThemeCookie"
+                  defaultChecked={settings.privacy?.allowThemeCookie ?? true}
+                  value="true"
+                />
+                Save Theme to Cookie (for login page)
+                <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: '4px' }}>
+                  Allows your theme preference to persist on the login page
+                </small>
               </label>
             </div>
             <button type="submit" className="save-btn">Save Changes</button>

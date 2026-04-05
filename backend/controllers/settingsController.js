@@ -179,7 +179,7 @@ const settingsController = {
 
   updatePrivacySettings: async (req, res) => {
     try {
-      const allowedFields = ['shareCalendar', 'showBusyStatus'];
+      const allowedFields = ['shareCalendar', 'showBusyStatus', 'allowThemeCookie'];
       
       const updates = {};
       for (const field of allowedFields) {
