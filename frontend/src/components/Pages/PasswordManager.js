@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Search, X, Copy, Check, Lock, User, Globe, FileText, Shield, Sparkles, RefreshCw, Settings, Download, Upload } from 'lucide-react';
 import passwordAPI from '../../services/passwordAPI';
+import { usePageActions } from '../../contexts/PageActionsContext';
 
 const calculatePasswordStrength = (password) => {
   if (!password) return { score: 0, label: 'Enter password', color: '#6B7280', width: '0%' };
@@ -50,6 +51,7 @@ const generatePassword = (length = 16, options = {}) => {
 };
 
 const PasswordManager = () => {
+  const { registerPageActions, clearPageActions } = usePageActions();
   const [passwords, setPasswords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -109,6 +111,49 @@ const PasswordManager = () => {
     fetchPasswords();
     fetchCategories();
   }, [categoryFilter, searchTerm, showFavorites]);
+
+  useEffect(() => {
+    registerPageActions([
+      {
+        icon: <Plus size={18} />,
+        label: 'Add Password',
+        onClick: () => {
+          setEditingPassword(null);
+          setFormData({
+            title: '',
+            username: '',
+            password: '',
+            website: '',
+            category: 'other',
+            notes: '',
+            isFavorite: false
+          });
+          setShowModal(true);
+        },
+        variant: 'primary'
+      },
+      {
+        icon: <Sparkles size={18} />,
+        label: 'Password Generator',
+        onClick: () => setShowGenerator(true),
+        closeOnClick: false
+      },
+      {
+        icon: <Upload size={18} />,
+        label: 'Import',
+        onClick: () => setShowImportModal(true),
+        closeOnClick: false
+      },
+      {
+        icon: <Download size={18} />,
+        label: 'Export',
+        onClick: handleExport,
+        closeOnClick: false
+      }
+    ]);
+
+    return () => clearPageActions();
+  }, [registerPageActions, clearPageActions]);
 
   useEffect(() => {
     const checkLock = () => {

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'r
 import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { CalendarActionsProvider } from './contexts/CalendarActionsContext';
+import { PageActionsProvider } from './contexts/PageActionsContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
@@ -19,6 +20,9 @@ import CookiePopup from './components/Pages/CookiePopup';
 import PasswordManager from './components/Pages/PasswordManager';
 import Wishlist from './components/Wishlist/Wishlist';
 import PublicWishlistItem from './components/Wishlist/PublicWishlistItem';
+import LinkNotFound from './components/Pages/LinkNotFound';
+import Sidebar from './components/Layout/Sidebar';
+import Row from './components/Layout/Row';
 import './App.css';
 
 const getInitialTheme = () => {
@@ -40,18 +44,31 @@ function AppContent() {
     <div className="App">
       <CookiePopup />
       <Routes>
+        {/* Route redirects */}
+        <Route path="/pass" element={<Navigate to="/passwords" replace />} />
+
+        {/* Auth routes */}
         <Route path="/login" element={<AuthPage />} />
+
+        {/* Legal routes */}
         <Route path="/privacy" element={<><Header /><Privacy /><Footer /></>} />
         <Route path="/terms" element={<><Header /><Terms /><Footer /></>} />
         <Route path="/cookies" element={<><Header /><Cookies /><Footer /></>} />
+
+        {/* Home route */}
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="/home" element={
           <ProtectedRoute>
             <div key={location.pathname}>
               <Header />
-              <Hero />
-              <ProductGrid />
-              <Features />
+              <Row>
+                {/* <Sidebar inline /> */}
+                <div style={{ flex: 1 }}>
+                  <Hero />
+                  <ProductGrid />
+                  <Features />
+                </div>
+              </Row>
               <Footer />
             </div>
           </ProtectedRoute>
@@ -61,7 +78,12 @@ function AppContent() {
           <ProtectedRoute>
             <div key={location.pathname}>
               <Header />
-              <CalendarApp />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <CalendarApp />
+                </div>
+              </Row>
               <Footer />
             </div>
           </ProtectedRoute>
@@ -70,7 +92,12 @@ function AppContent() {
           <ProtectedRoute>
             <div key={location.pathname}>
               <Header />
-              <Settings />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <Settings />
+                </div>
+              </Row>
               <Footer />
             </div>
           </ProtectedRoute>
@@ -79,7 +106,12 @@ function AppContent() {
           <ProtectedRoute>
             <div key={location.pathname}>
               <Header />
-              <PasswordManager />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <PasswordManager />
+                </div>
+              </Row>
               <Footer />
             </div>
           </ProtectedRoute>
@@ -88,13 +120,24 @@ function AppContent() {
           <ProtectedRoute>
             <div key={location.pathname}>
               <Header />
-              <Wishlist />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <Wishlist />
+                </div>
+              </Row>
               <Footer />
             </div>
           </ProtectedRoute>
         } />
         <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/placeholder" element={
+          <>
+            <Header />
+            <LinkNotFound />
+            <Footer />
+          </>
+        } />
       </Routes>
     </div>
   );
@@ -105,9 +148,11 @@ function App() {
     <Router>
       <AuthProvider>
         <SettingsProvider>
-          <CalendarActionsProvider>
-            <AppContent />
-          </CalendarActionsProvider>
+          <PageActionsProvider>
+            <CalendarActionsProvider>
+              <AppContent />
+            </CalendarActionsProvider>
+          </PageActionsProvider>
         </SettingsProvider>
       </AuthProvider>
     </Router>

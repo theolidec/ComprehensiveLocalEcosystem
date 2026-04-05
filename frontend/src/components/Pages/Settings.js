@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
+import { usePageActions } from '../../contexts/PageActionsContext';
+import { User, Calendar, Bell, Palette, Lock, RotateCcw } from 'lucide-react';
 import './Settings.css';
 
 const Settings = () => {
   const { settings, loading, updateProfile, updateCalendarSettings, updateNotificationSettings, updateDisplaySettings, updatePrivacySettings, resetSettings } = useSettings();
+  const { registerPageActions, clearPageActions } = usePageActions();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState(null);
 
@@ -12,9 +15,51 @@ const Settings = () => {
     setTimeout(() => setMessage(null), 3000);
   };
 
-  if (loading) {
-    return <div className="settings-loading">Loading settings...</div>;
-  }
+  useEffect(() => {
+    if (loading) return;
+    
+    registerPageActions([
+      {
+        icon: <User size={18} />,
+        label: 'Profile',
+        onClick: () => setActiveTab('profile'),
+        variant: activeTab === 'profile' ? 'primary' : 'default'
+      },
+      {
+        icon: <Calendar size={18} />,
+        label: 'Calendar',
+        onClick: () => setActiveTab('calendar'),
+        variant: activeTab === 'calendar' ? 'primary' : 'default'
+      },
+      {
+        icon: <Bell size={18} />,
+        label: 'Notifications',
+        onClick: () => setActiveTab('notifications'),
+        variant: activeTab === 'notifications' ? 'primary' : 'default'
+      },
+      {
+        icon: <Palette size={18} />,
+        label: 'Display',
+        onClick: () => setActiveTab('display'),
+        variant: activeTab === 'display' ? 'primary' : 'default'
+      },
+      {
+        icon: <Lock size={18} />,
+        label: 'Privacy',
+        onClick: () => setActiveTab('privacy'),
+        variant: activeTab === 'privacy' ? 'primary' : 'default'
+      },
+      {
+        icon: <RotateCcw size={18} />,
+        label: 'Reset All',
+        onClick: handleReset,
+        variant: 'danger',
+        closeOnClick: false
+      }
+    ]);
+
+    return () => clearPageActions();
+  }, [activeTab, loading, registerPageActions, clearPageActions]);
 
   const handleProfileSave = async (e) => {
     e.preventDefault();
@@ -101,6 +146,50 @@ const Settings = () => {
     { id: 'display', label: 'Display', icon: '🎨' },
     { id: 'privacy', label: 'Privacy', icon: '🔒' }
   ];
+
+  useEffect(() => {
+    registerPageActions([
+      {
+        icon: <User size={18} />,
+        label: 'Profile',
+        onClick: () => setActiveTab('profile'),
+        variant: activeTab === 'profile' ? 'primary' : 'default'
+      },
+      {
+        icon: <Calendar size={18} />,
+        label: 'Calendar',
+        onClick: () => setActiveTab('calendar'),
+        variant: activeTab === 'calendar' ? 'primary' : 'default'
+      },
+      {
+        icon: <Bell size={18} />,
+        label: 'Notifications',
+        onClick: () => setActiveTab('notifications'),
+        variant: activeTab === 'notifications' ? 'primary' : 'default'
+      },
+      {
+        icon: <Palette size={18} />,
+        label: 'Display',
+        onClick: () => setActiveTab('display'),
+        variant: activeTab === 'display' ? 'primary' : 'default'
+      },
+      {
+        icon: <Lock size={18} />,
+        label: 'Privacy',
+        onClick: () => setActiveTab('privacy'),
+        variant: activeTab === 'privacy' ? 'primary' : 'default'
+      },
+      {
+        icon: <RotateCcw size={18} />,
+        label: 'Reset All',
+        onClick: handleReset,
+        variant: 'danger',
+        closeOnClick: false
+      }
+    ]);
+
+    return () => clearPageActions();
+  }, [activeTab, registerPageActions, clearPageActions]);
 
   return (
     <div className="settings-container">

@@ -7,6 +7,7 @@ import CategoryManager from './CategoryManager';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
+import { usePageActions } from '../../contexts/PageActionsContext';
 
 const getEventId = (event) => event._id || event.id;
 
@@ -14,6 +15,7 @@ const CalendarApp = () => {
   const { isAuthenticated } = useAuth();
   const { settings, loading: settingsLoading } = useSettings();
   const { registerActions, clearActions, setIsCalendarPage } = useCalendarActions();
+  const { registerPageActions, clearPageActions } = usePageActions();
   const { view: urlView } = useParams();
   const navigate = useNavigate();
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -482,11 +484,38 @@ const CalendarApp = () => {
       }
     });
 
+    registerPageActions([
+      {
+        icon: <Plus size={18} />,
+        label: 'Add Event',
+        onClick: () => {
+          if (!selectedDate) {
+            setSelectedDate(new Date());
+          }
+          setShowEventForm(true);
+        },
+        variant: 'primary'
+      },
+      {
+        icon: <Upload size={18} />,
+        label: 'Import',
+        onClick: handleImportFile,
+        closeOnClick: false
+      },
+      {
+        icon: <Download size={18} />,
+        label: 'Export',
+        onClick: exportCalendar,
+        closeOnClick: false
+      }
+    ]);
+
     return () => {
       setIsCalendarPage(false);
       clearActions();
+      clearPageActions();
     };
-  }, [registerActions, clearActions, setIsCalendarPage, handleImportFile, exportCalendar, createDummyEvents, removeDummyEvents, selectedDate, setSelectedDate, setShowEventForm]);
+  }, [registerActions, clearActions, setIsCalendarPage, handleImportFile, exportCalendar, createDummyEvents, removeDummyEvents, selectedDate, setSelectedDate, setShowEventForm, registerPageActions, clearPageActions]);
 
   // Week view generation
   const generateWeekDays = () => {

@@ -2,27 +2,29 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Gift, Plus, Search, Share2, Lock,
   Heart, ShoppingBag, ExternalLink, Edit2, Trash2,
-  Tag, DollarSign, Star, X, CheckCircle, AlertCircle, Package,
-  Check, Square, ChevronLeft, ChevronRight, Download
+  Star, X, CheckCircle, AlertCircle, Package,
+  Check, Square, ChevronLeft, ChevronRight, Download,
+  Sparkles, Flame, Zap, Target
 } from 'lucide-react';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import WishlistItemModal from './WishlistItemModal';
 import WishlistShareModal from './WishlistShareModal';
 import ReservationModal from './ReservationModal';
 import { wishlistCategoryAPI } from '../../services/wishlistCategoryAPI';
+import { usePageActions } from '../../contexts/PageActionsContext';
 import './Wishlist.css';
 
 const priorityConfig = {
-  'must-have': { color: '#ef4444', label: 'Must Have', icon: Star },
-  'high': { color: '#f97316', label: 'High', icon: Star },
-  'medium': { color: '#3b82f6', label: 'Medium', icon: Star },
+  'must-have': { color: '#ef4444', label: 'Must Have', icon: Zap },
+  'high': { color: '#f97316', label: 'High', icon: Flame },
+  'medium': { color: '#3b82f6', label: 'Medium', icon: Target },
   'low': { color: '#6b7280', label: 'Low', icon: Star }
 };
 
 const categoryConfig = {
-  'birthday': { color: '#8b5cf6', label: 'Birthday', icon: Gift, gradient: 'from-purple-500 to-pink-500' },
-  'christmas': { color: '#10b981', label: 'Christmas', icon: Gift, gradient: 'from-green-500 to-emerald-500' },
-  'other': { color: '#6b7280', label: 'Other', icon: Package, gradient: 'from-gray-500 to-slate-500' }
+  'birthday': { color: '#8b5cf6', label: 'Birthday', icon: Gift, gradient: 'linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%)' },
+  'christmas': { color: '#10b981', label: 'Christmas', icon: Gift, gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
+  'other': { color: '#6b7280', label: 'Other', icon: Package, gradient: 'linear-gradient(135deg, #6b7280 0%, #4b5563 100%)' }
 };
 
 const currencySymbols = {
@@ -30,6 +32,7 @@ const currencySymbols = {
 };
 
 export default function Wishlist() {
+  const { registerPageActions, clearPageActions } = usePageActions();
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState(null);
@@ -40,7 +43,7 @@ export default function Wishlist() {
   const [searchQuery, setSearchQuery] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [selectedItems, setSelectedItems] = useState([]);
-  const [showBatchActions, setShowBatchActions] = useState(false);
+  const [viewMode, setViewMode] = useState('grid');
   
   // Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -82,6 +85,39 @@ export default function Wishlist() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  useEffect(() => {
+    registerPageActions([
+      {
+        icon: <Plus size={18} />,
+        label: 'Add Wish',
+        onClick: handleAddItem,
+        variant: 'primary'
+      },
+      {
+        icon: <Download size={18} />,
+        label: 'Export CSV',
+        onClick: () => handleExport('csv'),
+        closeOnClick: false
+      },
+      ...(selectedItems.length > 0 ? [
+        {
+          icon: <Trash2 size={18} />,
+          label: `Delete Selected (${selectedItems.length})`,
+          onClick: handleBatchDelete,
+          variant: 'danger'
+        },
+        {
+          icon: <CheckCircle size={18} />,
+          label: 'Mark as Purchased',
+          onClick: () => handleBatchStatusChange('purchased'),
+          variant: 'success'
+        }
+      ] : [])
+    ]);
+
+    return () => clearPageActions();
+  }, [selectedItems.length]);
 
   const handleAddItem = () => {
     setEditingItem(null);
@@ -235,10 +271,10 @@ export default function Wishlist() {
       return {
         color: category.color,
         label: category.name,
-        icon: category.icon === 'gift' ? Gift : category.icon === 'package' ? Package : Gift
+        icon: category.icon === 'gift' ? Gift : category.icon === 'package' ? Package : Gift,
+        gradient: `linear-gradient(135deg, ${category.color} 0%, ${category.color}99 100%)`
       };
     }
-    // Fallback to default config
     return categoryConfig[categoryName] || categoryConfig['other'];
   };
 
@@ -253,139 +289,166 @@ export default function Wishlist() {
 
   return (
     <div className="wishlist-container">
-      {/* Hero Section */}
-      <div className="wishlist-hero">
-        <div className="wishlist-hero-content">
-          <div className="wishlist-hero-icon">
-            <Gift size={28} />
+      {/* Hero Section - Redesigned */}
+      <div className="wishlist-hero-new">
+        <div className="hero-bg-pattern"></div>
+        <div className="hero-content">
+          <div className="hero-left">
+            <div className="hero-text">
+              <p className="wishlist-subtitle">
+                <span className="item-count">{items.length} wishes</span>
+                <span className="divider">•</span>
+                <span className="total-value">{currencySymbols.USD}{getTotalValue().toFixed(2)} total</span>
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="wishlist-title">My Wishlist</h1>
-            <p className="wishlist-subtitle">
-              {items.length} items · {currencySymbols.USD}{getTotalValue().toFixed(2)} total value
-            </p>
-          </div>
+          <button className="wishlist-add-btn" onClick={handleAddItem}>
+            <Plus size={20} />
+            <span>Add Wish</span>
+          </button>
         </div>
-        <button className="wishlist-add-btn" onClick={handleAddItem}>
-          <Plus size={18} />
-          <span>Add Item</span>
-        </button>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="wishlist-stats">
-        {categories.map(category => {
-          const CategoryIcon = category.icon === 'package' ? Package : Gift;
-          return (
-            <div 
-              key={category._id} 
-              className="wishlist-stat-card"
-              style={{ 
-                background: `linear-gradient(135deg, ${category.color}15 0%, ${category.color}25 100%)`,
-                borderColor: `${category.color}30`
-              }}
-            >
+        
+        {/* Quick Stats Row */}
+        <div className="hero-stats">
+          {categories.slice(0, 3).map(category => {
+            const CategoryIcon = category.icon === 'package' ? Package : Gift;
+            return (
               <div 
-                className="wishlist-stat-icon"
-                style={{ background: `${category.color}20`, color: category.color }}
+                key={category._id} 
+                className="hero-stat-chip"
+                style={{ 
+                  '--chip-color': category.color,
+                  background: `${category.color}15`,
+                  borderColor: `${category.color}30`
+                }}
               >
-                <CategoryIcon size={20} />
+                <CategoryIcon size={16} style={{ color: category.color }} />
+                <span className="chip-count">{getCategoryCount(category.name)}</span>
+                <span className="chip-label">{category.name}</span>
               </div>
-              <div className="wishlist-stat-content">
-                <span className="wishlist-stat-value">{getCategoryCount(category.name)}</span>
-                <span className="wishlist-stat-label">{category.name}</span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Filters & Search */}
-      <div className="wishlist-filters">
-        <div className="wishlist-search-container">
-          <Search className="wishlist-search-icon" size={18} />
-          <input
-            type="text"
-            className="wishlist-search-input"
-            placeholder="Search items..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button 
-              className="wishlist-search-clear" 
-              onClick={() => setSearchQuery('')}
-            >
-              <X size={16} />
-            </button>
-          )}
-        </div>
-
-        <div className="wishlist-filter-group">
-          <select
-            className="wishlist-select"
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-          >
-            <option value="all">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat._id} value={cat.name}>{cat.name}</option>
-            ))}
-          </select>
-
-          <select
-            className="wishlist-select"
-            value={selectedPriority}
-            onChange={(e) => setSelectedPriority(e.target.value)}
-          >
-            <option value="all">All Priorities</option>
-            <option value="must-have">Must Have</option>
-            <option value="high">High</option>
-            <option value="medium">Medium</option>
-            <option value="low">Low</option>
-          </select>
+            );
+          })}
+          <div className="hero-stat-chip priority-chip">
+            <Sparkles size={16} />
+            <span className="chip-count">{items.filter(i => i.priority === 'must-have').length}</span>
+            <span className="chip-label">Must Haves</span>
+          </div>
         </div>
       </div>
 
-      {/* Batch Actions Bar */}
-      {filteredItems.length > 0 && (
-        <div className="wishlist-batch-bar">
-          <label className="wishlist-select-all">
+      {/* Search & Filter Bar */}
+      <div className="wishlist-toolbar">
+        <div className="toolbar-row">
+          <div className="search-wrapper">
+            <Search className="search-icon" size={18} />
             <input
-              type="checkbox"
-              checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
-              onChange={toggleSelectAll}
+              type="text"
+              className="search-input"
+              placeholder="Search your wishes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
-            <span>Select All ({filteredItems.length})</span>
-          </label>
-          
-          {selectedItems.length > 0 ? (
-            <div className="wishlist-batch-actions">
-              <span className="batch-count">{selectedItems.length} selected</span>
-              <button className="batch-btn" onClick={() => handleBatchStatusChange('purchased')}>
-                <ShoppingBag size={14} /> Mark Purchased
+            {searchQuery && (
+              <button className="search-clear" onClick={() => setSearchQuery('')}>
+                <X size={16} />
               </button>
-              <button className="batch-btn" onClick={() => handleBatchStatusChange('active')}>
-                <CheckCircle size={14} /> Mark Active
-              </button>
-              <button className="batch-btn delete" onClick={handleBatchDelete}>
-                <Trash2 size={14} /> Delete
-              </button>
-              <button className="batch-btn" onClick={() => setSelectedItems([])}>
-                Clear
-              </button>
-            </div>
-          ) : (
-            <button className="wishlist-export-btn" onClick={() => handleExport('csv')}>
-              <Download size={16} /> Export CSV
+            )}
+          </div>
+
+          {/* Category Tabs */}
+          <div className="category-tabs">
+            <button 
+              className={`category-tab ${selectedCategory === 'all' ? 'active' : ''}`}
+              onClick={() => setSelectedCategory('all')}
+            >
+              All
             </button>
+            {categories.map(cat => (
+              <button
+                key={cat._id}
+                className={`category-tab ${selectedCategory === cat.name ? 'active' : ''}`}
+                style={{ 
+                  '--tab-color': cat.color,
+                  '--tab-bg': `${cat.color}15`,
+                  '--tab-border': `${cat.color}30`
+                }}
+                onClick={() => setSelectedCategory(cat.name)}
+              >
+                {cat.name}
+              </button>
+            ))}
+          </div>
+
+          {/* Batch Actions - inline */}
+          {filteredItems.length > 0 && (
+            <div className="batch-bar-inline">
+              <label className="select-all">
+                <input
+                  type="checkbox"
+                  checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                  onChange={toggleSelectAll}
+                />
+                <span>Select all</span>
+              </label>
+              
+              {selectedItems.length > 0 ? (
+                <div className="batch-actions-inline">
+                  <span className="selected-count">{selectedItems.length}</span>
+                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('purchased')}>
+                    <ShoppingBag size={14} />
+                  </button>
+                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('active')}>
+                    <CheckCircle size={14} />
+                  </button>
+                  <button className="batch-action-btn delete" onClick={handleBatchDelete}>
+                    <Trash2 size={14} />
+                  </button>
+                  <button className="batch-action-btn clear" onClick={() => setSelectedItems([])}>
+                    <X size={14} />
+                  </button>
+                </div>
+              ) : (
+                <button className="export-btn" onClick={() => handleExport('csv')}>
+                  <Download size={14} />
+                  Export
+                </button>
+              )}
+            </div>
           )}
+
+          {/* View Toggle */}
+          <div className="view-toggle">
+            <button 
+              className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
+              onClick={() => setViewMode('grid')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"/>
+                <rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/>
+                <rect x="14" y="14" width="7" height="7" rx="1"/>
+              </svg>
+            </button>
+            <button 
+              className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
+              onClick={() => setViewMode('list')}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <line x1="8" y1="6" x2="21" y2="6"/>
+                <line x1="8" y1="12" x2="21" y2="12"/>
+                <line x1="8" y1="18" x2="21" y2="18"/>
+                <line x1="3" y1="6" x2="3.01" y2="6"/>
+                <line x1="3" y1="12" x2="3.01" y2="12"/>
+                <line x1="3" y1="18" x2="3.01" y2="18"/>
+              </svg>
+            </button>
+          </div>
         </div>
-      )}
+      </div>
 
       {/* Error Display */}
       {error && (
-        <div className="wishlist-error">
+        <div className="error-banner">
           <AlertCircle size={18} />
           <span>{error}</span>
           <button onClick={() => setError(null)}>Dismiss</button>
@@ -394,25 +457,27 @@ export default function Wishlist() {
 
       {/* Items Grid/List */}
       {filteredItems.length === 0 ? (
-        <div className="wishlist-empty">
-          <div className="wishlist-empty-icon">
-            <Heart size={48} />
+        <div className="empty-state">
+          <div className="empty-illustration">
+            <div className="floating-gift gift-1">🎁</div>
+            <div className="floating-gift gift-2">✨</div>
+            <div className="floating-gift gift-3">🎀</div>
           </div>
-          <h3>No items found</h3>
+          <h3>No wishes yet</h3>
           <p>
             {searchQuery || selectedCategory !== 'all' || selectedPriority !== 'all'
-              ? 'Try adjusting your filters'
-              : 'Start adding items to your wishlist'}
+              ? 'Try adjusting your filters to find what you\'re looking for'
+              : 'Start adding items to your wishlist and make your dreams come true!'}
           </p>
           {!searchQuery && selectedCategory === 'all' && selectedPriority === 'all' && (
-            <button className="wishlist-empty-btn" onClick={handleAddItem}>
+            <button className="add-first-btn" onClick={handleAddItem}>
               <Plus size={18} />
-              Add Your First Item
+              Add Your First Wish
             </button>
           )}
         </div>
       ) : (
-        <div className="wishlist-items">
+        <div className={`wishlist-items ${viewMode}`}>
           {filteredItems.map((item, index) => {
             const categoryStyle = getCategoryStyle(item.category);
             const CategoryIcon = categoryStyle.icon;
@@ -424,115 +489,131 @@ export default function Wishlist() {
             return (
               <div 
                 key={item._id} 
-                className={`wishlist-item ${isPurchased ? 'purchased' : ''} ${selectedItems.includes(item._id) ? 'selected' : ''}`}
-                style={{ animationDelay: `${index * 0.05}s` }}
+                className={`wishlist-card ${isPurchased ? 'purchased' : ''} ${selectedItems.includes(item._id) ? 'selected' : ''}`}
+                style={{ '--delay': `${index * 0.03}s` }}
               >
-                {/* Selection Checkbox */}
-                <div className="wishlist-item-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={selectedItems.includes(item._id)}
-                    onChange={() => toggleItemSelection(item._id)}
-                  />
-                </div>
-                
-                {/* Content */}
-                <div className="wishlist-item-content">
-                  <div className="wishlist-item-header">
-                    <h3 className="wishlist-item-title">{item.title}</h3>
-                    <div className="wishlist-item-badges">
-                      <div 
-                        className="wishlist-item-category"
-                        style={{ backgroundColor: categoryStyle.color + '20', color: categoryStyle.color }}
-                      >
-                        <CategoryIcon size={14} />
-                        <span>{categoryStyle.label}</span>
+                {/* Card Image */}
+                {item.imageUrl && (
+                  <div className="card-image">
+                    <img src={item.imageUrl} alt={item.title} />
+                    {isPurchased && (
+                      <div className="purchased-overlay">
+                        <ShoppingBag size={24} />
+                        <span>Purchased</span>
                       </div>
-                      <span 
-                        className="priority-badge"
-                        style={{ backgroundColor: priorityConfig[item.priority].color + '20', color: priorityConfig[item.priority].color }}
-                      >
-                        <PriorityIcon size={12} />
-                        {priorityConfig[item.priority].label}
-                      </span>
-                      {hasReservations && !isPurchased && (
-                        <span className="reserved-badge">
-                          <Lock size={12} />
-                          Reserved
-                        </span>
-                      )}
+                    )}
+                  </div>
+                )}
+                
+                {/* Card Content */}
+                <div className="card-body">
+                  {/* Selection & Priority */}
+                  <div className="card-header">
+                    <div className="card-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item._id)}
+                        onChange={() => toggleItemSelection(item._id)}
+                      />
+                    </div>
+                    <div 
+                      className="priority-indicator"
+                      style={{ background: priorityConfig[item.priority].color }}
+                      title={priorityConfig[item.priority].label}
+                    >
+                      <PriorityIcon size={12} />
                     </div>
                   </div>
 
+                  {/* Category Badge */}
+                  <div 
+                    className="category-badge"
+                    style={{ background: `${categoryStyle.color}15`, color: categoryStyle.color }}
+                  >
+                    <CategoryIcon size={12} />
+                    <span>{categoryStyle.label}</span>
+                  </div>
+
+                  {/* Title & Description */}
+                  <h3 className="card-title">{item.title}</h3>
                   {item.description && (
-                    <p className="wishlist-item-description">{item.description}</p>
+                    <p className="card-description">{item.description}</p>
                   )}
 
-                  <div className="wishlist-item-meta">
+                  {/* Price & Link */}
+                  <div className="card-footer">
                     {item.price && (
-                      <span className="wishlist-item-price">
-                        <DollarSign size={14} />
-                        {currencySymbols[item.currency] || '$'}{item.price.toFixed(2)}
-                      </span>
+                      <div className="card-price">
+                        <span className="currency">{currencySymbols[item.currency] || '$'}</span>
+                        <span className="amount">{item.price.toFixed(2)}</span>
+                      </div>
                     )}
                     {item.url && (
                       <a 
                         href={item.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="wishlist-item-link"
+                        className="card-link"
                       >
                         <ExternalLink size={14} />
-                        View Product
                       </a>
                     )}
                   </div>
 
+                  {/* Reservations */}
+                  {hasReservations && !isPurchased && (
+                    <div className="reservation-badge" onClick={() => handleViewReservations(item)}>
+                      <Heart size={12} />
+                      <span>{item.reservations.length} reserved</span>
+                    </div>
+                  )}
+
+                  {/* Purchased By */}
                   {isPurchased && purchasedReservation && (
-                    <div className="wishlist-purchased-by">
-                      <ShoppingBag size={14} />
-                      <span>Purchased by {purchasedReservation.reservedBy.name}</span>
+                    <div className="purchased-by">
+                      <ShoppingBag size={12} />
+                      <span>{purchasedReservation.reservedBy.name}</span>
                     </div>
                   )}
                 </div>
 
-                {/* Actions */}
-                <div className="wishlist-item-actions">
+                {/* Card Actions */}
+                <div className="card-actions">
                   <button
-                    className={`action-btn purchase-btn ${isPurchased ? 'active' : ''}`}
+                    className={`card-action-btn purchase ${isPurchased ? 'active' : ''}`}
                     onClick={() => toggleItemStatus(item)}
                     title={isPurchased ? 'Mark as not purchased' : 'Mark as purchased'}
                   >
                     <ShoppingBag size={16} />
                   </button>
                   <button
-                    className="action-btn share-btn"
+                    className="card-action-btn share"
                     onClick={() => handleShareItem(item)}
-                    title="Share item"
+                    title="Share"
                   >
                     {item.isPublic ? <Share2 size={16} /> : <Lock size={16} />}
                   </button>
                   {hasReservations && (
                     <button
-                      className="action-btn reservations-btn"
+                      className="card-action-btn reservations"
                       onClick={() => handleViewReservations(item)}
-                      title="View reservations"
+                      title="Reservations"
                     >
                       <Heart size={16} />
-                      <span className="reservation-count">{item.reservations.length}</span>
+                      <span className="action-badge">{item.reservations.length}</span>
                     </button>
                   )}
                   <button
-                    className="action-btn edit-btn"
+                    className="card-action-btn edit"
                     onClick={() => handleEditItem(item)}
-                    title="Edit item"
+                    title="Edit"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button
-                    className="action-btn delete-btn"
+                    className="card-action-btn delete"
                     onClick={() => handleDeleteItem(item._id)}
-                    title="Delete item"
+                    title="Delete"
                   >
                     <Trash2 size={16} />
                   </button>
@@ -545,23 +626,43 @@ export default function Wishlist() {
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
-        <div className="wishlist-pagination">
+        <div className="pagination">
           <button 
-            className="pagination-btn"
+            className="page-btn"
             onClick={() => handlePageChange(pagination.page - 1)}
             disabled={pagination.page <= 1}
           >
-            <ChevronLeft size={16} /> Previous
+            <ChevronLeft size={16} />
           </button>
-          <span className="pagination-info">
-            Page {pagination.page} of {pagination.totalPages} ({pagination.total} items)
-          </span>
+          <div className="page-numbers">
+            {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+              let pageNum;
+              if (pagination.totalPages <= 5) {
+                pageNum = i + 1;
+              } else if (pagination.page <= 3) {
+                pageNum = i + 1;
+              } else if (pagination.page >= pagination.totalPages - 2) {
+                pageNum = pagination.totalPages - 4 + i;
+              } else {
+                pageNum = pagination.page - 2 + i;
+              }
+              return (
+                <button
+                  key={pageNum}
+                  className={`page-num ${pagination.page === pageNum ? 'active' : ''}`}
+                  onClick={() => handlePageChange(pageNum)}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+          </div>
           <button 
-            className="pagination-btn"
+            className="page-btn"
             onClick={() => handlePageChange(pagination.page + 1)}
             disabled={pagination.page >= pagination.totalPages}
           >
-            Next <ChevronRight size={16} />
+            <ChevronRight size={16} />
           </button>
         </div>
       )}

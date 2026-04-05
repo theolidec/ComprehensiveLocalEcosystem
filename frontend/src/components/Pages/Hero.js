@@ -1,7 +1,43 @@
-import React from 'react';
-import { ArrowRight, Shield, Lock, Users } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { ArrowRight, Shield, Lock, Users, Calendar, Key, Gift, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { usePageActions } from '../../contexts/PageActionsContext';
 
 const Hero = () => {
+  const navigate = useNavigate();
+  const { registerPageActions, clearPageActions } = usePageActions();
+
+  useEffect(() => {
+    registerPageActions([
+      {
+        icon: <Calendar size={18} />,
+        label: 'Calendar',
+        onClick: () => navigate('/calendar'),
+        variant: 'default'
+      },
+      {
+        icon: <Key size={18} />,
+        label: 'Passwords',
+        onClick: () => navigate('/passwords'),
+        variant: 'default'
+      },
+      {
+        icon: <Gift size={18} />,
+        label: 'Wishlist',
+        onClick: () => navigate('/wishlist'),
+        variant: 'default'
+      },
+      {
+        icon: <Settings size={18} />,
+        label: 'Settings',
+        onClick: () => navigate('/settings'),
+        variant: 'default'
+      }
+    ]);
+
+    return () => clearPageActions();
+  }, [registerPageActions, clearPageActions, navigate]);
+
   return (
     <section className="bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 py-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

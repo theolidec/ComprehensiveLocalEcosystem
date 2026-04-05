@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
+import { usePageActions } from '../../contexts/PageActionsContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const Header = () => {
@@ -21,6 +22,7 @@ const Header = () => {
     onAddEvent,
     isCalendarPage
   } = useCalendarActions();
+  const { toggleSidebar, items: sidebarItems } = usePageActions();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -85,7 +87,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50">
+    <header className="bg-white dark:bg-gray-900 sticky top-0 z-50">
       <nav className="px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
