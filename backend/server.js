@@ -1,4 +1,6 @@
 require('dotenv').config();
+const fs = require('fs');
+const https = require('https');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -20,6 +22,15 @@ const followRoutes = require('./routes/follow');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
+const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
+const USE_HTTPS = process.env.USE_HTTPS === 'true';
+const SSL_CERT_PATH = process.env.SSL_CERT_PATH ? 
+  require('path').resolve(__dirname, process.env.SSL_CERT_PATH) : undefined;
+const SSL_KEY_PATH = process.env.SSL_KEY_PATH ? 
+  require('path').resolve(__dirname, process.env.SSL_KEY_PATH) : undefined;
+
+logger.info(`__dirname: ${__dirname}`);
+logger.info(`CWD: ${process.cwd()}`);
 
 // Connect to database
 connectDB();
@@ -136,9 +147,40 @@ process.on('SIGINT', () => {
   process.exit(0);
 });
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`Server is running on port ${PORT}`);
-  logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
-});
+// Start server with HTTPS support
+if (USE_HTTPS && SSL_CERT_PATH && SSL_KEY_PATH) {
+  console.log(`[HTTPS] Attempting to start with cert: ${SSL_CERT_PATH}, key: ${SSL_KEY_PATH}`);
+  try {
+    const certContent = fs.readFileSync(SSL_CERT_PATH);
+    const keyContent = fs.readFileSync(SSL_KEY_PATH);
+    console.log(`[HTTPS] Cert file size: ${certContent.length}, Key file size: ${keyContent.length}`);
+    
+    const httpsOptions = {
+      cert: certContent,
+      key: keyContent
+    };
+    
+    const server = https.createServer(httpsOptions, app);
+    server.listen(HTTPS_PORT, () => {
+      logger.info(`HTTPS Server is running on port ${HTTPS_PORT}`);
+      logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+    });
+  } catch (error) {
+    console.error('[HTTPS] Error:', error);
+    logger.error('Failed to start HTTPS server:', error.message);
+    logger.error('Stack:', error.stack);
+    logger.info('Falling back to HTTP server');
+    app.listen(PORT, () => {
+      logger.info(`HTTP Server is running on port ${PORT}`);
+      logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+      logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+    });
+  }
+} else {
+  app.listen(PORT, () => {
+    logger.info(`Server is running on port ${PORT}`);
+    logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+  });
+}
