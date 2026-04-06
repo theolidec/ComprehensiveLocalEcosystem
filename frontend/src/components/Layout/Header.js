@@ -225,13 +225,6 @@ const Header = () => {
                       <span>Passwords</span>
                     </button>
                     <button
-                      onClick={() => { window.location.href = '/wishlist'; setIsProfileOpen(false); }}
-                      className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <Gift className="h-4 w-4" />
-                      <span>Wishlist</span>
-                    </button>
-                    <button
                       onClick={() => { window.location.href = '/settings'; setIsProfileOpen(false); }}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >

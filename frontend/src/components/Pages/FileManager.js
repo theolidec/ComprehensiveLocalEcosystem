@@ -5,7 +5,7 @@ import {
   Upload, Folder, FolderPlus, File, FileText, Image, Film, 
   Music, Archive, Download, Trash2, Share2, 
   Star, StarOff, Search, Grid, List, ChevronRight, Home,
-  X, RefreshCw, Trash, Plus, FilePlus, FileSpreadsheet, Presentation
+  X, RefreshCw, Trash, Plus, FilePlus, FileSpreadsheet, Presentation, Edit3
 } from 'lucide-react';
 import fileStorageService from '../../services/fileService';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -65,6 +65,9 @@ const FileManager = () => {
   const [dragOver, setDragOver] = useState(false);
   const [confirmModal, setConfirmModal] = useState({ show: false, message: '', onConfirm: null });
   const [showNewDocMenu, setShowNewDocMenu] = useState(false);
+  const [showCreateFileModal, setShowCreateFileModal] = useState(false);
+  const [newFileName, setNewFileName] = useState('');
+  const [newFileType, setNewFileType] = useState('txt');
 
   const showConfirm = (message, onConfirm) => {
     setConfirmModal({ show: true, message, onConfirm });
@@ -127,6 +130,11 @@ const FileManager = () => {
   useEffect(() => {
     registerPageActions([
       {
+        icon: <Edit3 size={18} />,
+        label: 'Create File',
+        onClick: () => setShowCreateFileModal(true)
+      },
+      {
         icon: <Plus size={18} />,
         label: 'New Folder',
         onClick: () => setShowNewFolderModal(true)
@@ -173,6 +181,22 @@ const FileManager = () => {
     }
   };
 
+  const handleCreateFile = async () => {
+    if (!newFileName.trim()) return;
+    try {
+      const mimeType = newFileType === 'md' ? 'text/markdown' : 'text/plain';
+      await fileService.createTextFile(newFileName.trim(), '', currentFolder, mimeType);
+      await loadFiles();
+      await loadStats();
+      setShowCreateFileModal(false);
+      setNewFileName('');
+      setNewFileType('txt');
+    } catch (error) {
+      console.error('Failed to create file:', error);
+      alert('Failed to create file: ' + error.message);
+    }
+  };
+
   const handleFolderClick = async (folder) => {
     setCurrentFolder(folder._id);
     setBreadcrumbs([...breadcrumbs, folder]);
@@ -196,7 +220,8 @@ const FileManager = () => {
       'application/vnd.oasis.opendocument.spreadsheet',
       'application/vnd.oasis.opendocument.presentation',
       'application/rtf',
-      'text/plain'
+      'text/plain',
+      'text/markdown'
     ];
     
     if (documentTypes.includes(file.mimeType)) {
@@ -769,6 +794,71 @@ const FileManager = () => {
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
                 Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCreateFileModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Create New File</h2>
+              <button 
+                onClick={() => { setShowCreateFileModal(false); setNewFileName(''); setNewFileType('txt'); }} 
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <input
+              type="text"
+              placeholder="File name"
+              value={newFileName}
+              onChange={(e) => setNewFileName(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-white mb-4"
+              autoFocus
+            />
+            <div className="mb-4">
+              <span className="text-sm text-gray-500 dark:text-gray-400 block mb-2">File type:</span>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => setNewFileType('txt')}
+                  className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+                    newFileType === 'txt'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="text-gray-900 dark:text-white">.txt</span>
+                </button>
+                <button
+                  onClick={() => setNewFileType('md')}
+                  className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
+                    newFileType === 'md'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                      : 'border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+                  }`}
+                >
+                  <FileText className="h-4 w-4" />
+                  <span className="text-gray-900 dark:text-white">.md</span>
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-end space-x-2">
+              <button
+                onClick={() => { setShowCreateFileModal(false); setNewFileName(''); setNewFileType('txt'); }}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateFile}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Create
               </button>
             </div>
           </div>

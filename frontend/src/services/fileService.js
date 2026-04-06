@@ -82,6 +82,26 @@ const fileService = {
     return response.data;
   },
 
+  createTextFile: async (name, content = '', folderId = null, mimeType = 'text/plain') => {
+    const response = await axios.post(`${API_URL}/api/files/create-text`, {
+      name,
+      content,
+      folderId,
+      mimeType
+    });
+    return response.data;
+  },
+
+  getFileContent: async (id) => {
+    const response = await axios.get(`${API_URL}/api/files/${id}/content`);
+    return response.data;
+  },
+
+  updateFileContent: async (id, content) => {
+    const response = await axios.put(`${API_URL}/api/files/${id}/content`, { content });
+    return response.data;
+  },
+
   shareFile: async (id, isPublic) => {
     const response = await axios.put(`${API_URL}/api/files/${id}/share`, { isPublic });
     return response.data;

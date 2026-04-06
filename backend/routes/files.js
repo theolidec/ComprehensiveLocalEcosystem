@@ -134,4 +134,8 @@ router.delete('/:id/permanent', authenticateToken, fileController.deleteFile);
 router.post('/:id/restore', authenticateToken, fileController.restoreFile);
 router.delete('/trash/empty', authenticateToken, fileController.emptyTrash);
 
+router.post('/create-text', authenticateToken, fileController.createTextFile);
+router.get('/:id/content', authenticateToken, fileController.getFileContent);
+router.put('/:id/content', authenticateToken, fileController.updateFileContent);
+
 module.exports = router;

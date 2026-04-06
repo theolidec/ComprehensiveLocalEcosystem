@@ -36,6 +36,18 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **One-Click Copy**: Copy passwords to clipboard
 - **Password Generator**: Built-in secure password generation
 
+### File Manager (NEW)
+- **Complete File Management**: Upload, download, organize files with folder structure
+- **Document Viewer**: Built-in text and markdown file editor with live preview
+- **File Organization**: Create folders, move files, favorite files
+- **File Types Supported**: Images, documents (PDF, Word, Excel, PowerPoint), spreadsheets, code files, archives, audio, video
+- **Trash System**: Soft delete with restore functionality
+- **File Sharing**: Generate shareable links for files
+- **Storage Stats**: Track storage usage with 10GB default limit
+- **Search & Filter**: Find files by name, type, or tags
+- **Large File Support**: Up to 500MB per file
+- **Secure Storage**: Files stored with unique hashed filenames
+
 ### Wishlist System
 - **Item Management**: Create, edit, delete wishlist items with rich details
 - **Public/Private Items**: Share items via unique shareable links
@@ -255,6 +267,45 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 | `POST` | `/avatar` | Upload avatar | Yes |
 | `DELETE` | `/avatar` | Remove avatar | Yes |
 
+### File Routes (`/api/files`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | Get all files with pagination | Yes |
+| `POST` | `/upload` | Upload a file | Yes |
+| `GET` | `/stats` | Get storage statistics | Yes |
+| `GET` | `/trash` | Get deleted files | Yes |
+| `DELETE` | `/trash/empty` | Permanently delete all trash | Yes |
+| `GET` | `/shared/:token` | Access shared file (public) | No |
+| `POST` | `/create-text` | Create text/markdown file | Yes |
+| `GET` | `/:id` | Get file metadata | Yes |
+| `GET` | `/:id/download` | Download file | Yes |
+| `GET` | `/:id/stream` | Stream file content | Yes |
+| `GET` | `/:id/dataurl` | Get file as data URL | Yes |
+| `GET` | `/:id/content` | Get text file content | Yes |
+| `PUT` | `/:id` | Update file metadata | Yes |
+| `PUT` | `/:id/content` | Update text file content | Yes |
+| `PUT` | `/:id/move` | Move file to folder | Yes |
+| `PUT` | `/:id/share` | Toggle public sharing | Yes |
+| `DELETE` | `/:id` | Soft delete file (move to trash) | Yes |
+| `DELETE` | `/:id/permanent` | Permanently delete file | Yes |
+| `POST` | `/:id/restore` | Restore file from trash | Yes |
+
+### File Folder Routes (`/api/file-folders`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | Get all folders | Yes |
+| `GET` | `/all` | Get all folders (flat list) | Yes |
+| `GET` | `/path/:id` | Get folder breadcrumb path | Yes |
+| `POST` | `/` | Create new folder | Yes |
+| `GET` | `/:id` | Get folder contents | Yes |
+| `PUT` | `/:id` | Update folder | Yes |
+| `PUT` | `/:id/move` | Move folder | Yes |
+| `DELETE` | `/:id` | Soft delete folder | Yes |
+| `DELETE` | `/:id/permanent` | Permanently delete folder | Yes |
+| `POST` | `/:id/restore` | Restore folder from trash | Yes |
+
 ### System Routes
 
 | Method | Endpoint | Description |
@@ -323,6 +374,15 @@ Authorization: Bearer <access_token>
 5. **Reservations:** Others can reserve or mark items as purchased
 6. **Following:** Follow other users to see their public wishlists
 
+### File Management
+1. **Access:** Navigate to `/files` (or `/drive`) from the sidebar
+2. **Upload Files:** Drag & drop or click to upload files up to 500MB
+3. **Create Documents:** Create and edit text/markdown files with live preview
+4. **Organize:** Create folders, move files, add favorites and tags
+5. **Share:** Generate public shareable links for files
+6. **Trash:** Soft delete files with ability to restore or permanently delete
+7. **Document Viewer:** Click text/markdown files to edit with live preview at `/files/document/:id`
+
 ### Form Validation Requirements
 - **Email:** Valid email format required
 - **Password:** Minimum 6 characters
@@ -362,6 +422,8 @@ ComprehensiveLocalEcosystem/
 │   ├── controllers/
 │   │   ├── calendarController.js    # Calendar API logic
 │   │   ├── categoryController.js    # Category management
+│   │   ├── fileController.js        # File management
+│   │   ├── fileFolderController.js  # File folder management
 │   │   ├── passwordController.js    # Password management
 │   │   ├── passwordCategoryController.js # Password categories
 │   │   └── settingsController.js    # User settings management
@@ -374,6 +436,8 @@ ComprehensiveLocalEcosystem/
 │   │   ├── Event.js             # Calendar event model
 │   │   ├── Category.js          # Event category model
 │   │   ├── Settings.js          # User settings model
+│   │   ├── File.js              # File model
+│   │   ├── FileFolder.js        # File folder model
 │   │   ├── Wishlist.js          # Wishlist model
 │   │   ├── WishlistItem.js      # Wishlist item model
 │   │   ├── WishlistCategory.js  # Wishlist category model
@@ -384,6 +448,8 @@ ComprehensiveLocalEcosystem/
 │   │   ├── auth.js              # Authentication routes
 │   │   ├── calendar.js          # Calendar API routes
 │   │   ├── categories.js        # Category routes
+│   │   ├── files.js             # File routes
+│   │   ├── fileFolders.js       # File folder routes
 │   │   ├── passwords.js         # Password routes
 │   │   ├── passwordCategories.js # Password category routes
 │   │   ├── wishlist.js          # Wishlist routes
@@ -418,22 +484,24 @@ ComprehensiveLocalEcosystem/
 │   │   │   ├── Pages/
 │   │   │   │   ├── Calendar.js        # Full calendar system
 │   │   │   │   ├── CategoryManager.js # Category management UI
+│   │   │   │   ├── DocumentViewer.js  # Document editor/viewer
+│   │   │   │   ├── FileManager.js    # File management UI
 │   │   │   │   ├── PasswordManager.js # Password management UI
-│   │   │   │   ├── Settings.js        # User settings page
-│   │   │   │   ├── Hero.js            # Landing page hero
-│   │   │   │   ├── ProductGrid.js     # Product showcase
-│   │   │   │   ├── Features.js        # Features display
-│   │   │   │   ├── Privacy.js         # Privacy policy page
-│   │   │   │   ├── Terms.js           # Terms of service page
-│   │   │   │   ├── Cookies.js         # Cookie policy page
-│   │   │   │   ├── CookiePopup.js     # Cookie consent popup
-│   │   │   │   └── LinkNotFound.js    # 404 placeholder page
+│   │   │   │   ├── Settings.js       # User settings page
+│   │   │   │   ├── Hero.js           # Landing page hero
+│   │   │   │   ├── ProductGrid.js    # Product showcase
+│   │   │   │   ├── Features.js       # Features display
+│   │   │   │   ├── Privacy.js        # Privacy policy page
+│   │   │   │   ├── Terms.js          # Terms of service page
+│   │   │   │   ├── Cookies.js        # Cookie policy page
+│   │   │   │   ├── CookiePopup.js    # Cookie consent popup
+│   │   │   │   └── LinkNotFound.js   # 404 placeholder page
 │   │   │   ├── Wishlist/
-│   │   │   │   ├── Wishlist.js        # Main wishlist component
-│   │   │   │   ├── WishlistItemModal.js    # Item create/edit modal
-│   │   │   │   ├── ReservationModal.js     # Reservation modal
-│   │   │   │   ├── WishlistShareModal.js   # Share link modal
-│   │   │   │   └── PublicWishlistItem.js   # Public item view
+│   │   │   │   ├── Wishlist.js       # Main wishlist component
+│   │   │   │   ├── WishlistItemModal.js # Item create/edit modal
+│   │   │   │   ├── ReservationModal.js  # Reservation modal
+│   │   │   │   ├── WishlistShareModal.js # Share link modal
+│   │   │   │   └── PublicWishlistItem.js # Public item view
 │   │   │   ├── CalendarHeader.js      # Calendar header component
 │   │   │   ├── CalendarSidebar.js     # Calendar sidebar component
 │   │   │   ├── EventForm.js           # Event creation form
@@ -446,6 +514,7 @@ ComprehensiveLocalEcosystem/
 │   │   ├── services/
 │   │   │   ├── calendarAPI.js         # Calendar API client
 │   │   │   ├── categoryAPI.js         # Category API client
+│   │   │   ├── fileService.js         # File API client
 │   │   │   ├── passwordAPI.js         # Password API client
 │   │   │   ├── settingsAPI.js         # Settings API client
 │   │   │   ├── wishlistAPI.js         # Wishlist API client
@@ -536,6 +605,11 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Analytics dashboard for wishlists
 - Cookie consent and legal pages
 - Theme support (light/dark mode)
+- File Manager with folder organization
+- Document Viewer with markdown support
+- File upload/download/streaming (up to 500MB)
+- File trash and restore functionality
+- File sharing with public tokens
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -599,7 +673,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.0.0
-**Last Updated**: 2026-04-05
+**Version**: 2.1.0
+**Last Updated**: 2026-04-06
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

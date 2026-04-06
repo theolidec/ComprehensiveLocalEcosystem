@@ -390,6 +390,103 @@ const fileController = {
       logger.error('Get storage stats error:', error);
       res.status(500).json({ error: 'Failed to get storage stats', code: 'STATS_ERROR' });
     }
+  },
+
+  createTextFile: async (req, res) => {
+    try {
+      const { name, content, folderId, mimeType } = req.body;
+      
+      if (!name || !name.trim()) {
+        return res.status(400).json({ error: 'File name is required', code: 'NO_NAME' });
+      }
+
+      if (folderId) {
+        const folder = await FileFolder.findOne({ _id: folderId, userId: req.user._id, isDeleted: false });
+        if (!folder) {
+          return res.status(400).json({ error: 'Invalid folder', code: 'INVALID_FOLDER' });
+        }
+      }
+
+      ensureUploadDir();
+
+      const fileContent = content || '';
+      const fileExt = mimeType === 'text/markdown' ? '.md' : '.txt';
+      const originalName = name.endsWith(fileExt) ? name : `${name}${fileExt}`;
+      const uniqueSuffix = crypto.randomBytes(16).toString('hex');
+      const filename = `${uniqueSuffix}${fileExt}`;
+      const filePath = path.join(UPLOAD_DIR, filename);
+
+      fs.writeFileSync(filePath, fileContent);
+
+      const file = new File({
+        userId: req.user._id,
+        filename,
+        originalName,
+        mimeType: mimeType || 'text/plain',
+        size: Buffer.byteLength(fileContent),
+        path: filePath,
+        folderId: folderId || null,
+        description: '',
+        tags: []
+      });
+
+      await file.save();
+      logger.info(`Text file created: ${file.originalName} by user ${req.user.email}`);
+      
+      res.status(201).json(file);
+    } catch (error) {
+      logger.error('Create text file error:', error);
+      res.status(500).json({ error: 'Failed to create text file', code: 'CREATE_TEXT_ERROR' });
+    }
+  },
+
+  getFileContent: async (req, res) => {
+    try {
+      const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+      
+      if (!file) {
+        return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
+      }
+
+      if (!fs.existsSync(file.path)) {
+        return res.status(404).json({ error: 'File not found on disk', code: 'FILE_MISSING' });
+      }
+
+      const content = fs.readFileSync(file.path, 'utf-8');
+      
+      res.json({ content, mimeType: file.mimeType, originalName: file.originalName });
+    } catch (error) {
+      logger.error('Get file content error:', error);
+      res.status(500).json({ error: 'Failed to get file content', code: 'GET_CONTENT_ERROR' });
+    }
+  },
+
+  updateFileContent: async (req, res) => {
+    try {
+      const { content } = req.body;
+      
+      const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+      
+      if (!file) {
+        return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
+      }
+
+      if (!fs.existsSync(file.path)) {
+        return res.status(404).json({ error: 'File not found on disk', code: 'FILE_MISSING' });
+      }
+
+      fs.writeFileSync(file.path, content || '');
+      
+      file.size = Buffer.byteLength(content || '');
+      await file.save();
+      
+      logger.info(`File content updated: ${file.originalName} by user ${req.user.email}`);
+      
+      res.json({ success: true, size: file.size });
+    } catch (error) {
+      logger.error('Update file content error:', error);
+      res.status(500).json({ error: 'Failed to update file content', code: 'UPDATE_CONTENT_ERROR' });
+    }
   }
 };
 

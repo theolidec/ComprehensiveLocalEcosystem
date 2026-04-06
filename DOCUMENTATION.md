@@ -36,6 +36,16 @@ This is a full-featured web application ecosystem combining robust authenticatio
 - **Component Architecture**: Modular, reusable components
 - **Category Manager**: Custom category creation and management UI
 - **Settings Page**: User preferences and account settings
+- **File Manager**
+  - **Complete File Management**: Upload, download, organize files with folder structure
+  - **Document Viewer**: Built-in text and markdown file editor with live preview
+  - **File Organization**: Create folders, move files, favorite files
+  - **File Types Supported**: Images, documents, spreadsheets, presentations, code files, archives, audio, video
+  - **Trash System**: Soft delete with restore functionality
+  - **File Sharing**: Generate shareable links for files
+  - **Storage Stats**: Track storage usage
+  - **Search & Filter**: Find files by name, type, or tags
+  - **Large File Support**: Up to 500MB per file
 
 ### Backend Features
 - **MongoDB Integration**: Scalable database with Mongoose ODM
@@ -789,6 +799,8 @@ backend/
 ├── controllers/
 │   ├── calendarController.js      # Calendar API logic
 │   ├── categoryController.js      # Category management
+│   ├── fileController.js          # File management
+│   ├── fileFolderController.js    # File folder management
 │   ├── passwordController.js      # Password management
 │   ├── passwordCategoryController.js  # Password categories
 │   ├── settingsController.js      # User settings management
@@ -803,6 +815,8 @@ backend/
 │   ├── Event.js             # Calendar event model
 │   ├── Category.js          # Event category model
 │   ├── Settings.js          # User settings model
+│   ├── File.js              # File model
+│   ├── FileFolder.js        # File folder model
 │   ├── Wishlist.js          # Wishlist model
 │   ├── WishlistItem.js      # Wishlist item model
 │   ├── WishlistCategory.js  # Wishlist category model
@@ -813,6 +827,8 @@ backend/
 │   ├── auth.js              # Authentication routes
 │   ├── calendar.js          # Calendar API routes
 │   ├── categories.js        # Category routes
+│   ├── files.js             # File routes
+│   ├── fileFolders.js       # File folder routes
 │   ├── passwords.js         # Password routes
 │   ├── passwordCategories.js  # Password category routes
 │   ├── wishlist.js          # Wishlist routes
@@ -847,6 +863,8 @@ frontend/src/
 │   ├── Pages/
 │   │   ├── Calendar.js          # Full calendar system
 │   │   ├── CategoryManager.js   # Category management UI
+│   │   ├── DocumentViewer.js    # Document editor/viewer
+│   │   ├── FileManager.js      # File management UI
 │   │   ├── PasswordManager.js   # Password management UI
 │   │   ├── Settings.js          # User settings page
 │   │   ├── Hero.js              # Landing page hero
@@ -875,6 +893,7 @@ frontend/src/
 ├── services/
 │   ├── calendarAPI.js         # Calendar API client
 │   ├── categoryAPI.js         # Category API client
+│   ├── fileService.js         # File API client
 │   ├── passwordAPI.js         # Password API client
 │   ├── settingsAPI.js         # Settings API client
 │   ├── wishlistAPI.js         # Wishlist API client
@@ -1166,6 +1185,13 @@ server.js
 | `RATE_LIMIT_MAX_REQUESTS` | General rate limit max requests | 100 | No |
 | `AUTH_RATE_LIMIT_MAX_REQUESTS` | Authentication rate limit | 5 | No |
 | `PASSWORD_MASTER_KEY` | Master key for password encryption | - | Yes |
+| `UPLOAD_DIR` | Directory for file uploads | ./uploads/files | No |
+| `MAX_FILE_SIZE` | Maximum file upload size (bytes) | 524288000 (500MB) | No |
+| `MAX_STORAGE_BYTES` | Maximum storage per user (bytes) | 10737418240 (10GB) | No |
+| `USE_HTTPS` | Enable HTTPS server | false | No |
+| `HTTPS_PORT` | HTTPS server port | 3443 | No |
+| `SSL_CERT_PATH` | Path to SSL certificate | - | No |
+| `SSL_KEY_PATH` | Path to SSL private key | - | No |
 
 ### Database Schema
 
@@ -1304,6 +1330,39 @@ server.js
   name: String (required),
   color: String (required),
   user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### File Model
+```javascript
+{
+  userId: ObjectId (ref: User, required),
+  filename: String (required),
+  originalName: String (required),
+  mimeType: String (required),
+  size: Number (required),
+  path: String (required),
+  folderId: ObjectId (ref: FileFolder),
+  isPublic: Boolean (default: false),
+  shareToken: String (unique, sparse),
+  description: String (maxlength: 500),
+  tags: [String],
+  isFavorite: Boolean (default: false),
+  isDeleted: Boolean (default: false),
+  deletedAt: Date,
+  timestamps: true
+}
+```
+
+#### FileFolder Model
+```javascript
+{
+  userId: ObjectId (ref: User, required),
+  name: String (required),
+  parentId: ObjectId (ref: FileFolder),
+  isDeleted: Boolean (default: false),
+  deletedAt: Date,
   timestamps: true
 }
 ```
@@ -1533,7 +1592,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.0.0
-**Last Updated**: 2026-04-05
+**Version**: 2.1.0
+**Last Updated**: 2026-04-06
 **Status**: Production Ready
-**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings
+**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer

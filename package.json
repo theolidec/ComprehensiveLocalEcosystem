@@ -4,7 +4,7 @@
   "description": "Full System Architecture with frontend and backend",
   "scripts": {
     "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
-    "dev:services": "docker-compose up -d mongodb collabora",
+    "dev:services": "docker-compose up -d mongodb",
     "dev:all": "npm run dev:services && sleep 5 && npm run dev",
     "start": "docker-compose up -d",
     "stop": "docker-compose down",

@@ -78,6 +78,10 @@ export const SettingsProvider = ({ children }) => {
       if (theme && allowCookie !== false && typeof document !== 'undefined') {
         document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
       }
+      // Apply theme to document
+      if (theme && typeof document !== 'undefined') {
+        document.documentElement.setAttribute('data-theme', theme);
+      }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.response?.data?.error || 'Failed to load settings' });
     }

@@ -137,7 +137,9 @@ const Settings = () => {
       showMessage('Privacy settings updated');
       // Delete theme cookie if user disabled it
       if (!allowThemeCookie) {
-        document.cookie = 'theme=;path=/;max-age=0;SameSite=Lax';
+        document.cookie = 'theme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax';
+        document.cookie = 'theme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;domain=' + window.location.hostname;
+        localStorage.removeItem('theme');
       } else {
         // Re-save current theme to cookie if enabling
         const currentTheme = document.documentElement.getAttribute('data-theme');

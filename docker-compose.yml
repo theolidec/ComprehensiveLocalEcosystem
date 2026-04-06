@@ -38,14 +38,11 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:-your_refresh_secret_change_in_production}
       - FRONTEND_URL=http://localhost:3000
       - BACKEND_URL=http://localhost:3001
-      - COLLABORA_URL=http://collabora:9980
       - UPLOAD_DIR=/app/uploads/files
       - MAX_FILE_SIZE=524288000
       - MAX_STORAGE_BYTES=10737418240
-      - WOPI_TOKEN_SECRET=${WOPI_TOKEN_SECRET:-wopi_secret_change_me}
     depends_on:
       - mongodb
-      - collabora
     networks:
       - cle_network
 
@@ -63,29 +60,9 @@ services:
       - /app/node_modules
     environment:
       - REACT_APP_API_URL=http://localhost:3001
-      - REACT_APP_COLLABORA_URL=http://localhost:9980
       - CHOKIDAR_USEPOLLING=true
     depends_on:
       - backend
-    networks:
-      - cle_network
-
-  # Collabora Online Document Editor
-  collabora:
-    image: collabora/code:latest
-    container_name: cle_collabora
-    restart: unless-stopped
-    ports:
-      - "9980:9980"
-    environment:
-      - domain=localhost:3001
-      - username=admin
-      - password=${COLLABORA_ADMIN_PASS:-admin}
-      - server_name=collabora
-      - dictionaries=en,de,fr,es
-      - "extra_params=--o:ssl.enable=false"
-    cap_add:
-      - MKNOD
     networks:
       - cle_network
 

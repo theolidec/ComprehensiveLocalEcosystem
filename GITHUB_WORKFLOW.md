@@ -266,13 +266,14 @@ git checkout -b new-branch-name
 ComprehensiveLocalEcosystem/
 ├── backend/          # Node.js/Express backend
 │   ├── config/       # Database, logger, rate limiter
-│   ├── controllers/  # API controllers
-│   ├── models/       # Mongoose models
+│   ├── controllers/  # API controllers (auth, calendar, files, passwords, wishlist)
+│   ├── models/       # Mongoose models (User, File, FileFolder, Wishlist, etc.)
 │   ├── routes/       # Express routes
 │   └── middleware/   # Auth middleware
 ├── frontend/         # React frontend
 │   ├── src/
 │   │   ├── components/  # React components
+│   │   │   ├── Pages/   # Calendar, FileManager, DocumentViewer, PasswordManager, etc.
 │   │   ├── services/    # API clients
 │   │   └── contexts/    # React contexts
 ├── .gitignore        # Git ignore rules
