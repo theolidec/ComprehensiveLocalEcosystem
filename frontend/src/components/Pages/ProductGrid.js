@@ -1,81 +1,61 @@
 import React from 'react';
-import { Mail, Calendar, Globe, HardDrive, FileText, Key, Smartphone, Brain, Building } from 'lucide-react';
+import { Calendar, HardDrive, Key, Gift, Calculator, Users } from 'lucide-react';
 
 const ProductGrid = () => {
   const products = [
     {
-      icon: Mail,
-      title: 'Proton Mail',
-      description: 'Defeat spam, tracking, and ads with encrypted email.',
-      features: ['End-to-end encryption', 'No ads', 'Anonymous usage'],
-      cta: 'Get it for free',
-      color: 'bg-blue-600'
-    },
-    {
       icon: Calendar,
-      title: 'Proton Calendar',
-      description: 'Organize your schedule privately with encrypted calendar.',
-      features: ['Encrypted events', 'Shared calendars', 'Privacy by default'],
+      title: 'Calendar',
+      description: 'Organize your schedule with a private, encrypted calendar.',
+      features: ['Event management', 'Category organization', 'Import/Export'],
       cta: 'Explore Calendar',
       link: '/calendar',
       color: 'bg-indigo-600'
     },
     {
-      icon: Globe,
-      title: 'Proton VPN',
-      description: 'Browse privately and access content from anywhere.',
-      features: ['High-speed servers', 'No logs policy', 'Kill switch'],
-      cta: 'Get Proton VPN',
-      color: 'bg-green-600'
-    },
-    {
-      icon: HardDrive,
-      title: 'Proton Drive',
-      description: 'Store, share, and collaborate securely with encrypted cloud storage.',
-      features: ['End-to-end encrypted', 'File sharing', 'Version history'],
-      cta: 'Explore Drive',
-      color: 'bg-purple-600'
-    },
-    {
-      icon: FileText,
-      title: 'Proton Docs',
-      description: 'Create and edit documents with privacy-focused collaboration.',
-      features: ['Real-time collaboration', 'Encrypted editing', 'Rich formatting'],
-      cta: 'Try Docs',
-      color: 'bg-orange-600'
-    },
-    {
       icon: Key,
-      title: 'Proton Pass',
-      description: 'Defend your digital life from hackers with a secure password manager.',
-      features: ['Password generator', '2FA support', 'Secure sharing'],
-      cta: 'Get Pass',
+      title: 'Password Manager',
+      description: 'Secure your digital life with military-grade encryption.',
+      features: ['AES-256-GCM encryption', 'Password generator', 'Categories'],
+      cta: 'Manage Passwords',
       link: '/passwords',
       color: 'bg-red-600'
     },
     {
-      icon: Smartphone,
-      title: 'Proton Authenticator',
-      description: 'Secure your accounts with privacy-focused 2FA authentication.',
-      features: ['TOTP support', 'Encrypted storage', 'Easy backup'],
-      cta: 'Get Authenticator',
-      color: 'bg-teal-600'
+      icon: HardDrive,
+      title: 'File Storage',
+      description: 'Store and organize your files with secure local storage.',
+      features: ['Folder organization', 'Document editor', 'Share links'],
+      cta: 'Explore Files',
+      link: '/files',
+      color: 'bg-purple-600'
     },
     {
-      icon: Brain,
-      title: 'Lumo by Proton',
-      description: 'Powerful AI that respects your privacy.',
-      features: ['Privacy-preserving AI', 'No data training', 'Secure processing'],
-      cta: 'Try Lumo',
+      icon: Gift,
+      title: 'Wishlist',
+      description: 'Create and share wishlists with friends and family.',
+      features: ['Public/Private items', 'Reservation system', 'Social features'],
+      cta: 'View Wishlist',
+      link: '/wishlist',
       color: 'bg-pink-600'
     },
     {
-      icon: Building,
-      title: 'Proton for Business',
-      description: 'Protect your business with easy-to-use encrypted solutions.',
-      features: ['Team management', 'Custom domains', 'Priority support'],
-      cta: 'Explore Business',
-      color: 'bg-gray-700'
+      icon: Calculator,
+      title: 'Calculator',
+      description: 'Interactive graphing calculator for mathematical visualization.',
+      features: ['Function plotting', 'Geometric objects', 'Save states'],
+      cta: 'Try Calculator',
+      link: '/calculator',
+      color: 'bg-teal-600'
+    },
+    {
+      icon: Users,
+      title: 'Social Features',
+      description: 'Connect with others while keeping your data private.',
+      features: ['User following', 'Public profiles', 'Item sharing'],
+      cta: 'Explore Social',
+      link: '/following',
+      color: 'bg-blue-600'
     }
   ];
 

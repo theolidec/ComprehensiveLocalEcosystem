@@ -14,13 +14,12 @@ const Footer = () => {
   };
 
   const products = [
-    { name: 'Proton Mail', href: '/mail' },
-    { name: 'Proton Calendar', href: '/calendar' },
-    { name: 'Proton VPN', href: '/vpn' },
-    { name: 'Proton Drive', href: '/drive' },
-    { name: 'Proton Docs', href: '/docs' },
-    { name: 'Proton Pass', href: '/pass' },
-    { name: 'Proton Meet', href: '/meet' }
+    { name: 'Calendar', href: '/calendar' },
+    { name: 'Password Manager', href: '/passwords' },
+    { name: 'File Storage', href: '/files' },
+    { name: 'Wishlist', href: '/wishlist' },
+    { name: 'Calculator', href: '/calculator' },
+    { name: 'Settings', href: '/settings' }
   ];
 
   const company = [
@@ -57,10 +56,10 @@ const Footer = () => {
               <div className="p-2 bg-blue-600 rounded-xl">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">Proton</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">Oasis</span>
             </div>
             <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
-              Choose an internet where your privacy comes first. <br />Over 100 million people use Proton to stay private and secure online.
+              Your personal sanctuary for digital life. <br />Secure, private, and completely under your control.
             </p>
             <div className="flex space-x-3">
               {socialLinks.map((social, index) => (
@@ -119,10 +118,9 @@ const Footer = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
-              <span>© 2024 Proton AG. All rights reserved.</span>
+              <span>© 2024 Oasis. All rights reserved.</span>
               <span className="hidden md:inline">•</span>
-              <span className="hidden md:inline">Based in Switzerland</span>
-              <span className="md:hidden">Switzerland</span>
+              <span className="hidden md:inline">Self-hosted with love</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
               <button onClick={handleDebugTimeout} className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors">

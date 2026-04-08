@@ -13,6 +13,8 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
     reminder: editingEvent?.reminder || '15',
     isRecurring: editingEvent?.isRecurring || false,
     recurringPattern: editingEvent?.recurringPattern || 'daily',
+    recurringEndDate: editingEvent?.recurringEndDate ? new Date(editingEvent.recurringEndDate).toISOString().split('T')[0] : '',
+    recurringOccurrences: editingEvent?.recurringOccurrences || '',
     isAllDay: editingEvent?.isAllDay || false,
     duration: editingEvent?.duration || ''
   });
@@ -22,6 +24,8 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
     const eventData = {
       ...formData,
       duration: formData.duration ? parseInt(formData.duration, 10) : null,
+      recurringEndDate: formData.recurringEndDate || null,
+      recurringOccurrences: formData.recurringOccurrences ? parseInt(formData.recurringOccurrences, 10) : null,
       attendees: formData.attendees ? formData.attendees.split(',').map(email => email.trim()).filter(email => email) : []
     };
     
@@ -244,27 +248,61 @@ const EventForm = ({ selectedDate, categories, editingEvent, onSubmit, onClose }
             </div>
 
             {formData.isRecurring && (
-              <div className="ml-6">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Repeat pattern
-                </label>
-                <select
-                  name="recurringPattern"
-                  value={formData.recurringPattern}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                >
-                  <option value="daily">Every day</option>
-                  <option value="weekly">Every week</option>
-                  <option value="monthly">Every month</option>
-                  <option value="yearly">Every year</option>
-                </select>
-                <p className="text-xs text-gray-500 mt-1">
-                  {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
-                  {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
-                  {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
-                  {formData.recurringPattern === 'yearly' && 'Event will repeat on the same date every year'}
-                </p>
+              <div className="ml-6 space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Repeat pattern
+                  </label>
+                  <select
+                    name="recurringPattern"
+                    value={formData.recurringPattern}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  >
+                    <option value="daily">Every day</option>
+                    <option value="weekly">Every week</option>
+                    <option value="monthly">Every month</option>
+                    <option value="yearly">Every year</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
+                    {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
+                    {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
+                    {formData.recurringPattern === 'yearly' && 'Event will repeat on the same date every year'}
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Ends on
+                    </label>
+                    <input
+                      type="date"
+                      name="recurringEndDate"
+                      value={formData.recurringEndDate}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Or after occurrences
+                    </label>
+                    <select
+                      name="recurringOccurrences"
+                      value={formData.recurringOccurrences}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">No limit</option>
+                      <option value="5">5 times</option>
+                      <option value="10">10 times</option>
+                      <option value="25">25 times</option>
+                      <option value="50">50 times</option>
+                      <option value="100">100 times</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             )}
           </div>

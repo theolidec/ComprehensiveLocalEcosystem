@@ -1,4 +1,4 @@
-# Comprehensive Local Ecosystem
+# Comprehensive Local Ecosystem - Oasis
 
 A full-featured web application ecosystem combining robust authentication, dynamic calendar management, secure password storage, wishlist management with social features, and modern user interface design. Built with React (frontend) and Node.js/Express (backend) implementing industry best practices for security, scalability, and user experience.
 
@@ -103,8 +103,10 @@ A full-featured web application ecosystem combining robust authentication, dynam
 
 ### Prerequisites
 - Node.js 18+
-- MongoDB 5.0+
+- Docker & Docker Compose (for MongoDB container)
 - npm or yarn
+
+**Note:** MongoDB runs in a Docker container when using `npm run dev:all`. No local MongoDB installation required.
 
 ### Installation
 
@@ -126,7 +128,13 @@ cd backend && npm install
 cd ../frontend && npm install
 ```
 
-3. **Environment Configuration:**
+3. **Quick Setup (Recommended):**
+```bash
+# Run the automated setup script
+bash setup.sh
+```
+
+Or manually configure:
 ```bash
 cd backend
 cp .env.example .env
@@ -161,12 +169,31 @@ LOG_LEVEL=debug
 ```
 
 4. **Start the application:**
-```bash
-# From root directory - starts both frontend and backend
-npm run dev
 
-# Or start individually
+**Option A: Quick Start with Docker (Recommended)**
+```bash
+# Starts MongoDB container, then frontend + backend
+npm run dev:all
+```
+
+**Option B: Manual Start**
+```bash
+# Start MongoDB container first
+npm run dev:services
+
+# Then in another terminal, start both servers
+npm run dev
+```
+
+**Option C: Start Individually**
+```bash
+# Terminal 1 - MongoDB (if not using docker-compose)
+docker-compose up -d mongodb
+
+# Terminal 2 - Backend
 cd backend && npm run dev    # Backend on http://localhost:3001
+
+# Terminal 3 - Frontend
 cd frontend && npm start     # Frontend on http://localhost:3000
 ```
 
@@ -653,8 +680,9 @@ curl -X POST http://localhost:3001/api/wishlist \
 ### Common Issues
 
 **Database Connection:**
-- Ensure MongoDB is running on the specified port
-- Check connection string in `.env` file
+- When using `npm run dev:all`, MongoDB runs automatically in Docker
+- For manual setup, ensure MongoDB container is running: `docker-compose ps`
+- Check connection string in `.env` file (default: `mongodb://localhost:27017/full-system-architecture`)
 - Verify database user permissions
 
 **Authentication Issues:**

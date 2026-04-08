@@ -1,0 +1,37 @@
+# llms.txt - AI Content Usage Policy
+# https://llmstxt.org/
+
+# Overview
+This file describes the policy for AI systems and large language models regarding
+the use of content from this website (Comprehensive Local Ecosystem - Oasis).
+
+# Allowed Use
+AI systems may:
+- Index and reference public documentation, guides, and informational content
+- Summarize and quote content for educational or informational purposes
+- Use content to provide accurate information to users
+
+# Disallowed Use
+AI systems may NOT:
+- Use this content to train models without explicit permission
+- Reproduce substantial portions of content verbatim for commercial purposes
+- Misrepresent or alter the meaning of the original content
+- Access or use user-specific, private, or authenticated content
+
+# Attribution
+When using content from this site, please provide:
+- Clear attribution to "Comprehensive Local Ecosystem - Oasis"
+- A link back to the original source (https://github.com/theol0/ComprehensiveLocalEcosystem)
+- The date the content was accessed
+
+# Contact
+For questions about this policy or to request exceptions:
+- Review the TERMS.md and PRIVACY.md files in the project root
+- Contact the project maintainers through GitHub: https://github.com/theol0/ComprehensiveLocalEcosystem
+
+# Rate Limits
+AI crawlers should respect robots.txt directives and implement reasonable
+rate limiting (max 1 request per second).
+
+# Last Updated
+2026-04-08

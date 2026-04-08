@@ -295,9 +295,13 @@ const CalendarApp = () => {
         date: selectedDate.toISOString(),
         attendees: eventData.attendees,
         reminder: eventData.reminder,
-        color: categoryData?.color || '#3B82F6'
+        color: categoryData?.color || '#3B82F6',
+        isRecurring: eventData.isRecurring || false,
+        recurringPattern: eventData.recurringPattern || 'daily',
+        recurringEndDate: eventData.recurringEndDate,
+        recurringOccurrences: eventData.recurringOccurrences
       });
-      setEvents(prev => [...prev, newEvent]);
+      await fetchEvents();
       setShowEventForm(false);
     } catch (err) {
       alert(err.message || 'Failed to create event');
@@ -307,15 +311,11 @@ const CalendarApp = () => {
   const handleUpdateEvent = async (eventId, updatedData) => {
     try {
       const categoryData = categories.find(cat => cat.id === updatedData.category);
-      const updatedEvent = await calendarAPI.updateEvent(eventId, {
+      await calendarAPI.updateEvent(eventId, {
         ...updatedData,
         color: categoryData?.color
       });
-      setEvents(prev => prev.map(event => 
-        event._id === eventId || event.id === eventId 
-          ? { ...event, ...updatedEvent }
-          : event
-      ));
+      await fetchEvents();
       setEditingEvent(null);
       setShowEventForm(false);
     } catch (err) {
@@ -327,7 +327,7 @@ const CalendarApp = () => {
     if (window.confirm('Are you sure you want to delete this event?')) {
       try {
         await calendarAPI.deleteEvent(eventId);
-        setEvents(prev => prev.filter(event => event._id !== eventId && event.id !== eventId));
+        await fetchEvents();
         setShowEventDetails(null);
       } catch (err) {
         alert(err.message || 'Failed to delete event');
@@ -374,11 +374,11 @@ const CalendarApp = () => {
       }
 
       // Create all events
-      const createdEvents = await Promise.all(
+      await Promise.all(
         dummyEvents.map(event => calendarAPI.createEvent(event))
       );
 
-      setEvents(prev => [...prev, ...createdEvents]);
+      await fetchEvents();
       alert('10 dummy events created successfully under "Testing" category!');
     } catch (err) {
       alert(err.message || 'Failed to create dummy events');

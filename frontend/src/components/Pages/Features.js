@@ -6,19 +6,19 @@ const Features = () => {
     {
       icon: Shield,
       title: 'End-to-end encryption',
-      description: 'Our end-to-end encryption and zero-access encryption mean that no one (not even Proton) has the technical means to access your data without your permission.',
+      description: 'Your data is encrypted with AES-256-GCM. Only you hold the keys - not even the server administrator can access your private information.',
       link: '/encryption'
     },
     {
       icon: Lock,
-      title: 'Swiss privacy',
-      description: 'Proton is based in Switzerland, and your data does not go to the cloud. Instead, it stays under the protection of some of the world\'s strongest privacy laws.',
+      title: 'Self-hosted',
+      description: 'Self-hosted and local-first. Your data stays on your infrastructure with no third-party access or cloud dependencies.',
       link: '/swiss-privacy'
     },
     {
       icon: Zap,
       title: 'Security made easy',
-      description: 'Proton\'s services are so simple and intuitive that anyone can use them. Encryption is automatic and seamless.',
+      description: 'Powerful security that works automatically in the background. No technical knowledge required to stay protected.',
       link: '/migration'
     },
     {
@@ -30,13 +30,13 @@ const Features = () => {
     {
       icon: Smartphone,
       title: 'One account, any device',
-      description: 'Access your email, files, calendars, passwords, and VPN anywhere. Get Proton apps on all your devices with one Proton Account.',
+      description: 'Access your calendar, files, passwords, and wishlists from any device. One account, complete control, everywhere you go.',
       link: '/services'
     },
     {
       icon: Gift,
       title: 'Free forever',
-      description: 'Privacy is a human right, so our services are always available for free. Proton has no ads and does not sell your data.',
+      description: 'Privacy is a human right. No ads, no tracking, and your data is never sold. You control everything.',
       link: '/pricing'
     }
   ];
@@ -47,7 +47,7 @@ const Features = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            With Proton, your data belongs to you
+            With Oasis, your data belongs to you
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Not tech companies, governments, or hackers. Privacy isn't a promise, it's mathematically ensured.
@@ -67,12 +67,12 @@ const Features = () => {
                   <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3">{feature.title}</h3>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">{feature.description}</p>
                   <a href={feature.link} className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium inline-flex items-center">
-                    {feature.link === '/encryption' && 'Discover Proton\'s encryption'}
-                    {feature.link === '/swiss-privacy' && 'About Swiss privacy'}
-                    {feature.link === '/migration' && 'Migrate your emails to Proton'}
-                    {feature.link === '/open-source' && 'Proton and open source'}
-                    {feature.link === '/services' && 'See all Proton services'}
-                    {feature.link === '/pricing' && 'Get a free Proton account'}
+                    {feature.link === '/encryption' && 'Discover our encryption'}
+                    {feature.link === '/swiss-privacy' && 'About self-hosting'}
+                    {feature.link === '/migration' && 'Learn about security'}
+                    {feature.link === '/open-source' && 'Open source commitment'}
+                    {feature.link === '/services' && 'Explore all features'}
+                    {feature.link === '/pricing' && 'Create your free account'}
                     <svg className="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                     </svg>

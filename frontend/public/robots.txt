@@ -1,3 +1,29 @@
 # https://www.robotstxt.org/robotstxt.html
+# General web crawlers - allow all
 User-agent: *
 Disallow:
+
+# AI crawlers - see llms.txt for content permissions
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ChatGPT-User
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Claude-Web
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+# Link to AI content policy
+Link: /llms.txt

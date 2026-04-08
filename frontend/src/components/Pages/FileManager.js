@@ -68,6 +68,7 @@ const FileManager = () => {
   const [showCreateFileModal, setShowCreateFileModal] = useState(false);
   const [newFileName, setNewFileName] = useState('');
   const [newFileType, setNewFileType] = useState('txt');
+  const [shareModal, setShareModal] = useState({ show: false, file: null, shareUrl: '', isPublic: false });
 
   const showConfirm = (message, onConfirm) => {
     setConfirmModal({ show: true, message, onConfirm });
@@ -333,12 +334,33 @@ const FileManager = () => {
     try {
       const result = await fileService.shareFile(file._id, !file.isPublic);
       if (result.shareUrl) {
-        await navigator.clipboard.writeText(window.location.origin + result.shareUrl);
-        alert('Share link copied to clipboard!');
+        const fullUrl = window.location.origin + result.shareUrl;
+        setShareModal({
+          show: true,
+          file,
+          shareUrl: fullUrl,
+          isPublic: true
+        });
+      } else if (result.isPublic === false) {
+        setShareModal({
+          show: true,
+          file,
+          shareUrl: '',
+          isPublic: false
+        });
       }
       await loadFiles();
     } catch (error) {
       console.error('Share failed:', error);
+    }
+  };
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareModal.shareUrl);
+      alert('Link copied to clipboard!');
+    } catch (error) {
+      console.error('Copy failed:', error);
     }
   };
 
@@ -880,6 +902,68 @@ const FileManager = () => {
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Create
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {shareModal.show && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 w-full max-w-md">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">Share File</h2>
+              <button onClick={() => setShareModal({ show: false, file: null, shareUrl: '', isPublic: false })} className="text-gray-400 hover:text-gray-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="mb-4">
+              <p className="text-gray-600 dark:text-gray-400 mb-2">File: <span className="font-medium text-gray-900 dark:text-white">{shareModal.file?.originalName}</span></p>
+            </div>
+
+            {shareModal.isPublic && shareModal.shareUrl ? (
+              <>
+                <div className="mb-4">
+                  <label className="block text-sm text-gray-500 dark:text-gray-400 mb-2">Share link:</label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      readOnly
+                      value={shareModal.shareUrl}
+                      className="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white text-sm"
+                    />
+                    <button
+                      onClick={copyShareLink}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-1"
+                    >
+                      <Share2 className="h-4 w-4" />
+                      <span>Copy</span>
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+                  Anyone with this link can view the file.
+                </p>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-gray-600 dark:text-gray-400 mb-4">This file is not shared publicly.</p>
+                <button
+                  onClick={() => handleShare(shareModal.file)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  Create Share Link
+                </button>
+              </div>
+            )}
+
+            <div className="flex justify-end space-x-2 pt-4 border-t">
+              <button
+                onClick={() => setShareModal({ show: false, file: null, shareUrl: '', isPublic: false })}
+                className="px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+              >
+                Close
               </button>
             </div>
           </div>

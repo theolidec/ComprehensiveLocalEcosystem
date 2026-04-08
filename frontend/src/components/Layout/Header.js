@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -86,7 +86,10 @@ const Header = () => {
     if (location.pathname === '/files') {
       return 'My Files';
     }
-    return 'Proton';
+    if (location.pathname === '/following') {
+      return 'User Following';
+    }
+    return 'Oasis';
   };
 
   return (
@@ -207,6 +210,13 @@ const Header = () => {
                       <Calculator className="h-4 w-4 text-teal-600" />
                       <span>Calculator</span>
                     </button>
+                    <button
+                      onClick={() => window.location.href = '/following'}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Users className="h-4 w-4 text-pink-600" />
+                      <span>Following</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -254,7 +264,7 @@ const Header = () => {
                   Sign in
                 </button>
                 <button className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors">
-                  Get Proton for free
+                  Get started
                 </button>
               </>
             )}
@@ -294,7 +304,7 @@ const Header = () => {
                       Sign in
                     </button>
                     <button className="bg-blue-600 text-white hover:bg-blue-700 block px-3 py-2 rounded-lg text-base font-medium w-full mt-2">
-                      Get Proton for free
+                      Get started
                     </button>
                   </>
                 )}

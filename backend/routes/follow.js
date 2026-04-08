@@ -1,5 +1,6 @@
 const express = require('express');
 const { param, validationResult } = require('express-validator');
+const mongoose = require('mongoose');
 const UserFollow = require('../models/UserFollow');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
@@ -48,9 +49,10 @@ router.post('/follow/:userId', authenticateToken, [
   param('userId').isMongoId().withMessage('Invalid user ID')
 ], handleValidationErrors, async (req, res) => {
   try {
-    const targetUserId = req.params.userId;
+    const targetUserId = new mongoose.Types.ObjectId(req.params.userId);
+    const followerId = req.user._id;
     
-    if (req.user._id.toString() === targetUserId) {
+    if (followerId.toString() === targetUserId.toString()) {
       return res.status(400).json({ error: 'Cannot follow yourself', code: 'SELF_FOLLOW' });
     }
     
@@ -59,7 +61,7 @@ router.post('/follow/:userId', authenticateToken, [
       return res.status(404).json({ error: 'User not found', code: 'NOT_FOUND' });
     }
     
-    await UserFollow.follow(req.user._id, targetUserId);
+    await UserFollow.follow(followerId, targetUserId);
     logger.info(`User ${req.user.email} followed user ${targetUserId}`);
     
     res.status(201).json({ message: 'Successfully followed user' });
@@ -74,8 +76,11 @@ router.delete('/follow/:userId', authenticateToken, [
   param('userId').isMongoId().withMessage('Invalid user ID')
 ], handleValidationErrors, async (req, res) => {
   try {
-    await UserFollow.unfollow(req.user._id, req.params.userId);
-    logger.info(`User ${req.user.email} unfollowed user ${req.params.userId}`);
+    const targetUserId = new mongoose.Types.ObjectId(req.params.userId);
+    const followerId = req.user._id;
+    
+    await UserFollow.unfollow(followerId, targetUserId);
+    logger.info(`User ${req.user.email} unfollowed user ${targetUserId}`);
     
     res.json({ message: 'Successfully unfollowed user' });
   } catch (error) {
@@ -89,9 +94,10 @@ router.get('/following/:userId', authenticateToken, [
   param('userId').isMongoId().withMessage('Invalid user ID')
 ], handleValidationErrors, async (req, res) => {
   try {
+    const targetUserId = new mongoose.Types.ObjectId(req.params.userId);
     const follow = await UserFollow.findOne({ 
       follower: req.user._id, 
-      following: req.params.userId 
+      following: targetUserId 
     });
     res.json({ isFollowing: !!follow });
   } catch (error) {

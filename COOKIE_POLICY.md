@@ -4,7 +4,7 @@
 
 ## 1. Introduction
 
-This Cookie Policy explains how Comprehensive Local Ecosystem ("we," "our," or "us") uses cookies and similar technologies to recognize you when you visit our web application.
+This Cookie Policy explains how Oasis ("we," "our," or "us") uses cookies and similar technologies to recognize you when you visit our web application.
 
 ## 2. What Are Cookies?
 

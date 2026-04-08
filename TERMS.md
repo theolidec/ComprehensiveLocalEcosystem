@@ -4,7 +4,7 @@
 
 ## 1. Acceptance of Terms
 
-By accessing and using Comprehensive Local Ecosystem ("the Service"), you accept and agree to be bound by the terms and provisions of this agreement.
+By accessing and using Oasis ("the Service"), you accept and agree to be bound by the terms and provisions of this agreement.
 
 ## 2. Description of Service
 

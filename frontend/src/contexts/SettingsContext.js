@@ -167,6 +167,24 @@ export const SettingsProvider = ({ children }) => {
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
+  const getActiveSessions = async () => {
+    try {
+      const data = await settingsAPI.getActiveSessions();
+      return { success: true, sessions: data.sessions };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
+  const revokeSession = async (sessionId) => {
+    try {
+      await settingsAPI.revokeSession(sessionId);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
   const value = {
     ...state,
     loadSettings,
@@ -177,7 +195,9 @@ export const SettingsProvider = ({ children }) => {
     updateDisplaySettings,
     updatePrivacySettings,
     resetSettings,
-    clearError
+    clearError,
+    getActiveSessions,
+    revokeSession
   };
 
   return (

@@ -81,6 +81,8 @@ const EventDetails = ({ event, categories, onEdit, onDelete, onClose }) => {
                   {event.recurringPattern === 'weekly' && 'Repeats weekly'}
                   {event.recurringPattern === 'monthly' && 'Repeats monthly'}
                   {event.recurringPattern === 'yearly' && 'Repeats yearly'}
+                  {event.recurringEndDate && ` until ${new Date(event.recurringEndDate).toLocaleDateString()}`}
+                  {event.recurringOccurrences && ` (${event.recurringOccurrences} times)`}
                 </span>
               </div>
             )}

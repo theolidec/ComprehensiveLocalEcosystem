@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
-import { User, Calendar, Bell, Palette, Lock, RotateCcw } from 'lucide-react';
+import { User, Calendar, Bell, Palette, Lock, RotateCcw, Monitor, Trash2, RefreshCw } from 'lucide-react';
 import './Settings.css';
 
 const Settings = () => {
-  const { settings, loading, updateProfile, updateCalendarSettings, updateNotificationSettings, updateDisplaySettings, updatePrivacySettings, resetSettings } = useSettings();
+  const { settings, loading, updateProfile, updateCalendarSettings, updateNotificationSettings, updateDisplaySettings, updatePrivacySettings, resetSettings, getActiveSessions, revokeSession } = useSettings();
   const { registerPageActions, clearPageActions } = usePageActions();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState(null);
+  const [sessions, setSessions] = useState([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
 
   const showMessage = (text, type = 'success') => {
     setMessage({ text, type });
@@ -160,11 +162,12 @@ const Settings = () => {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: '👤' },
-    { id: 'calendar', label: 'Calendar', icon: '📅' },
-    { id: 'notifications', label: 'Notifications', icon: '🔔' },
-    { id: 'display', label: 'Display', icon: '🎨' },
-    { id: 'privacy', label: 'Privacy', icon: '🔒' }
+    { id: 'profile', label: 'Profile', icon: '?' },
+    { id: 'calendar', label: 'Calendar', icon: '?' },
+    { id: 'notifications', label: 'Notifications', icon: '?' },
+    { id: 'display', label: 'Display', icon: '?' },
+    { id: 'privacy', label: 'Privacy', icon: '?' },
+    { id: 'sessions', label: 'Sessions', icon: '?' }
   ];
 
   useEffect(() => {
@@ -200,6 +203,12 @@ const Settings = () => {
         variant: activeTab === 'privacy' ? 'primary' : 'default'
       },
       {
+        icon: <Monitor size={18} />,
+        label: 'Sessions',
+        onClick: () => setActiveTab('sessions'),
+        variant: activeTab === 'sessions' ? 'primary' : 'default'
+      },
+      {
         icon: <RotateCcw size={18} />,
         label: 'Reset All',
         onClick: handleReset,
@@ -209,15 +218,13 @@ const Settings = () => {
     ]);
 
     return () => clearPageActions();
-  }, [activeTab, registerPageActions, clearPageActions]);
+  }, [activeTab, registerPageActions, clearPageActions, handleReset]);
 
   return (
     <div className="settings-container">
-      <div className="settings-header">
-        <h1>Settings</h1>
-        {message && <div className={`settings-message ${message.type}`}>{message.text}</div>}
-      </div>
+      
 
+{/*
       <div className="settings-tabs">
         {tabs.map(tab => (
           <button
@@ -229,7 +236,7 @@ const Settings = () => {
             <span className="tab-label">{tab.label}</span>
           </button>
         ))}
-      </div>
+      </div> */}
 
       <div className="settings-content">
         {activeTab === 'profile' && (
@@ -309,7 +316,7 @@ const Settings = () => {
               </label>
             </div>
             <div className="form-group">
-              <label htmlFor="defaultEventDuration">Default Event Duration (minutes)</label>
+              <label htmlFor="defaultEventDuration">Default Event Duration</label>
               <select id="defaultEventDuration" name="defaultEventDuration" defaultValue={settings.calendar?.defaultEventDuration || 60}>
                 <option value={15}>15 minutes</option>
                 <option value={30}>30 minutes</option>
@@ -482,6 +489,76 @@ const Settings = () => {
             </div>
             <button type="submit" className="save-btn">Save Changes</button>
           </form>
+        )}
+
+        {activeTab === 'sessions' && (
+          <div className="settings-form">
+            <h2>Active Sessions</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Manage your active login sessions. Revoke any session you don't recognize.
+            </p>
+            <button
+              onClick={async () => {
+                setSessionsLoading(true);
+                const result = await getActiveSessions();
+                if (result.success) {
+                  setSessions(result.sessions);
+                } else {
+                  showMessage(result.error, 'error');
+                }
+                setSessionsLoading(false);
+              }}
+              className="flex items-center space-x-2 text-sm text-blue-600 hover:text-blue-800 mb-4"
+            >
+              <RefreshCw size={16} className={sessionsLoading ? 'animate-spin' : ''} />
+              <span>Refresh Sessions</span>
+            </button>
+            
+            {sessionsLoading ? (
+              <div className="text-center py-8 text-gray-500">Loading sessions...</div>
+            ) : sessions.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                No active sessions. Click refresh to load your sessions.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {sessions.map((session) => (
+                  <div key={session._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+                    <div className="flex items-center space-x-3">
+                      <Monitor className="h-5 w-5 text-gray-400" />
+                      <div>
+                        <div className="font-medium text-gray-900">
+                          {session.userAgent ? session.userAgent.substring(0, 50) + '...' : 'Unknown Device'}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {session.ip && `IP: ${session.ip}`}
+                          {session.createdAt && ` | Started: ${new Date(session.createdAt).toLocaleString()}`}
+                          {session.isExpired && <span className="text-red-500 ml-2">(Expired)</span>}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={async () => {
+                        if (window.confirm('Are you sure you want to revoke this session?')) {
+                          const result = await revokeSession(session._id);
+                          if (result.success) {
+                            showMessage('Session revoked successfully');
+                            setSessions(sessions.filter(s => s._id !== session._id));
+                          } else {
+                            showMessage(result.error, 'error');
+                          }
+                        }
+                      }}
+                      className="flex items-center space-x-1 text-red-600 hover:text-red-800 text-sm"
+                    >
+                      <Trash2 size={16} />
+                      <span>Revoke</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         )}
       </div>
 

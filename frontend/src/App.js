@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { CalendarActionsProvider } from './contexts/CalendarActionsContext';
 import { PageActionsProvider } from './contexts/PageActionsContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
@@ -11,6 +12,7 @@ import Hero from './components/Pages/Hero';
 import ProductGrid from './components/Pages/ProductGrid';
 import Features from './components/Pages/Features';
 import Footer from './components/Layout/Footer';
+import Toast from './components/Layout/Toast';
 import CalendarApp from './components/Pages/Calendar';
 import Settings from './components/Pages/Settings';
 import Privacy from './components/Pages/Privacy';
@@ -24,6 +26,7 @@ import FileManager from './components/Pages/FileManager';
 import DocumentViewer from './components/Pages/DocumentViewer';
 import LinkNotFound from './components/Pages/LinkNotFound';
 import GeoGebraCalculator from './components/Math/GeoGebraCalculator';
+import UserFollowing from './components/Pages/UserFollowing';
 import Sidebar from './components/Layout/Sidebar';
 import Row from './components/Layout/Row';
 import './App.css';
@@ -189,6 +192,20 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
+        <Route path="/following" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <UserFollowing />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
         <Route path="/placeholder" element={
           <>
             <Header />
@@ -204,15 +221,18 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <SettingsProvider>
-          <PageActionsProvider>
-            <CalendarActionsProvider>
-              <AppContent />
-            </CalendarActionsProvider>
-          </PageActionsProvider>
-        </SettingsProvider>
-      </AuthProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <PageActionsProvider>
+              <CalendarActionsProvider>
+                <AppContent />
+                <Toast />
+              </CalendarActionsProvider>
+            </PageActionsProvider>
+          </SettingsProvider>
+        </AuthProvider>
+      </NotificationProvider>
     </Router>
   );
 }
