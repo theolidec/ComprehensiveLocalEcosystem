@@ -7,7 +7,6 @@
 }
 
 .sidebar-nav {
-  flex: 1;
   padding: 0.75rem;
   overflow-y: auto;
 }
@@ -77,6 +76,64 @@
   color: var(--text-secondary, #9ca3af);
 }
 
+.sidebar-custom-content {
+  padding: 1rem;
+  border-top: 1px solid var(--border-color, #e5e7eb);
+}
+
+/* Storage Widget Styles */
+.storage-widget {
+  padding: 0.75rem;
+  background: var(--bg-secondary, #f9fafb);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.storage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.storage-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary, #6b7280);
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.storage-value {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary, #111827);
+}
+
+.storage-bar-container {
+  height: 0.5rem;
+  background: var(--bg-tertiary, #e5e7eb);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.storage-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.storage-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.storage-total {
+  font-size: 0.75rem;
+  color: var(--text-secondary, #6b7280);
+}
+
 @media (max-width: 768px) {
   .sidebar {
     width: 100%;
@@ -107,7 +164,6 @@
 }
 
 .sidebar-inline .sidebar-nav {
-  flex: 1;
   padding: 0.75rem;
   overflow-y: auto;
 }

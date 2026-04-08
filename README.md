@@ -36,7 +36,7 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **One-Click Copy**: Copy passwords to clipboard
 - **Password Generator**: Built-in secure password generation
 
-### File Manager (NEW)
+### File Manager
 - **Complete File Management**: Upload, download, organize files with folder structure
 - **Document Viewer**: Built-in text and markdown file editor with live preview
 - **File Organization**: Create folders, move files, favorite files
@@ -47,6 +47,16 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Search & Filter**: Find files by name, type, or tags
 - **Large File Support**: Up to 500MB per file
 - **Secure Storage**: Files stored with unique hashed filenames
+
+### GeoGebra Calculator (NEW)
+- **Interactive Graphing**: Plot functions, equations, and inequalities
+- **Multiple Object Types**: Functions, parametric curves, points, circles, polygons, implicit equations
+- **Advanced Mathematics**: Support for inequalities, conic sections, geometric shapes
+- **Interactive Controls**: Pan, zoom, and navigate the coordinate system
+- **Visual Customization**: Light/dark themes, grid toggle, axis controls
+- **State Management**: Save and restore calculator states
+- **Object Management**: Add, edit, delete, and label mathematical objects
+- **Command Interface**: Text-based input for rapid object creation
 
 ### Wishlist System
 - **Item Management**: Create, edit, delete wishlist items with rich details
@@ -383,6 +393,15 @@ Authorization: Bearer <access_token>
 6. **Trash:** Soft delete files with ability to restore or permanently delete
 7. **Document Viewer:** Click text/markdown files to edit with live preview at `/files/document/:id`
 
+### GeoGebra Calculator
+1. **Access:** Navigate to `/calculator` from the sidebar
+2. **Graph Functions:** Enter expressions like `f(x) = x^2 + 3x - 2`
+3. **Plot Points:** Create points with `A = (3, 4)`
+4. **Draw Shapes:** Add circles, polygons, and geometric objects
+5. **Parametric Curves:** Plot with `x(t) = cos(t), y(t) = sin(t)`
+6. **Inequalities:** Graph regions with `y > x^2` or `x^2 + y^2 < 25`
+7. **Navigation:** Use mouse wheel to zoom, drag to pan, save states
+
 ### Form Validation Requirements
 - **Email:** Valid email format required
 - **Password:** Minimum 6 characters
@@ -502,6 +521,9 @@ ComprehensiveLocalEcosystem/
 │   │   │   │   ├── ReservationModal.js  # Reservation modal
 │   │   │   │   ├── WishlistShareModal.js # Share link modal
 │   │   │   │   └── PublicWishlistItem.js # Public item view
+│   │   │   ├── Math/
+│   │   │   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
+│   │   │   │   └── GeoGebraCalculator.css # Calculator styles
 │   │   │   ├── CalendarHeader.js      # Calendar header component
 │   │   │   ├── CalendarSidebar.js     # Calendar sidebar component
 │   │   │   ├── EventForm.js           # Event creation form
@@ -519,6 +541,9 @@ ComprehensiveLocalEcosystem/
 │   │   │   ├── settingsAPI.js         # Settings API client
 │   │   │   ├── wishlistAPI.js         # Wishlist API client
 │   │   │   └── wishlistCategoryAPI.js # Wishlist category API client
+│   │   ├── utils/
+│   │   │   ├── GraphingEngine.js      # Canvas-based graphing engine
+│   │   │   └── MathParser.js          # Mathematical expression parser
 │   │   ├── config/
 │   │   │   └── api.js                 # API endpoint configuration
 │   │   ├── types/
@@ -610,6 +635,9 @@ curl -X POST http://localhost:3001/api/wishlist \
 - File upload/download/streaming (up to 500MB)
 - File trash and restore functionality
 - File sharing with public tokens
+- GeoGebra Calculator with interactive graphing
+- GraphingEngine with multiple object types support
+- MathParser for expression evaluation
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -673,7 +701,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.1.0
-**Last Updated**: 2026-04-06
+**Version**: 2.2.0
+**Last Updated**: 2026-04-08
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

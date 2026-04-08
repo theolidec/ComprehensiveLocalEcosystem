@@ -1,177 +1,272 @@
-# Implementation Status & Security Recommendations
+# Implementation Status & Roadmap
 
-**Last Updated**: 2026-04-06
+**Last Updated**: 2026-04-08
 
 ## ✅ Recently Implemented Features
 
-### File Manager (Completed)
+### GeoGebra Calculator (Completed - April 2026)
+- Interactive graphing calculator with canvas-based rendering
+- Support for functions, parametric curves, points, circles, polygons
+- Inequalities and implicit equation plotting
+- Mouse-based navigation (zoom, pan)
+- Light/dark theme support
+- State save/restore functionality
+- Command-based object creation interface
+- Accessible at `/calculator`
+
+### File Manager (Completed - April 2026)
 - Full file management with folder organization
 - File upload/download/streaming (up to 500MB per file)
-- Document viewer with text and markdown editing
+- Document viewer with text and markdown editing with live preview
 - File trash with soft delete and restore
-- File sharing with public tokens
+- File sharing with public tokens (`/files/shared/:token`)
 - Storage stats tracking (10GB default limit)
-- Support for 60+ file types (images, documents, audio, video, archives)
+- Support for 60+ file types (images, documents, audio, video, archives, code files)
 - Secure file storage with hashed filenames
+- Folder management (create, move, delete, restore)
+- File search and filtering
+
+### Document Viewer (Completed)
+- Full-screen document editor at `/files/document/:id` and `/files/document/new`
+- Live markdown preview with `react-markdown` and `remark-gfm`
+- Syntax highlighting for code files
+- Auto-save functionality
+
+### Authentication & Security (Completed)
+- JWT-based authentication with 15-minute access tokens and 7-day refresh tokens
+- HttpOnly, SameSite=Strict cookies
+- Account lockout after 5 failed login attempts
+- bcrypt password hashing with 12 salt rounds
+- Helmet.js security headers with CSP policy
+- CORS configuration for cross-origin requests
+- Rate limiting on all endpoints (general, auth, password reset, token refresh)
+- Graceful shutdown handling (SIGTERM/SIGINT)
+- HTTPS support with configurable SSL certificates
+
+### Calendar System (Completed)
+- Full calendar with month, week, and day views
+- Event CRUD operations with categories (Work, Personal, Social, Health, Education, Travel)
+- Event search and filtering
+- Import/export functionality (JSON)
+- Category management UI
+- Statistics dashboard
 
 ### Password Manager (Completed)
-- AES-256-GCM encryption for secure password storage
-- Password categories with custom organization
-- Favorites system for quick access
-- Search and filter capabilities
-- Import/Export functionality
-- One-click password copying
-- `PASSWORD_MASTER_KEY` environment variable configuration
+- AES-256-GCM encryption for stored passwords
+- Master key protection via environment variable
+- Password categories and favorites
+- Import/export functionality
+- Password generator
+- One-click copy to clipboard
 
 ### Wishlist System (Completed)
-- Full CRUD operations for wishlist items
+- Item management with priorities (low, medium, high, must-have)
 - Public/private sharing with unique tokens
-- Reservation system for gift coordination
-- Multi-currency support (8 currencies)
-- Priority levels (low, medium, high, must-have)
-- Category templates (Birthday, Christmas, Wedding, etc.)
-- Analytics dashboard with statistics and trends
-- Image upload support for items
+- Reservation system for guests and authenticated users
+- Categories with templates (Birthday, Christmas, Wedding, Baby Shower, Housewarming)
+- Multi-currency price tracking (USD, EUR, GBP, CAD, AUD, NOK, SEK, DKK)
+- User following system
+- Analytics dashboard
+- Public item access at `/wishlist/shared/:token`
 
-### Social Features (Completed)
-- User following system (follow/unfollow)
-- Public user profiles with wishlists
-- User search by name/email
-- Guest reservations on public items
-- Shareable links with unique tokens
+### User Features (Completed)
+- Settings page with theme support (light/dark mode)
+- Cookie consent popup (GDPR-compliant)
+- Legal pages: Privacy Policy, Terms of Service, Cookie Policy
+- User profile with avatar upload
 
-### UI/UX Improvements (Completed)
-- Theme support (light/dark mode)
-- Cookie consent popup (GDPR compliant)
-- Legal pages (Privacy, Terms, Cookies)
-- Responsive sidebar navigation
-- Placeholder page for missing features
+---
 
-## 🔒 Security Recommendations
-
-Based on the comprehensive codebase security review, the following improvements are recommended:
+## 🛠️ Technical Debt & Improvements
 
 ### High Priority
 
-#### 1. Production HTTPS/TLS
-- Add TLS termination via reverse proxy (nginx/traefik) OR
-- Configure Node.js with `https.createServer()` for direct HTTPS
-- **Why**: Current setup only uses HTTP; production requires encrypted transport
+#### 1. Production HTTPS/TLS Configuration
+- **Current**: Optional HTTPS via `USE_HTTPS=true` environment variable
+- **Recommendation**: Add TLS termination via reverse proxy (nginx/traefik) for production
+- **Files**: `@backend/server.js:155-189`
+- **Why**: While HTTPS is supported, production deployments should use a reverse proxy for better certificate management
 
-#### 2. HSTS Header
-- Add `Strict-Transport-Security` header in production environment
-- Example: `Strict-Transport-Security: max-age=31536000; includeSubDomains`
-- **Location**: `@backend/server.js` Helmet configuration
+#### 2. HSTS Header Implementation
+- **Current**: Not configured in Helmet
+- **Recommendation**: Add `Strict-Transport-Security: max-age=31536000; includeSubDomains`
+- **Files**: `@backend/server.js:44-53`
 
 #### 3. Logger Data Sanitization
-- **Prevent Sensitive Data Leakage**
-  - **Location**: `@backend/config/logger.js`
-  - **Issue**: Logger may capture passwords, tokens, or encrypted data
-  - **Fix**: Add redaction patterns for `password`, `token`, `encryptedPassword`, `authorization`
+- **Current**: Winston logger captures all request data without redaction
+- **Risk**: Potential sensitive data leakage (passwords, tokens)
+- **Recommendation**: Add redaction patterns for `password`, `token`, `encryptedPassword`, `authorization`
+- **Files**: `@backend/config/logger.js`
 
 #### 4. Avatar URL Validation
-- **Settings Avatar Field**
-  - **Location**: `@backend/models/Settings.js` and `@backend/routes/settings.js`
-  - **Issue**: `avatar` field accepts any string without URL validation
-  - **Risk**: XSS via `javascript:` URLs or data exfiltration
-  - **Fix**: Add URL regex validation, whitelist `https:` protocol only
+- **Current**: `avatar` field in Settings accepts any string
+- **Risk**: XSS via `javascript:` URLs
+- **Recommendation**: Add URL validation, whitelist `https:` and `data:` protocols only
+- **Files**: `@backend/models/Settings.js`, `@backend/routes/settings.js`
 
 ### Medium Priority
 
 #### 5. Key Rotation Strategy
-- Implement versioning for `PASSWORD_MASTER_KEY`
-- Store key version identifier alongside encrypted passwords
-- Plan for re-encryption workflow when rotating keys
-- **Location**: `@backend/services/passwordService.js`
+- **Current**: `PASSWORD_MASTER_KEY` is static
+- **Recommendation**: Implement versioning with key identifiers and re-encryption workflow
+- **Files**: `@backend/services/passwordService.js`
 
-#### 6. Secret Validation
-- Ensure `PASSWORD_MASTER_KEY` is at least 32 characters of high entropy
-- Add startup validation to check secret strength
-- **Location**: `@backend/services/passwordService.js:getMasterKey()`
+#### 6. Secret Validation at Startup
+- **Current**: No validation of `PASSWORD_MASTER_KEY` strength
+- **Recommendation**: Add startup check ensuring key is at least 32 characters of high entropy
+- **Files**: `@backend/services/passwordService.js:getMasterKey()`
 
 #### 7. CSRF Protection Enhancement
-- **Current State**: Uses `sameSite: 'strict'` cookies
+- **Current**: Relies on `sameSite: 'strict'` cookies
 - **Enhancement**: Add explicit CSRF tokens for defense in depth
-- **Location**: `@backend/server.js`, `@backend/routes/auth.js`
+- **Files**: `@backend/server.js`, `@backend/routes/auth.js`
 
-#### 8. Request Size Limits on Import
-- **Location**: `@backend/routes/calendar.js:importEvents`
-- **Issue**: 10MB body limit may be too generous for JSON imports
-- **Fix**: Add specific limit for import endpoint (e.g., 1MB)
+#### 8. Request Size Limits on Import Endpoints
+- **Current**: 10MB body limit across all endpoints
+- **Issue**: May be too generous for JSON imports (calendar, passwords)
+- **Recommendation**: Add specific limits (1MB) for import endpoints
+- **Files**: `@backend/routes/calendar.js:importEvents`, `@backend/routes/passwords.js:importPasswords`
 
 #### 9. Structured Audit Logging
-- Add dedicated audit log for security events:
-  - Login/logout attempts (failed and successful)
-  - Password decryption operations
-  - Session revocations
-  - Settings changes
-- **Location**: `@backend/config/logger.js` or separate audit logger
+- **Current**: General logging only
+- **Recommendation**: Add dedicated audit log for security events (login/logout, password decryption, settings changes)
+- **Files**: New `@backend/config/auditLogger.js`
+
+#### 10. Socket.io Security Review
+- **Current**: Socket.io is included in dependencies but implementation status unclear
+- **Action**: Verify if WebSocket features are active; if so, add authentication middleware
+- **Files**: Check `@backend/server.js` for Socket.io usage
 
 ### Low Priority
 
-#### 10. Additional Security Headers
-- Consider adding `Referrer-Policy: strict-origin-when-cross-origin`
-- Review CSP policy for any unnecessary `unsafe-inline` directives
-- **Location**: `@backend/server.js` Helmet configuration
+#### 11. Additional Security Headers
+- Add `Referrer-Policy: strict-origin-when-cross-origin`
+- Review CSP for unnecessary `unsafe-inline` directives
+- **Files**: `@backend/server.js:44-53`
 
-#### 11. Export Data Encryption
-- **Location**: `@backend/controllers/calendarController.js:exportEvents`
-- **Enhancement**: Offer encrypted export option with password protection for calendar data
+#### 12. Export Data Encryption
+- **Current**: Calendar and password exports are plaintext JSON
+- **Enhancement**: Offer optional password-protected encrypted exports
+- **Files**: `@backend/controllers/calendarController.js:exportEvents`, `@backend/controllers/passwordController.js:exportPasswords`
 
-#### 12. Dependency Security Scanning
+#### 13. Dependency Security Scanning
 - Add `npm audit` to CI/CD pipeline
-- Consider using Snyk or GitHub Dependabot
-- **Location**: `.github/workflows/` (if exists)
+- Consider GitHub Dependabot or Snyk integration
+- **Files**: `.github/workflows/` (create if not exists)
 
-#### 13. Rate Limiting Enhancements
-- Add specific rate limits for:
-  - Wishlist operations (prevent spam)
-  - User search (prevent enumeration)
-  - Public item viewing (prevent scraping)
+#### 14. Rate Limiting Enhancements
+- Add specific rate limits for wishlist operations (prevent spam)
+- Add rate limits for user search (prevent enumeration)
+- Add rate limits for public item viewing (prevent scraping)
+- **Files**: `@backend/config/rateLimiter.js`
 
-#### 14. File Upload Security (NEW)
-- **File Type Validation**: Ensure mime-type is validated against file content
-- **Virus Scanning**: Consider adding ClamAV integration for uploaded files
-- **File Size Enforcement**: Add server-side validation for file size limits
-- **Storage Quota**: Enforce per-user storage limits strictly
-- **Path Traversal Protection**: Ensure file paths cannot escape upload directory
+---
 
 ## 📋 Planned Future Enhancements
 
-### User Experience
-- Event reminders and notifications
-- Email verification system
-- Two-factor authentication (2FA)
-- Social authentication integration (Google, GitHub)
-- User profile management with avatar upload
+### Phase 1: Core Improvements (Next 30 Days)
 
-### Calendar Features
-- Recurring events
-- File attachments for events
-- Calendar sharing capabilities
-- Multiple calendar support
-- Calendar synchronization (Google Calendar, iCal)
+#### User Experience
+- [ ] Email verification system
+- [ ] Password reset email functionality (currently placeholder)
+- [ ] Two-factor authentication (2FA) with TOTP
+- [ ] Social authentication (Google, GitHub OAuth)
+- [ ] User profile management enhancements
+- [ ] Notification system for events and wishlist reservations
 
-### Wishlist Enhancements
-- Bulk import from URLs (auto-scrape product info)
-- Price change notifications
-- Purchase tracking and history
-- Collaborative wishlists (multiple owners)
+#### Calendar Features
+- [ ] Recurring events (daily, weekly, monthly, yearly)
+- [ ] File attachments for events
+- [ ] Calendar sharing (read-only and editable)
+- [ ] Multiple calendar support per user
+- [ ] Calendar synchronization (Google Calendar, iCal import/export)
+- [ ] Event reminders and notifications
 
-### System Improvements
-- Role-based access control (RBAC)
-- Admin dashboard
-- User activity tracking and analytics
-- Performance monitoring dashboard
-- Automated backup system
+#### File Manager Enhancements
+- [ ] Virus scanning integration (ClamAV)
+- [ ] File type validation against content (magic numbers)
+- [ ] Storage quota enforcement per user
+- [ ] File versioning system
+- [ ] Bulk file operations (move, delete, download as zip)
+
+### Phase 2: Social & Collaboration (Next 60 Days)
+
+#### Wishlist Enhancements
+- [ ] Bulk import from URLs (auto-scrape product info)
+- [ ] Price change notifications
+- [ ] Purchase tracking and history
+- [ ] Collaborative wishlists (multiple owners)
+- [ ] Wishlist comments and discussions
+
+#### Collaboration Features
+- [ ] Real-time notifications using Socket.io
+- [ ] Activity feed for followed users
+- [ ] Share folders (not just individual files)
+- [ ] Shared password categories (team passwords)
+
+### Phase 3: Administration & Scale (Next 90 Days)
+
+#### System Administration
+- [ ] Role-based access control (RBAC)
+- [ ] Admin dashboard with user management
+- [ ] System-wide settings and configuration
+- [ ] User activity tracking and analytics
+- [ ] Automated backup system for user data
+- [ ] Data retention policies
+
+#### Performance & Monitoring
+- [ ] Redis caching layer for frequent queries
+- [ ] Database query optimization
+- [ ] CDN integration for file serving
+- [ ] Application performance monitoring (APM)
+- [ ] Error tracking integration (Sentry)
+
+---
+
+## 🧪 Testing & Quality
+
+### Current Status
+- **Backend**: Jest configured but test coverage unknown
+- **Frontend**: React Testing Library configured
+- **Scripts**: `npm test` available in both frontend and backend
+
+### Testing Roadmap
+- [ ] Unit tests for all API endpoints (target: 80% coverage)
+- [ ] Integration tests for authentication flow
+- [ ] Frontend component tests with React Testing Library
+- [ ] E2E tests with Playwright or Cypress
+- [ ] Security penetration testing
+- [ ] Load testing for file upload/download endpoints
+
+---
+
+## 🚀 DevOps & Deployment
+
+### Current State
+- Docker support with `Dockerfile` and `docker-compose.yml`
+- Setup script (`setup.sh`) and start script (`start.sh`)
+- Environment configuration via `.env` files
+
+### Improvements Needed
+- [ ] CI/CD pipeline (GitHub Actions)
+- [ ] Automated testing on pull requests
+- [ ] Staging environment configuration
+- [ ] Production deployment documentation
+- [ ] Database migration strategy
+- [ ] Log aggregation and monitoring
+- [ ] Backup automation
+
+---
 
 ## 🛡️ Security Debt Summary
 
 | Priority | Count | Key Areas |
 |----------|-------|-----------|
-| High | 4 | HTTPS, HSTS, logging sanitization, URL validation |
-| Medium | 5 | Key rotation, CSRF, request limits, audit logs |
-| Low | 4 | Headers, export encryption, dependency scanning |
+| High | 4 | HTTPS hardening, logger sanitization, URL validation |
+| Medium | 6 | Key rotation, CSRF tokens, audit logging, request limits, secret validation, Socket.io review |
+| Low | 4 | Headers, export encryption, dependency scanning, rate limiting |
+
+---
 
 ## ✅ What's Already Secure
 
@@ -188,4 +283,26 @@ Based on the comprehensive codebase security review, the following improvements 
 - Graceful shutdown handling
 - Input validation with express-validator on critical routes
 - Public item caching with TTL
-- Share token generation using crypto.randomBytes
+- Share token generation using `crypto.randomBytes`
+- File upload path traversal protection
+- Hashed filenames for secure file storage
+
+---
+
+## 📊 Codebase Statistics
+
+| Component | Count |
+|-----------|-------|
+| Backend Models | 14 |
+| Backend Routes | 12 |
+| Backend Controllers | 7 |
+| Frontend Pages | 17 |
+| Frontend Components | 38 |
+| API Endpoints | 80+ |
+| Supported File Types | 60+ |
+
+---
+
+**Version**: 2.2.0  
+**Status**: Production Ready with noted security recommendations  
+**Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

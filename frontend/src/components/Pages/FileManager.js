@@ -128,6 +128,27 @@ const FileManager = () => {
   }, [loadFiles, loadFolders, loadStats, loadTrash, showTrash]);
 
   useEffect(() => {
+    const storageWidget = stats && (
+      <div className="storage-widget">
+        <div className="storage-header">
+          <span className="storage-label">Storage Used</span>
+          <span className="storage-value">{formatFileSize(stats.usedStorage)}</span>
+        </div>
+        <div className="storage-bar-container">
+          <div 
+            className="storage-bar-fill" 
+            style={{ 
+              width: `${Math.min((stats.usedStorage / (stats.totalStorage || 10737418240)) * 100, 100)}%`,
+              backgroundColor: (stats.usedStorage / (stats.totalStorage || 10737418240)) > 0.9 ? '#ef4444' : '#3b82f6'
+            }}
+          />
+        </div>
+        <div className="storage-footer">
+          <span className="storage-total">of {formatFileSize(stats.totalStorage || 10737418240)}</span>
+        </div>
+      </div>
+    );
+
     registerPageActions([
       {
         icon: <Edit3 size={18} />,
@@ -144,9 +165,9 @@ const FileManager = () => {
         label: 'Upload File',
         onClick: () => document.querySelector('input[type="file"]')?.click()
       }
-    ]);
+    ], storageWidget);
     return () => clearPageActions();
-  }, [registerPageActions, clearPageActions]);
+  }, [registerPageActions, clearPageActions, stats]);
 
   const handleFileUpload = async (e) => {
     const uploadedFiles = e.target.files;

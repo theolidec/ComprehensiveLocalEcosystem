@@ -23,6 +23,7 @@ import PublicWishlistItem from './components/Wishlist/PublicWishlistItem';
 import FileManager from './components/Pages/FileManager';
 import DocumentViewer from './components/Pages/DocumentViewer';
 import LinkNotFound from './components/Pages/LinkNotFound';
+import GeoGebraCalculator from './components/Math/GeoGebraCalculator';
 import Sidebar from './components/Layout/Sidebar';
 import Row from './components/Layout/Row';
 import './App.css';
@@ -173,6 +174,19 @@ function AppContent() {
             </div>
             <Footer />
           </div>
+        } />
+        <Route path="/calculator" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <div style={{ flex: 1 }}>
+                  <GeoGebraCalculator />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
         } />
         <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
         <Route path="/placeholder" element={

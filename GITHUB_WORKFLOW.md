@@ -266,7 +266,7 @@ git checkout -b new-branch-name
 ComprehensiveLocalEcosystem/
 ├── backend/          # Node.js/Express backend
 │   ├── config/       # Database, logger, rate limiter
-│   ├── controllers/  # API controllers (auth, calendar, files, passwords, wishlist)
+│   ├── controllers/  # API controllers (auth, calendar, files, passwords, wishlist, follow)
 │   ├── models/       # Mongoose models (User, File, FileFolder, Wishlist, etc.)
 │   ├── routes/       # Express routes
 │   └── middleware/   # Auth middleware
@@ -274,13 +274,22 @@ ComprehensiveLocalEcosystem/
 │   ├── src/
 │   │   ├── components/  # React components
 │   │   │   ├── Pages/   # Calendar, FileManager, DocumentViewer, PasswordManager, etc.
+│   │   │   ├── Math/    # GeoGebraCalculator component
+│   │   │   ├── Wishlist/# Wishlist components
+│   │   │   ├── Auth/    # Authentication components
+│   │   │   └── Layout/  # Layout components
 │   │   ├── services/    # API clients
-│   │   └── contexts/    # React contexts
+│   │   ├── contexts/    # React contexts
+│   │   └── utils/       # GraphingEngine, MathParser
 ├── .gitignore        # Git ignore rules
 ├── package.json      # Root package configuration
 ├── README.md         # Main project documentation
 ├── DOCUMENTATION.md  # Technical documentation
+├── NEXT_STEPS.md     # Roadmap and security recommendations
 ├── SECURITY.md       # Security policy
+├── PRIVACY.md        # Privacy policy
+├── TERMS.md          # Terms of service
+├── COOKIE_POLICY.md  # Cookie policy
 └── GITHUB_WORKFLOW.md # This file
 ```
 

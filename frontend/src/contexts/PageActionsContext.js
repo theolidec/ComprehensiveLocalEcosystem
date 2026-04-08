@@ -13,18 +13,20 @@ export const usePageActions = () => {
 export const PageActionsProvider = ({ children }) => {
   const [actions, setActions] = useState({
     items: [],
+    customContent: null,
     isOpen: false
   });
 
-  const registerPageActions = useCallback((newActions) => {
+  const registerPageActions = useCallback((newActions, customContent = null) => {
     setActions({
       items: newActions,
-      isOpen: newActions.length > 0
+      customContent,
+      isOpen: newActions.length > 0 || customContent !== null
     });
   }, []);
 
   const clearPageActions = useCallback(() => {
-    setActions({ items: [], isOpen: false });
+    setActions({ items: [], customContent: null, isOpen: false });
   }, []);
 
   const toggleSidebar = useCallback(() => {

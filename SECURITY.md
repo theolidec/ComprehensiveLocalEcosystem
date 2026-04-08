@@ -164,6 +164,7 @@ The project uses the following security-focused dependencies:
 
 ## Changelog
 
+- **v2.2.0**: Added GeoGebra Calculator (client-side only, no server security impact)
 - **v2.1.0**: Added File Manager with secure file upload, storage, and sharing
 - **v2.0.0**: Added comprehensive rate limiting, account locking, CSP
 - **v1.0.0**: Initial security implementation with JWT auth

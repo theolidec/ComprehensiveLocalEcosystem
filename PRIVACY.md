@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Last Updated:** March 26, 2026
+**Last Updated:** April 8, 2026
 
 ## 1. Introduction
 
@@ -14,6 +14,10 @@ By accessing or using our Service, you agree to this Privacy Policy. If you do n
 - **Account Information**: Email address, name, and password (encrypted)
 - **Login Data**: Last login timestamp, login attempts, device information (IP address, user-agent)
 - **Calendar Data**: Events, categories, and preferences you create
+- **Password Manager Data**: Encrypted passwords, password categories, and associated metadata
+- **File Manager Data**: File metadata (names, sizes, types), folder structure, and user content
+- **Wishlist Data**: Wishlist items, categories, reservations, and public sharing preferences
+- **Calculator Data**: Saved calculator states and mathematical objects (stored locally)
 
 ### 2.2 Automatically Collected Information
 - **Device Information**: IP address, browser type, operating system
@@ -69,6 +73,10 @@ To exercise these rights, please contact us through the application.
 - Authentication tokens: Automatically expire (15 minutes for access, 7 days for refresh)
 - Login history: Retained for security purposes
 - Calendar data: Retained until you delete it or your account
+- Password data: Retained until you delete passwords or your account
+- File data: Retained until you delete files or your account; trash items purged after 30 days
+- Wishlist data: Retained until you delete items or your account
+- Calculator states: Stored locally in browser, retained until cleared
 
 ## 8. Children's Privacy
 

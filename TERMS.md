@@ -1,6 +1,6 @@
 # Terms of Service
 
-**Last Updated:** March 26, 2026
+**Last Updated:** April 8, 2026
 
 ## 1. Acceptance of Terms
 
@@ -13,6 +13,11 @@ Comprehensive Local Ecosystem is a web application providing:
 - Calendar and event management
 - Category organization for events
 - User settings and preferences
+- Password manager with encrypted storage
+- File manager with upload, download, and sharing capabilities
+- Wishlist management with public sharing and reservations
+- Interactive graphing calculator for mathematical visualization
+- Social features including user following and public profiles
 
 ## 3. User Accounts
 
@@ -44,9 +49,11 @@ You agree not to:
 ## 5. User Content
 
 ### 5.1 Your Content
-- You retain ownership of content you create (calendar events, categories)
+- You retain ownership of content you create (calendar events, categories, files, passwords, wishlists, calculator states)
 - You are responsible for content you submit to the Service
 - You grant us license to use content for Service operation
+- File uploads must comply with all applicable laws and regulations
+- Public wishlist items may be viewed by other users
 
 ### 5.2 Content Guidelines
 - Content must not violate any third-party rights

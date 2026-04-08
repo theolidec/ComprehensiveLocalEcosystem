@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -199,6 +199,13 @@ const Header = () => {
                     >
                       <FolderOpen className="h-4 w-4 text-teal-600" />
                       <span>Files</span>
+                    </button>
+                    <button
+                      onClick={() => window.location.href = '/calculator'}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Calculator className="h-4 w-4 text-teal-600" />
+                      <span>Calculator</span>
                     </button>
                   </div>
                 )}

@@ -47,6 +47,15 @@ This is a full-featured web application ecosystem combining robust authenticatio
   - **Search & Filter**: Find files by name, type, or tags
   - **Large File Support**: Up to 500MB per file
 
+- **GeoGebra Calculator**
+  - **Interactive Graphing**: Canvas-based graphing of functions and equations
+  - **Object Types**: Functions, parametric curves, points, circles, polygons, implicit equations
+  - **Advanced Math**: Inequalities, conic sections, geometric constructions
+  - **Navigation**: Pan, zoom, mouse wheel controls
+  - **Themes**: Light/dark mode support
+  - **State Management**: Save and restore calculator states
+  - **Command Interface**: Text-based input for rapid object creation
+
 ### Backend Features
 - **MongoDB Integration**: Scalable database with Mongoose ODM
 - **Refresh Token System**: Automatic token rotation with device tracking
@@ -801,11 +810,12 @@ backend/
 │   ├── categoryController.js      # Category management
 │   ├── fileController.js          # File management
 │   ├── fileFolderController.js    # File folder management
+│   ├── followController.js        # User following management
 │   ├── passwordController.js      # Password management
 │   ├── passwordCategoryController.js  # Password categories
 │   ├── settingsController.js      # User settings management
 │   ├── wishlistController.js      # Wishlist management
-│   └── followController.js        # User following management
+│   └── wishlistCategoryController.js  # Wishlist categories
 ├── middleware/
 │   └── auth.js              # Authentication middleware
 ├── models/
@@ -881,6 +891,9 @@ frontend/src/
 │   │   ├── ReservationModal.js  # Reservation modal
 │   │   ├── WishlistShareModal.js # Share link modal
 │   │   └── PublicWishlistItem.js # Public item view
+│   ├── Math/
+│   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
+│   │   └── GeoGebraCalculator.css # Calculator styles
 │   ├── CalendarHeader.js      # Calendar header component
 │   ├── CalendarSidebar.js     # Calendar sidebar component
 │   ├── EventForm.js           # Event creation form
@@ -898,6 +911,9 @@ frontend/src/
 │   ├── settingsAPI.js         # Settings API client
 │   ├── wishlistAPI.js         # Wishlist API client
 │   └── wishlistCategoryAPI.js   # Wishlist category API client
+├── utils/
+│   ├── GraphingEngine.js      # Canvas-based graphing engine
+│   └── MathParser.js          # Mathematical expression parser
 ├── config/
 │   └── api.js                 # API endpoint configuration
 ├── types/
@@ -1012,7 +1028,82 @@ const [error, setError] = useState(null);
 - Drag-and-drop event rescheduling (planned)
 - Keyboard navigation support (planned)
 
-## � Application Architecture
+## 📐 GeoGebra Calculator Architecture
+
+### GraphingEngine Class
+
+The `GraphingEngine` is a canvas-based mathematical graphing engine:
+
+**Key Features:**
+- **Coordinate System**: Configurable x/y axis ranges with auto-fit
+- **Object Types Supported**:
+  - Functions: `f(x) = x^2 + 3x - 2`
+  - Parametric curves: `x(t) = cos(t), y(t) = sin(t)`
+  - Points: `A = (3, 4)`
+  - Circles: Center-radius and diameter definitions
+  - Polygons: Triangle, quadrilateral, custom polygons
+  - Implicit equations: `x^2 + y^2 = 25`
+  - Inequalities: `y > x^2`, `x + y < 5`
+- **Interactive Navigation**: Pan, zoom (mouse wheel), reset view
+- **Visual Rendering**: Grid, axes, labels with light/dark theme support
+- **Color Management**: Automatic color cycling for multiple objects
+
+**Technical Implementation:**
+```javascript
+// Coordinate transformations
+this.xMin, this.xMax, this.yMin, this.yMax  // View bounds
+this.toCanvasX(x)  // Math to canvas coordinates
+this.toCanvasY(y)  // Math to canvas coordinates
+this.zoom(factor)  // Zoom around center point
+this.pan(dx, dy)   // Pan the view
+```
+
+### MathParser Utility
+
+The `MathParser` provides expression evaluation:
+
+**Capabilities:**
+- Arithmetic operations: `+`, `-`, `*`, `/`, `^`
+- Mathematical functions: `sin`, `cos`, `tan`, `log`, `ln`, `sqrt`, `abs`
+- Constants: `pi`, `e`
+- Variables: `x`, `y`, `t`
+- Inequality parsing: `<`, `>`, `<=`, `>=`
+
+**Supported Commands:**
+- `f(x) = expression` - Define functions
+- `y = expression` - Explicit functions
+- `A = (x, y)` - Define points
+- `x(t) = ..., y(t) = ...` - Parametric equations
+- `Circle(A, r)` or `Circle(A, B)` - Circles
+- `Polygon(A, B, C, ...)` - Polygons
+- `expression = 0` - Implicit equations
+- `y > f(x)` - Inequalities
+
+### GeoGebraCalculator Component
+
+React component providing the user interface:
+
+**Features:**
+- **Command Input**: Text-based interface for creating objects
+- **Object List**: Sidebar showing all objects with visibility toggle
+- **Object Editing**: Click to edit, delete, or modify objects
+- **State Management**: Save/restore calculator states
+- **Theme Support**: Light/dark mode with automatic switching
+- **Mouse Interactions**: Wheel zoom, drag pan, click selection
+
+**State Structure:**
+```javascript
+{
+  objects: [],           // Array of mathematical objects
+  showGrid: true,        // Grid visibility
+  showAxes: true,        // Axes visibility
+  panMode: true,         // Pan vs selection mode
+  isDarkTheme: false,    // Theme state
+  savedStates: []        // Saved calculator states
+}
+```
+
+## 📊 Application Architecture
 
 ### System Overview
 
@@ -1592,7 +1683,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.1.0
-**Last Updated**: 2026-04-06
+**Version**: 2.2.0
+**Last Updated**: 2026-04-08
 **Status**: Production Ready
-**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer
+**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator

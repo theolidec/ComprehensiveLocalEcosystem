@@ -1,0 +1,323 @@
+.geogebra-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 120px);
+  background: var(--bg-primary, #fff);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.geogebra-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--bg-secondary, #f5f5f5);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  flex-wrap: wrap;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.toolbar-section button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  color: var(--text-primary, #333);
+  transition: background 0.2s;
+}
+
+.toolbar-section button:hover:not(:disabled) {
+  background: var(--bg-hover, #e0e0e0);
+}
+
+.toolbar-section button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.toolbar-section button.active {
+  background: var(--accent-color, #4a90d9);
+  color: white;
+}
+
+.toolbar-label {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  margin-right: 4px;
+}
+
+.toolbar-insert select {
+  padding: 6px 8px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #333);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.toolbar-insert select:disabled {
+  opacity: 0.5;
+}
+
+.geogebra-main {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.geogebra-algebra {
+  width: 320px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-secondary, #f9f9f9);
+  border-right: 1px solid var(--border-color, #e0e0e0);
+}
+
+.algebra-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text-primary, #333);
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+  background: var(--bg-primary, #fff);
+}
+
+.algebra-input {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid var(--border-color, #e0e0e0);
+}
+
+.algebra-input input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border-color, #ddd);
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #333);
+  ime-mode: disabled;
+  font-family: monospace;
+}
+
+.algebra-input input:focus {
+  outline: none;
+  border-color: var(--accent-color, #4a90d9);
+}
+
+.algebra-input input:disabled {
+  opacity: 0.5;
+}
+
+.algebra-input button {
+  padding: 8px;
+  border: none;
+  background: var(--accent-color, #4a90d9);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.algebra-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.algebra-error {
+  padding: 8px 12px;
+  background: #fee;
+  color: #c00;
+  font-size: 12px;
+}
+
+.algebra-objects {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+}
+
+.algebra-object {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  background: var(--bg-primary, #fff);
+  border-radius: 4px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+.object-icon {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-color, #4a90d9);
+  color: white;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.object-name {
+  font-weight: 600;
+  color: var(--text-primary, #333);
+  min-width: 24px;
+}
+
+.object-value {
+  flex: 1;
+  color: var(--text-secondary, #666);
+  font-family: monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.object-edit {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.object-edit input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--accent-color, #4a90d9);
+  border-radius: 3px;
+  font-size: 12px;
+  font-family: monospace;
+}
+
+.object-edit button {
+  padding: 4px;
+  border: none;
+  background: var(--accent-color, #4a90d9);
+  color: white;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.object-edit button:last-child {
+  background: #999;
+}
+
+.object-actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.algebra-object:hover .object-actions {
+  opacity: 1;
+}
+
+.object-actions button {
+  padding: 4px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary, #666);
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.object-actions button:hover {
+  background: var(--bg-hover, #e0e0e0);
+  color: var(--text-primary, #333);
+}
+
+.algebra-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--text-secondary, #999);
+  font-size: 13px;
+}
+
+.geogebra-canvas {
+  flex: 1;
+  position: relative;
+  background: #fff;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.geogebra-canvas.dark-theme {
+  background: #2d2d2d;
+}
+
+.geogebra-canvas.dark-theme canvas {
+  filter: none;
+}
+
+.toolbar-theme {
+  margin-left: auto;
+}
+
+.geogebra-loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: var(--text-secondary, #666);
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border-color, #e0e0e0);
+  border-top-color: var(--accent-color, #4a90d9);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .geogebra-main {
+    flex-direction: column;
+  }
+
+  .geogebra-algebra {
+    width: 100%;
+    min-width: unset;
+    max-height: 200px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color, #e0e0e0);
+  }
+
+  .geogebra-toolbar {
+    overflow-x: auto;
+  }
+}
