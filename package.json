@@ -5,13 +5,14 @@
   "scripts": {
     "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
     "dev:services": "docker-compose up -d mongodb",
-    "dev:all": "npm run dev:services && sleep 5 && npm run dev",
+    "dev:all": "npm run dev:services && npx wait-on tcp:27017 && npm run dev",
     "start": "docker-compose up -d",
     "stop": "docker-compose down",
     "build": "docker-compose build",
     "logs": "docker-compose logs -f"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "wait-on": "^7.2.0"
   }
 }

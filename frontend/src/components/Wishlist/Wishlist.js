@@ -41,6 +41,7 @@ export default function Wishlist() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedPriority, setSelectedPriority] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [selectedItems, setSelectedItems] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
@@ -80,11 +81,20 @@ export default function Wishlist() {
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedPriority, searchQuery, pagination.page, pagination.limit]);
+  }, [selectedCategory, selectedPriority, debouncedSearch, pagination.page, pagination.limit]);
 
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchQuery);
+      setPagination(prev => ({ ...prev, page: 1 }));
+    }, 500000);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     registerPageActions([

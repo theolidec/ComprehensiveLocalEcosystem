@@ -1292,12 +1292,12 @@ const CalendarApp = () => {
       {/* Category Manager Modal */}
       {showCategoryManager && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-xl font-semibold text-gray-900">Manage Categories</h3>
+          <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b dark:border-gray-700">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Manage Categories</h3>
               <button
                 onClick={() => setShowCategoryManager(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
               >
                 ×
               </button>
@@ -1363,15 +1363,15 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
-        <h3 className="text-xl font-semibold text-gray-900 mb-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
           {editingEvent ? 'Edit Event' : 'Add Event'} for {selectedDate?.toLocaleDateString()}
         </h3>
         
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Event Title *
               </label>
               <input
@@ -1380,20 +1380,20 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                 required
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter event title"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Category
               </label>
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {categories.slice(1).map(category => (
                   <option key={category.id} value={category.id}>
@@ -1405,7 +1405,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Description
             </label>
             <textarea
@@ -1413,7 +1413,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
               value={formData.description}
               onChange={handleChange}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter event description"
             />
           </div>
@@ -1429,14 +1429,14 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                 onChange={(e) => setFormData(prev => ({ ...prev, isAllDay: e.target.checked, time: e.target.checked ? '' : prev.time }))}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="isAllDay" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isAllDay" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 All-day event
               </label>
             </div>
 
             {!formData.isAllDay && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                   Start Time
                 </label>
                 <input
@@ -1444,20 +1444,20 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                   name="time"
                   value={formData.time}
                   onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Duration (minutes)
               </label>
               <select
                 name="duration"
                 value={formData.duration}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Default (60 min)</option>
                 <option value="15">15 minutes</option>
@@ -1475,7 +1475,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Location
               </label>
               <input
@@ -1483,20 +1483,20 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                 name="location"
                 value={formData.location}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter location"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Timezone
               </label>
               <select
                 name="timezone"
                 value={formData.timezone}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                 {commonTimezones.map(tz => (
                   <option key={tz} value={tz}>{tz.replace(/_/g, ' ')}</option>
@@ -1506,7 +1506,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Attendees (comma separated emails)
             </label>
             <input
@@ -1514,20 +1514,20 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
               name="attendees"
               value={formData.attendees}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="email1@example.com, email2@example.com"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
               Reminder
             </label>
             <select
               name="reminder"
               value={formData.reminder}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="0">No reminder</option>
               <option value="5">5 minutes before</option>
@@ -1539,7 +1539,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
           </div>
 
           {/* Recurring Event Options */}
-          <div className="border-t pt-4 mt-4">
+          <div className="border-t dark:border-gray-700 pt-4 mt-4">
             <div className="flex items-center space-x-2 mb-3">
               <input
                 type="checkbox"
@@ -1549,7 +1549,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                 onChange={(e) => setFormData(prev => ({ ...prev, isRecurring: e.target.checked }))}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isRecurring" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Repeat this event
               </label>
             </div>
@@ -1557,21 +1557,21 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
             {formData.isRecurring && (
               <div className="ml-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Repeat pattern
                   </label>
                   <select
                     name="recurringPattern"
                     value={formData.recurringPattern}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="daily">Every day</option>
                     <option value="weekly">Every week</option>
                     <option value="monthly">Every month</option>
                     <option value="yearly">Every year</option>
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                     {formData.recurringPattern === 'daily' && 'Event will repeat every day from the start date'}
                     {formData.recurringPattern === 'weekly' && 'Event will repeat on the same day every week'}
                     {formData.recurringPattern === 'monthly' && 'Event will repeat on the same date every month'}
@@ -1581,7 +1581,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       End date (optional)
                     </label>
                     <input
@@ -1590,13 +1590,13 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                       value={formData.recurringEndDate}
                       onChange={handleChange}
                       min={selectedDate ? selectedDate.toISOString().split('T')[0] : ''}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Leave empty to repeat forever</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Leave empty to repeat forever</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                       Or number of occurrences
                     </label>
                     <input
@@ -1607,9 +1607,9 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
                       min="1"
                       max="365"
                       placeholder="e.g., 10"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">1-365 occurrences</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">1-365 occurrences</p>
                   </div>
                 </div>
               </div>
@@ -1626,7 +1626,7 @@ const EventForm = ({ selectedDate, categories, editingEvent, defaultDuration, on
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+              className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 py-2 px-4 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
             >
               Cancel
             </button>
@@ -1642,12 +1642,12 @@ const EventDetails = ({ event, categories, onEdit, onDelete, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-md w-full p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold text-gray-900">Event Details</h3>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white">Event Details</h3>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
           >
             ×
           </button>
@@ -1660,45 +1660,45 @@ const EventDetails = ({ event, categories, onEdit, onDelete, onClose }) => {
               style={{ backgroundColor: event.color }}
             ></div>
             <span className="text-2xl">{category.icon}</span>
-            <h4 className="text-lg font-medium text-gray-900">{event.title}</h4>
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white">{event.title}</h4>
           </div>
 
           {event.description && (
             <div>
-              <h5 className="text-sm font-medium text-gray-700 mb-1">Description</h5>
-              <p className="text-gray-600">{event.description}</p>
+              <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</h5>
+              <p className="text-gray-600 dark:text-gray-400">{event.description}</p>
             </div>
           )}
 
           <div className="space-y-2">
-            <div className="flex items-center space-x-2 text-sm text-gray-600">
+            <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
               <Calendar className="h-4 w-4" />
               <span>{new Date(event.date).toLocaleDateString()}</span>
             </div>
             
             {event.time && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <Clock className="h-4 w-4" />
                 <span>{event.time}</span>
               </div>
             )}
             
             {event.location && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <MapPin className="h-4 w-4" />
                 <span>{event.location}</span>
               </div>
             )}
             
             {event.attendees && event.attendees.length > 0 && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
                 <Users className="h-4 w-4" />
                 <span>{event.attendees.length} attendees</span>
               </div>
             )}
 
             {event.isRecurring && (
-              <div className="flex items-center space-x-2 text-sm text-blue-600">
+              <div className="flex items-center space-x-2 text-sm text-blue-600 dark:text-blue-400">
                 <Repeat className="h-4 w-4" />
                 <span className="capitalize">
                   {event.recurringPattern === 'daily' && 'Repeats daily'}
@@ -1710,7 +1710,7 @@ const EventDetails = ({ event, categories, onEdit, onDelete, onClose }) => {
             )}
           </div>
 
-          <div className="flex space-x-3 pt-4 border-t">
+          <div className="flex space-x-3 pt-4 border-t dark:border-gray-700">
             <button
               onClick={onEdit}
               className="flex-1 flex items-center justify-center space-x-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"

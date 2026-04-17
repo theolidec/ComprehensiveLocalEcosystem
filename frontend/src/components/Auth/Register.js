@@ -70,23 +70,23 @@ const Register = ({ onToggleMode }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100">
-            <User className="h-6 w-6 text-blue-600" />
+          <div className="mx-auto h-12 w-12 flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900">
+            <User className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
             Create your account
           </h2>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4 border border-red-200">
+            <div className="rounded-md bg-red-50 dark:bg-red-900/30 p-4 border border-red-200 dark:border-red-800">
               <div className="flex">
-                <AlertCircle className="h-5 w-5 text-red-400" />
+                <AlertCircle className="h-5 w-5 text-red-400 dark:text-red-500" />
                 <div className="ml-3">
-                  <p className="text-sm text-red-800">{error}</p>
+                  <p className="text-sm text-red-800 dark:text-red-400">{error}</p>
                 </div>
               </div>
             </div>
@@ -99,13 +99,13 @@ const Register = ({ onToggleMode }) => {
                 name="name"
                 type="text"
                 required
-                className={`appearance-none relative block w-full px-3 py-2 border ${fieldErrors.name ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`appearance-none relative block w-full px-3 py-2 border ${fieldErrors.name ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'} placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Full name"
                 value={formData.name}
                 onChange={handleChange}
               />
               {fieldErrors.name && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   {fieldErrors.name}
                 </p>
@@ -113,7 +113,7 @@ const Register = ({ onToggleMode }) => {
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+                <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="email"
@@ -121,13 +121,13 @@ const Register = ({ onToggleMode }) => {
                 type="email"
                 autoComplete="email"
                 required
-                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.email ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.email ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'} placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Email address"
                 value={formData.email}
                 onChange={handleChange}
               />
               {fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   {fieldErrors.email}
                 </p>
@@ -135,20 +135,20 @@ const Register = ({ onToggleMode }) => {
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="password"
                 name="password"
                 type="password"
                 required
-                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.password ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.password ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'} placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
               />
               {fieldErrors.password && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   {fieldErrors.password}
                 </p>
@@ -156,38 +156,38 @@ const Register = ({ onToggleMode }) => {
               {formData.password && !fieldErrors.password && (
                 <div className="mt-2 space-y-1">
                   <div className="flex items-center text-xs">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${formData.password.length >= 6 ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className={formData.password.length >= 6 ? 'text-green-600' : 'text-gray-500'}>At least 6 characters</span>
+                    <div className={`w-2 h-2 rounded-full mr-2 ${formData.password.length >= 6 ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                    <span className={formData.password.length >= 6 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>At least 6 characters</span>
                   </div>
                   <div className="flex items-center text-xs">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                    <span className={/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'text-green-600' : 'text-gray-500'}>Uppercase, lowercase & number</span>
+                    <div className={`w-2 h-2 rounded-full mr-2 ${/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                    <span className={/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>Uppercase, lowercase & number</span>
                   </div>
                 </div>
               )}
             </div>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <input
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
                 required
-                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.confirmPassword || (formData.confirmPassword && formData.password !== formData.confirmPassword) ? 'border-red-300' : 'border-gray-300'} placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
+                className={`appearance-none relative block w-full pl-10 pr-3 py-2 border ${fieldErrors.confirmPassword || (formData.confirmPassword && formData.password !== formData.confirmPassword) ? 'border-red-300 dark:border-red-600' : 'border-gray-300 dark:border-gray-600'} placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm`}
                 placeholder="Confirm password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
               />
               {fieldErrors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600 flex items-center">
+                <p className="mt-1 text-sm text-red-600 dark:text-red-400 flex items-center">
                   <AlertCircle className="h-3 w-3 mr-1" />
                   {fieldErrors.confirmPassword}
                 </p>
               )}
               {formData.confirmPassword && !fieldErrors.confirmPassword && formData.password === formData.confirmPassword && (
-                <p className="mt-1 text-sm text-green-600 flex items-center">
+                <p className="mt-1 text-sm text-green-600 dark:text-green-400 flex items-center">
                   <CheckCircle className="h-3 w-3 mr-1" />
                   Passwords match
                 </p>
@@ -213,12 +213,12 @@ const Register = ({ onToggleMode }) => {
           </div>
 
           <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={onToggleMode}
-                className="font-medium text-blue-600 hover:text-blue-500"
+                className="font-medium text-blue-600 dark:text-blue-400 hover:text-blue-500 dark:hover:text-blue-300"
               >
                 Sign in
               </button>

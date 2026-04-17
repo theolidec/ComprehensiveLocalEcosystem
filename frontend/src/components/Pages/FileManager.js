@@ -250,6 +250,11 @@ const FileManager = () => {
       navigate(`/files/document/${file._id}`);
       return;
     }
+
+    if (file.mimeType === 'text/html') {
+      navigate(`/files/document/edit/${file._id}`);
+      return;
+    }
     
     const isPreviewable = file.mimeType.startsWith('image/') || 
                           file.mimeType.startsWith('video/') || 
@@ -442,11 +447,11 @@ const FileManager = () => {
                   {showNewDocMenu && (
                     <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-2 w-48 z-50">
                       <button
-                        onClick={() => { setShowNewDocMenu(false); navigate('/files/document/new?type=word'); }}
+                        onClick={() => { setShowNewDocMenu(false); navigate(`/files/document/edit/new${currentFolder ? `?folderId=${currentFolder}` : ''}`); }}
                         className="w-full flex items-center space-x-3 px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 text-left"
                       >
                         <FileText className="h-4 w-4 text-blue-500" />
-                        <span className="text-gray-900 dark:text-white">Word Document</span>
+                        <span className="text-gray-900 dark:text-white">Document</span>
                       </button>
                       <button
                         onClick={() => { setShowNewDocMenu(false); navigate('/files/document/new?type=excel'); }}

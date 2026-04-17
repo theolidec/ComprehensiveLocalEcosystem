@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { SettingsProvider } from './contexts/SettingsContext';
 import { CalendarActionsProvider } from './contexts/CalendarActionsContext';
 import { PageActionsProvider } from './contexts/PageActionsContext';
@@ -8,9 +8,8 @@ import { NotificationProvider } from './contexts/NotificationContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
-import Hero from './components/Pages/Hero';
-import ProductGrid from './components/Pages/ProductGrid';
-import Features from './components/Pages/Features';
+import Home from './components/Pages/Home';
+import LandingPage from './components/Pages/LandingPage';
 import Footer from './components/Layout/Footer';
 import Toast from './components/Layout/Toast';
 import CalendarApp from './components/Pages/Calendar';
@@ -24,6 +23,7 @@ import Wishlist from './components/Wishlist/Wishlist';
 import PublicWishlistItem from './components/Wishlist/PublicWishlistItem';
 import FileManager from './components/Pages/FileManager';
 import DocumentViewer from './components/Pages/DocumentViewer';
+import DocumentEditor from './components/Pages/DocumentEditor';
 import LinkNotFound from './components/Pages/LinkNotFound';
 import GeoGebraCalculator from './components/Math/GeoGebraCalculator';
 import UserFollowing from './components/Pages/UserFollowing';
@@ -45,6 +45,24 @@ const getInitialTheme = () => {
   if (savedTheme) return savedTheme;
   return 'light';
 };
+
+function RootRoute() {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    return <Navigate to="/home" replace />;
+  }
+
+  return <LandingPage />;
+}
 
 function AppContent() {
   const location = useLocation();
@@ -71,7 +89,7 @@ function AppContent() {
         <Route path="/cookies" element={<><Header /><Cookies /><Footer /></>} />
 
         {/* Home route */}
-        <Route path="/" element={<Navigate to="/home" replace />} />
+        <Route path="/" element={<RootRoute />} />
         <Route path="/home" element={
           <ProtectedRoute>
             <div key={location.pathname}>
@@ -79,9 +97,7 @@ function AppContent() {
               <Row>
                 {/* <Sidebar inline /> */}
                 <div style={{ flex: 1 }}>
-                  <Hero />
-                  <ProductGrid />
-                  <Features />
+                  <Home />
                 </div>
               </Row>
               <Footer />
@@ -167,6 +183,16 @@ function AppContent() {
         <Route path="/files/document/new" element={
           <ProtectedRoute>
             <DocumentViewer />
+          </ProtectedRoute>
+        } />
+        <Route path="/files/document/edit/new" element={
+          <ProtectedRoute>
+            <DocumentEditor />
+          </ProtectedRoute>
+        } />
+        <Route path="/files/document/edit/:fileId" element={
+          <ProtectedRoute>
+            <DocumentEditor />
           </ProtectedRoute>
         } />
         <Route path="/files/shared/:token" element={
