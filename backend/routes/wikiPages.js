@@ -1,0 +1,153 @@
+const express = require('express');
+const { body, validationResult } = require('express-validator');
+const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const wikiPageController = require('../controllers/wikiPageController');
+const logger = require('../config/logger');
+
+const router = express.Router({ mergeParams: true });
+
+router.post('/', authenticateToken, [
+  body('title').trim().notEmpty().withMessage('Page title is required')
+    .isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
+  body('content').optional().isString(),
+  body('parentId').optional().isMongoId(),
+  body('order').optional().isInt({ min: 0 }),
+  body('tags').optional().isArray(),
+  body('categoryIds').optional().isArray(),
+  body('infobox').optional().isObject()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  await wikiPageController.createPage(req, res);
+});
+
+router.get('/', optionalAuth, async (req, res) => {
+  await wikiPageController.getPages(req, res);
+});
+
+router.get('/search', optionalAuth, async (req, res) => {
+  await wikiPageController.searchWiki(req, res);
+});
+
+router.get('/categories', optionalAuth, async (req, res) => {
+  await wikiPageController.getCategories(req, res);
+});
+
+router.post('/categories', authenticateToken, [
+  body('name').trim().notEmpty().withMessage('Category name is required')
+    .isLength({ max: 100 }).withMessage('Category name cannot exceed 100 characters'),
+  body('description').optional().isLength({ max: 500 }),
+  body('color').optional().isString()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  await wikiPageController.createCategory(req, res);
+});
+
+router.get('/:pageSlug', optionalAuth, async (req, res) => {
+  await wikiPageController.getPage(req, res);
+});
+
+router.put('/:pageSlug', authenticateToken, [
+  body('title').optional().trim().isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
+  body('content').optional().isString(),
+  body('parentId').optional(),
+  body('order').optional().isInt({ min: 0 }),
+  body('tags').optional().isArray(),
+  body('categoryIds').optional().isArray(),
+  body('infobox').optional(),
+  body('editSummary').optional().isLength({ max: 500 })
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  await wikiPageController.updatePage(req, res);
+});
+
+router.delete('/:pageSlug', authenticateToken, async (req, res) => {
+  await wikiPageController.deletePage(req, res);
+});
+
+router.get('/:pageSlug/history', optionalAuth, async (req, res) => {
+  await wikiPageController.getPageHistory(req, res);
+});
+
+router.get('/:pageSlug/history/:versionId', optionalAuth, async (req, res) => {
+  await wikiPageController.getVersion(req, res);
+});
+
+router.get('/:pageSlug/diff', optionalAuth, async (req, res) => {
+  await wikiPageController.getDiff(req, res);
+});
+
+router.post('/:pageSlug/restore/:versionId', authenticateToken, async (req, res) => {
+  await wikiPageController.restoreVersion(req, res);
+});
+
+router.get('/:pageSlug/backlinks', optionalAuth, async (req, res) => {
+  await wikiPageController.getBacklinks(req, res);
+});
+
+router.post('/:pageSlug/move', authenticateToken, [
+  body('newTitle').trim().notEmpty().withMessage('New title is required')
+    .isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
+  body('newParentId').optional()
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  await wikiPageController.movePage(req, res);
+});
+
+router.post('/:pageSlug/redirect', authenticateToken, [
+  body('targetTitle').trim().notEmpty().withMessage('Target title is required')
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  await wikiPageController.createRedirect(req, res);
+});
+
+router.post('/:pageSlug/watch', authenticateToken, async (req, res) => {
+  await wikiPageController.addToWatchlist(req, res);
+});
+
+router.delete('/:pageSlug/watch', authenticateToken, async (req, res) => {
+  await wikiPageController.removeFromWatchlist(req, res);
+});
+
+router.get('/watchlist', authenticateToken, async (req, res) => {
+  await wikiPageController.getWatchlist(req, res);
+});
+
+router.get('/recent-changes', optionalAuth, async (req, res) => {
+  await wikiPageController.getRecentChanges(req, res);
+});
+
+router.get('/all', optionalAuth, async (req, res) => {
+  await wikiPageController.getAllPages(req, res);
+});
+
+module.exports = router;

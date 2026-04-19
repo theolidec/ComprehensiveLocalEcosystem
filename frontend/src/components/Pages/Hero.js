@@ -51,12 +51,18 @@ const Hero = () => {
             Calendar, passwords, files, and more - all in one private place.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <button className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center">
-              Get started free
+            <button
+              onClick={() => navigate('/calendar')}
+              className="bg-blue-600 text-white hover:bg-blue-700 px-8 py-3 rounded-lg font-medium transition-colors flex items-center justify-center"
+            >
+              Get started
               <ArrowRight className="ml-2 h-5 w-5" />
             </button>
-            <button className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-3 rounded-lg font-medium border border-gray-300 dark:border-gray-600 transition-colors">
-              Explore all products
+            <button
+              onClick={() => navigate('/settings')}
+              className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 px-8 py-3 rounded-lg font-medium border border-gray-300 dark:border-gray-600 transition-colors"
+            >
+              Settings
             </button>
           </div>
 

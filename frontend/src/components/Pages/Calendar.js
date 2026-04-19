@@ -69,8 +69,11 @@ const CalendarApp = () => {
   useEffect(() => {
     if (urlView && ['month', 'week', 'day'].includes(urlView)) {
       setViewMode(urlView);
+      if (urlView === 'day' && !selectedDate) {
+        setSelectedDate(new Date());
+      }
     }
-  }, [urlView]);
+  }, [urlView, selectedDate]);
 
   // Save category sort order to localStorage
   useEffect(() => {

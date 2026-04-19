@@ -52,8 +52,8 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 | Password Reset | 3 requests | 1 hour |
 | Token Refresh | 50 requests | 15 minutes |
 | User Actions | 50 actions | 1 hour |
-| Categories | 100 requests | 15 minutes |
 | Settings | 100 requests | 15 minutes |
+| Public Reservations | 10 requests | 1 hour |
 
 ### Security Headers
 
@@ -164,6 +164,7 @@ The project uses the following security-focused dependencies:
 
 ## Changelog
 
+- **v2.3.0**: Updated rate limiting configuration, added recurring event support
 - **v2.2.0**: Added GeoGebra Calculator (client-side only, no server security impact)
 - **v2.1.0**: Added File Manager with secure file upload, storage, and sharing
 - **v2.0.0**: Added comprehensive rate limiting, account locking, CSP

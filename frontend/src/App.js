@@ -5,6 +5,7 @@ import { SettingsProvider } from './contexts/SettingsContext';
 import { CalendarActionsProvider } from './contexts/CalendarActionsContext';
 import { PageActionsProvider } from './contexts/PageActionsContext';
 import { NotificationProvider } from './contexts/NotificationContext';
+import { WikiProvider } from './contexts/WikiContext';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
@@ -29,6 +30,13 @@ import GeoGebraCalculator from './components/Math/GeoGebraCalculator';
 import UserFollowing from './components/Pages/UserFollowing';
 import Sidebar from './components/Layout/Sidebar';
 import Row from './components/Layout/Row';
+import WikiList from './components/Wiki/WikiList';
+import WikiView from './components/Wiki/WikiView';
+import WikiPageView from './components/Wiki/WikiPageView';
+import WikiPageEditor from './components/Wiki/WikiPageEditor';
+import WikiPageHistory from './components/Wiki/WikiPageHistory';
+import WikiSettings from './components/Wiki/WikiSettings';
+import WikiRecentChanges from './components/Wiki/WikiRecentChanges';
 import './App.css';
 
 const getInitialTheme = () => {
@@ -95,7 +103,7 @@ function AppContent() {
             <div key={location.pathname}>
               <Header />
               <Row>
-                {/* <Sidebar inline /> */}
+                <Sidebar inline />
                 <div style={{ flex: 1 }}>
                   <Home />
                 </div>
@@ -218,6 +226,93 @@ function AppContent() {
           </ProtectedRoute>
         } />
         <Route path="/wishlist/shared/:token" element={<PublicWishlistItem />} />
+        <Route path="/wikis" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <WikiList />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                  <WikiView />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug/:pageSlug" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                  <WikiPageView />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug/edit/:pageSlug" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                <WikiPageEditor />
+              </div>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug/history/:pageSlug" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                <WikiPageHistory />
+              </div>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug/settings" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <WikiSettings />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/wiki/:slug/recent-changes" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                <WikiRecentChanges />
+              </div>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
         <Route path="/following" element={
           <ProtectedRoute>
             <div key={location.pathname}>
@@ -250,12 +345,14 @@ function App() {
       <NotificationProvider>
         <AuthProvider>
           <SettingsProvider>
-            <PageActionsProvider>
-              <CalendarActionsProvider>
-                <AppContent />
-                <Toast />
-              </CalendarActionsProvider>
-            </PageActionsProvider>
+            <WikiProvider>
+              <PageActionsProvider>
+                <CalendarActionsProvider>
+                  <AppContent />
+                  <Toast />
+                </CalendarActionsProvider>
+              </PageActionsProvider>
+            </WikiProvider>
           </SettingsProvider>
         </AuthProvider>
       </NotificationProvider>

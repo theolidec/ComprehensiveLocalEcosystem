@@ -18,6 +18,8 @@ yarn-error.log*
 
 # Uploads
 uploads/
+backend/uploads/files/
+backend/uploads/documents/
 
 # Build outputs
 dist/

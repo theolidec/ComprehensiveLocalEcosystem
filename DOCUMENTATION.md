@@ -859,66 +859,72 @@ backend/
 ### Frontend Structure
 ```
 frontend/src/
-├── components/
-│   ├── Auth/
-│   │   ├── AuthPage.js          # Login/Register container
-│   │   ├── Login.js             # Login form with validation
-│   │   ├── Register.js          # Registration form
-│   │   └── ProtectedRoute.js  # Route protection wrapper
-│   ├── Layout/
-│   │   ├── Header.js            # Navigation header
-│   │   ├── Footer.js            # Page footer
-│   │   ├── Sidebar.js           # Navigation sidebar
-│   │   └── Row.js               # Layout row component
-│   ├── Pages/
-│   │   ├── Calendar.js          # Full calendar system
-│   │   ├── CategoryManager.js   # Category management UI
-│   │   ├── DocumentViewer.js    # Document editor/viewer
-│   │   ├── FileManager.js      # File management UI
-│   │   ├── PasswordManager.js   # Password management UI
-│   │   ├── Settings.js          # User settings page
-│   │   ├── Hero.js              # Landing page hero
-│   │   ├── ProductGrid.js       # Product showcase
-│   │   ├── Features.js          # Features display
-│   │   ├── Privacy.js           # Privacy policy page
-│   │   ├── Terms.js             # Terms of service page
-│   │   ├── Cookies.js           # Cookie policy page
-│   │   ├── CookiePopup.js       # Cookie consent popup
-│   │   └── LinkNotFound.js      # 404 placeholder page
-│   ├── Wishlist/
-│   │   ├── Wishlist.js          # Main wishlist component
-│   │   ├── WishlistItemModal.js # Item create/edit modal
-│   │   ├── ReservationModal.js  # Reservation modal
-│   │   ├── WishlistShareModal.js # Share link modal
-│   │   └── PublicWishlistItem.js # Public item view
-│   ├── Math/
-│   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
-│   │   └── GeoGebraCalculator.css # Calculator styles
-│   ├── CalendarHeader.js      # Calendar header component
-│   ├── CalendarSidebar.js     # Calendar sidebar component
-│   ├── EventForm.js           # Event creation form
-│   └── EventDetails.js        # Event details display
-├── contexts/
-│   ├── AuthContext.js         # Authentication state management
-│   ├── SettingsContext.js     # Settings state management
-│   ├── CalendarActionsContext.js  # Calendar actions
-│   └── PageActionsContext.js  # Page actions
-├── services/
-│   ├── calendarAPI.js         # Calendar API client
-│   ├── categoryAPI.js         # Category API client
-│   ├── fileService.js         # File API client
-│   ├── passwordAPI.js         # Password API client
-│   ├── settingsAPI.js         # Settings API client
-│   ├── wishlistAPI.js         # Wishlist API client
-│   └── wishlistCategoryAPI.js   # Wishlist category API client
-├── utils/
-│   ├── GraphingEngine.js      # Canvas-based graphing engine
-│   └── MathParser.js          # Mathematical expression parser
-├── config/
-│   └── api.js                 # API endpoint configuration
-├── types/
-│   └── auth.ts                # TypeScript type definitions
-└── App.js                       # Main routing and app structure
+│   ├── components/
+│   │   ├── Auth/
+│   │   │   ├── AuthPage.js          # Login/Register container
+│   │   │   ├── Login.js             # Login form with validation
+│   │   │   ├── Register.js          # Registration form
+│   │   │   └── ProtectedRoute.js    # Route protection wrapper
+│   │   ├── Layout/
+│   │   │   ├── Header.js            # Navigation header
+│   │   │   ├── Footer.js            # Page footer
+│   │   │   ├── Sidebar.js           # Navigation sidebar
+│   │   │   ├── Row.js               # Layout row component
+│   │   │   └── Toast.js             # Toast notification component
+│   │   ├── Pages/
+│   │   │   ├── Calendar.js          # Full calendar system
+│   │   │   ├── CategoryManager.js   # Category management UI
+│   │   │   ├── DocumentViewer.js    # Document editor/viewer
+│   │   │   ├── DocumentEditor.js    # Full-screen document editor
+│   │   │   ├── FileManager.js       # File management UI
+│   │   │   ├── PasswordManager.js   # Password management UI
+│   │   │   ├── Settings.js          # User settings page
+│   │   │   ├── UserFollowing.js     # User following/social page
+│   │   │   ├── Hero.js              # Landing page hero
+│   │   │   ├── LandingPage.js       # Landing page container
+│   │   │   ├── Home.js              # Home dashboard
+│   │   │   ├── ProductGrid.js       # Product showcase
+│   │   │   ├── Features.js          # Features display
+│   │   │   ├── Privacy.js           # Privacy policy page
+│   │   │   ├── Terms.js             # Terms of service page
+│   │   │   ├── Cookies.js           # Cookie policy page
+│   │   │   ├── CookiePopup.js       # Cookie consent popup
+│   │   │   └── LinkNotFound.js      # 404 placeholder page
+│   │   ├── Wishlist/
+│   │   │   ├── Wishlist.js          # Main wishlist component
+│   │   │   ├── WishlistItemModal.js # Item create/edit modal
+│   │   │   ├── ReservationModal.js  # Reservation modal
+│   │   │   ├── WishlistShareModal.js # Share link modal
+│   │   │   └── PublicWishlistItem.js # Public item view
+│   │   ├── Math/
+│   │   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
+│   │   │   └── GeoGebraCalculator.css # Calculator styles
+│   │   ├── CalendarHeader.js      # Calendar header component
+│   │   ├── CalendarSidebar.js     # Calendar sidebar component
+│   │   ├── EventForm.js           # Event creation form
+│   │   └── EventDetails.js        # Event details display
+│   ├── contexts/
+│   │   ├── AuthContext.js         # Authentication state management
+│   │   ├── SettingsContext.js     # Settings state management
+│   │   ├── CalendarActionsContext.js  # Calendar actions
+│   │   ├── PageActionsContext.js  # Page actions
+│   │   └── NotificationContext.js # Notification state management
+│   ├── services/
+│   │   ├── calendarAPI.js         # Calendar API client
+│   │   ├── categoryAPI.js         # Category API client
+│   │   ├── fileService.js         # File API client
+│   │   ├── passwordAPI.js         # Password API client
+│   │   ├── settingsAPI.js         # Settings API client
+│   │   ├── wishlistAPI.js         # Wishlist API client
+│   │   └── wishlistCategoryAPI.js   # Wishlist category API client
+│   ├── utils/
+│   │   ├── GraphingEngine.js      # Canvas-based graphing engine
+│   │   └── MathParser.js          # Mathematical expression parser
+│   ├── config/
+│   │   └── api.js                 # API endpoint configuration
+│   ├── types/
+│   │   └── auth.ts                # TypeScript type definitions
+│   └── App.js                       # Main routing and app structure
 ```
 
 ## 📅 Calendar System Architecture
@@ -1683,7 +1689,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.2.0
-**Last Updated**: 2026-04-08
+**Version**: 2.3.0
+**Last Updated**: 2026-04-17
 **Status**: Production Ready
-**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator
+**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events

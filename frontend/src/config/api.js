@@ -51,6 +51,10 @@ const API_ENDPOINTS = {
   
   // Follow/social endpoints
   FOLLOW: '/api/follow',
+
+  // Wiki endpoints
+  WIKIS: '/api/wikis',
+  WIKIS_PUBLIC: '/api/wikis/public',
 };
 
 // Create full URLs for endpoints
@@ -84,4 +88,6 @@ export const API_URLS = {
   WISHLIST_CATEGORIES: createApiUrl(API_ENDPOINTS.WISHLIST_CATEGORIES),
   WISHLISTS: createApiUrl(API_ENDPOINTS.WISHLISTS),
   FOLLOW: createApiUrl(API_ENDPOINTS.FOLLOW),
+  WIKIS: createApiUrl(API_ENDPOINTS.WIKIS),
+  WIKIS_PUBLIC: createApiUrl(API_ENDPOINTS.WIKIS_PUBLIC),
 };

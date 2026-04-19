@@ -223,6 +223,8 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 | `GET` | `/events/:id` | Get specific event | Yes |
 | `GET` | `/events/export` | Export events as JSON | Yes |
 | `POST` | `/events/import` | Import events from JSON | Yes |
+| `GET` | `/events/recurring` | Get recurring event instances | Yes |
+| `POST` | `/events/:id/recurring` | Create recurring event pattern | Yes |
 
 ### Event Category Routes (`/api/categories`)
 
@@ -526,26 +528,31 @@ ComprehensiveLocalEcosystem/
 │   │   │   │   ├── Header.js          # Navigation header
 │   │   │   │   ├── Footer.js          # Page footer
 │   │   │   │   ├── Sidebar.js         # Navigation sidebar
-│   │   │   │   └── Row.js             # Layout row component
+│   │   │   │   ├── Row.js             # Layout row component
+│   │   │   │   └── Toast.js           # Toast notification component
 │   │   │   ├── Pages/
 │   │   │   │   ├── Calendar.js        # Full calendar system
 │   │   │   │   ├── CategoryManager.js # Category management UI
 │   │   │   │   ├── DocumentViewer.js  # Document editor/viewer
-│   │   │   │   ├── FileManager.js    # File management UI
+│   │   │   │   ├── DocumentEditor.js  # Full-screen document editor
+│   │   │   │   ├── FileManager.js     # File management UI
 │   │   │   │   ├── PasswordManager.js # Password management UI
-│   │   │   │   ├── Settings.js       # User settings page
-│   │   │   │   ├── Hero.js           # Landing page hero
-│   │   │   │   ├── ProductGrid.js    # Product showcase
-│   │   │   │   ├── Features.js       # Features display
-│   │   │   │   ├── Privacy.js        # Privacy policy page
-│   │   │   │   ├── Terms.js          # Terms of service page
-│   │   │   │   ├── Cookies.js        # Cookie policy page
-│   │   │   │   ├── CookiePopup.js    # Cookie consent popup
-│   │   │   │   └── LinkNotFound.js   # 404 placeholder page
+│   │   │   │   ├── Settings.js        # User settings page
+│   │   │   │   ├── UserFollowing.js   # User following/social page
+│   │   │   │   ├── Hero.js            # Landing page hero
+│   │   │   │   ├── LandingPage.js     # Landing page container
+│   │   │   │   ├── Home.js            # Home dashboard
+│   │   │   │   ├── ProductGrid.js     # Product showcase
+│   │   │   │   ├── Features.js        # Features display
+│   │   │   │   ├── Privacy.js         # Privacy policy page
+│   │   │   │   ├── Terms.js           # Terms of service page
+│   │   │   │   ├── Cookies.js         # Cookie policy page
+│   │   │   │   ├── CookiePopup.js     # Cookie consent popup
+│   │   │   │   └── LinkNotFound.js    # 404 placeholder page
 │   │   │   ├── Wishlist/
-│   │   │   │   ├── Wishlist.js       # Main wishlist component
-│   │   │   │   ├── WishlistItemModal.js # Item create/edit modal
-│   │   │   │   ├── ReservationModal.js  # Reservation modal
+│   │   │   │   ├── Wishlist.js        # Main wishlist component
+│   │   │   │   ├── WishlistItemModal.js  # Item create/edit modal
+│   │   │   │   ├── ReservationModal.js   # Reservation modal
 │   │   │   │   ├── WishlistShareModal.js # Share link modal
 │   │   │   │   └── PublicWishlistItem.js # Public item view
 │   │   │   ├── Math/
@@ -559,7 +566,8 @@ ComprehensiveLocalEcosystem/
 │   │   │   ├── AuthContext.js         # Authentication state management
 │   │   │   ├── SettingsContext.js     # Settings state management
 │   │   │   ├── CalendarActionsContext.js  # Calendar actions
-│   │   │   └── PageActionsContext.js  # Page actions
+│   │   │   ├── PageActionsContext.js  # Page actions
+│   │   │   └── NotificationContext.js # Notification state management
 │   │   ├── services/
 │   │   │   ├── calendarAPI.js         # Calendar API client
 │   │   │   ├── categoryAPI.js         # Category API client
@@ -729,7 +737,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.2.0
-**Last Updated**: 2026-04-08
+**Version**: 2.3.0
+**Last Updated**: 2026-04-17
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

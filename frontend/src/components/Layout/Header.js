@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users, BookOpen } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -88,6 +88,9 @@ const Header = () => {
     }
     if (location.pathname === '/following') {
       return 'User Following';
+    }
+    if (location.pathname.startsWith('/wikis')) {
+      return 'Wiki';
     }
     return 'Oasis';
   };
@@ -216,6 +219,13 @@ const Header = () => {
                     >
                       <Users className="h-4 w-4 text-pink-600" />
                       <span>Following</span>
+                    </button>
+                    <button
+                      onClick={() => window.location.href = '/wikis'}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <BookOpen className="h-4 w-4 text-amber-600" />
+                      <span>Wiki</span>
                     </button>
                   </div>
                 )}

@@ -7,7 +7,7 @@ const ProductGrid = () => {
       icon: Calendar,
       title: 'Calendar',
       description: 'Organize your schedule with a private, encrypted calendar.',
-      features: ['Event management', 'Category organization', 'Import/Export'],
+      features: ['Event management', 'Recurring events', 'Import/Export'],
       cta: 'Explore Calendar',
       link: '/calendar',
       color: 'bg-indigo-600'
@@ -16,7 +16,7 @@ const ProductGrid = () => {
       icon: Key,
       title: 'Password Manager',
       description: 'Secure your digital life with military-grade encryption.',
-      features: ['AES-256-GCM encryption', 'Password generator', 'Categories'],
+      features: ['AES-256-GCM encryption', 'Password generator', 'Organize by category'],
       cta: 'Manage Passwords',
       link: '/passwords',
       color: 'bg-red-600'
@@ -25,7 +25,7 @@ const ProductGrid = () => {
       icon: HardDrive,
       title: 'File Storage',
       description: 'Store and organize your files with secure local storage.',
-      features: ['Folder organization', 'Document editor', 'Share links'],
+      features: ['Folder organization', 'Document editor', 'Up to 500MB files'],
       cta: 'Explore Files',
       link: '/files',
       color: 'bg-purple-600'
@@ -34,7 +34,7 @@ const ProductGrid = () => {
       icon: Gift,
       title: 'Wishlist',
       description: 'Create and share wishlists with friends and family.',
-      features: ['Public/Private items', 'Reservation system', 'Social features'],
+      features: ['Public/Private items', 'Reservation system', 'Multi-currency support'],
       cta: 'View Wishlist',
       link: '/wishlist',
       color: 'bg-pink-600'
@@ -43,7 +43,7 @@ const ProductGrid = () => {
       icon: Calculator,
       title: 'Calculator',
       description: 'Interactive graphing calculator for mathematical visualization.',
-      features: ['Function plotting', 'Geometric objects', 'Save states'],
+      features: ['Function plotting', 'Geometric shapes', 'Save states'],
       cta: 'Try Calculator',
       link: '/calculator',
       color: 'bg-teal-600'
@@ -67,7 +67,7 @@ const ProductGrid = () => {
             All your digital life, secured
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            From email to VPN, passwords to documents - everything you need to stay private and secure online.
+            Calendar, passwords, files, wishlists, and more - everything you need to stay organized, private, and secure.
           </p>
         </div>
 

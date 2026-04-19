@@ -269,7 +269,10 @@ ComprehensiveLocalEcosystem/
 │   ├── controllers/  # API controllers (auth, calendar, files, passwords, wishlist, follow)
 │   ├── models/       # Mongoose models (User, File, FileFolder, Wishlist, etc.)
 │   ├── routes/       # Express routes
-│   └── middleware/   # Auth middleware
+│   ├── middleware/   # Auth middleware
+│   ├── services/     # Business logic services
+│   ├── logs/         # Log files
+│   └── uploads/      # File uploads
 ├── frontend/         # React frontend
 │   ├── src/
 │   │   ├── components/  # React components
@@ -281,8 +284,10 @@ ComprehensiveLocalEcosystem/
 │   │   ├── services/    # API clients
 │   │   ├── contexts/    # React contexts
 │   │   └── utils/       # GraphingEngine, MathParser
+│   └── public/         # Static assets
 ├── .gitignore        # Git ignore rules
 ├── package.json      # Root package configuration
+├── docker-compose.yml # Docker configuration
 ├── README.md         # Main project documentation
 ├── DOCUMENTATION.md  # Technical documentation
 ├── NEXT_STEPS.md     # Roadmap and security recommendations
@@ -290,6 +295,8 @@ ComprehensiveLocalEcosystem/
 ├── PRIVACY.md        # Privacy policy
 ├── TERMS.md          # Terms of service
 ├── COOKIE_POLICY.md  # Cookie policy
+├── setup.sh          # Setup script
+├── start.sh          # Start script
 └── GITHUB_WORKFLOW.md # This file
 ```
 

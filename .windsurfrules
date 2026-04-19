@@ -1,0 +1,54 @@
+At the start of every response, write this "Yes sir!"
+Before making any changes, determine the scope of the changes and read the appropriate documentation files in the root directory and in /doc to understand the project structure. Always follow the existing project structure and coding conventions.
+Make the smallest change necessary to accomplish the task. Do not refactor, reorganize, or rename things unless explicitly instructed.
+After making changes, re-read every modified file and verify that the changes are correct and complete. Check for errors, inconsistencies, missing imports, broken references, and missing details.
+At the end of every task, update the documentation files in the root directory and in /doc to reflect the changes. Always include every essential detail needed to understand the changes and to get a full understanding in the future. Documentation must be kept in sync with the code — never leave it outdated.
+
+
+## Commands - These are simple comands the user can use to control the assistant more easily. They are case insensitive and can be used in any order or alone. Ignore this section if none of the commands are the message given.
+
+"End of Day" / "EOD"
+Re-read all modified files and verify correctness. Check that all documentation in the root directory and in /doc is up to date and reflects the current state of the code. Then commit and push everything to GitHub with a clear and descriptive commit message summarizing the session.
+
+"Checkpoint" / "Save"
+Commit and push the current state to GitHub with a short status message. No full doc review required.
+
+"Sync"
+Pull the latest changes from GitHub before continuing work.
+
+"Review" / "Check"
+Re-read all recently modified files and verify correctness, consistency, and completeness. Check for errors, missing imports, broken references, and inconsistencies. Do not make any changes.
+
+"Doc Check" / "Check Docs"
+Scan all documentation files in the root directory and in /doc and flag anything that is outdated, missing, or inconsistent with the current code. Do not make any changes unless explicitly told to fix them.
+
+"Status"
+Summarize what has been changed so far in the current session, what is pending, and which documentation files may need updating.
+
+"Plan"
+Before touching any code, outline the full scope of the changes. List every file that will be affected and describe what will be done to each. Wait for explicit approval before proceeding.
+
+"Scope"
+Estimate the size and risk of the requested change and list which files will be affected. Lighter than Plan — no approval needed, just an overview.
+
+"Clean Up" / "Cleanup"
+Remove dead code, debug statements, unused imports, and TODO comments. Do not change any logic.
+
+"Refactor" [target]
+Restructuring is explicitly intentional. The agent has permission to reorganize, rename, and restructure the specified target while preserving all existing behavior.
+
+"Recap"
+Summarize the current project structure, recent changes made in this session, and any decisions or open questions that came up.
+
+"Fresh Eyes"
+Re-read all documentation from scratch as if starting a brand new session. Flag anything that has drifted, is unclear, or is missing context.
+
+"Security Review"
+Conduct a thorough security review of the entire codebase, identifying potential vulnerabilities, security risks, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
+
+"Next Steps"
+Analyze the current state of the project and determine the next logical steps to take in order to complete the project or individual parts/modules.
+
+"Legal Review"
+Conduct a thorough legal review of the entire codebase, identifying potential legal issues, compliance risks, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
+

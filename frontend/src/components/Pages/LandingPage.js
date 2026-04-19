@@ -1,16 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Shield, Lock, Users, Calendar, Key, Gift, FileText, Calculator } from 'lucide-react';
+import { ArrowRight, Shield, Lock, Users, Calendar, Key, Gift, FileText, Calculator, BookOpen } from 'lucide-react';
+import Features from './Features';
+
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
   const features = [
-    { icon: Calendar, title: 'Calendar', description: 'Organize your schedule with powerful calendar tools' },
-    { icon: Key, title: 'Passwords', description: 'Securely store and manage your passwords' },
+    { icon: Calendar, title: 'Calendar', description: 'Organize your schedule with powerful calendar tools and recurring events' },
+    { icon: Key, title: 'Passwords', description: 'Securely store and manage your passwords with military-grade encryption' },
     { icon: Gift, title: 'Wishlists', description: 'Create and share wishlists with friends and family' },
-    { icon: FileText, title: 'Files', description: 'Store and organize your documents securely' },
-    { icon: Calculator, title: 'Calculator', description: 'Advanced mathematical calculations with GeoGebra' }
+    { icon: FileText, title: 'Files', description: 'Store and organize your documents securely up to 500MB each' },
+    { icon: Calculator, title: 'Calculator', description: 'Advanced mathematical calculations and graphing with GeoGebra' },
+    { icon: Users, title: 'Social', description: 'Connect with others while keeping your data private' },
+    { icon: BookOpen, title: 'Wiki', description: 'Create and manage knowledge bases with collaborative documentation' }
   ];
 
   return (
@@ -18,7 +22,7 @@ const LandingPage = () => {
       <header className="bg-white dark:bg-gray-900 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">AL</h1>
+            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Oasis</h1>
           </div>
           <div className="flex gap-4">
             <button
@@ -92,6 +96,8 @@ const LandingPage = () => {
           </div>
         </section>
 
+        <Features />
+
         <section className="py-16 bg-white dark:bg-gray-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-12">
@@ -137,7 +143,7 @@ const LandingPage = () => {
       <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            © 2024 AL. All rights reserved.
+            © 2026 Oasis. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 text-sm">

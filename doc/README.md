@@ -1,0 +1,135 @@
+# Documentation Index
+
+Welcome to the Comprehensive Local Ecosystem documentation. This directory contains detailed documentation for every major component of the system.
+
+## Quick Navigation
+
+### Getting Started
+
+| Document | Description | Audience |
+|----------|-------------|----------|
+| [`../README.md`](../README.md) | Project overview and quick start | Everyone |
+| [`development.md`](development.md) | Development setup and workflows | Developers |
+| [`deployment.md`](deployment.md) | Production deployment guide | DevOps |
+
+### Architecture & Technical Documentation
+
+| Document | Description | Key Topics |
+|----------|-------------|------------|
+| [`backend-architecture.md`](backend-architecture.md) | Backend structure and patterns | Express, middleware, controllers, services |
+| [`frontend-architecture.md`](frontend-architecture.md) | Frontend structure and patterns | React, contexts, components, hooks |
+| [`database-models.md`](database-models.md) | All MongoDB schemas | Models, indexes, relationships |
+| [`authentication.md`](authentication.md) | Auth system deep dive | JWT, sessions, security |
+
+### API & Module Documentation
+
+| Document | Description | Endpoints |
+|----------|-------------|-----------|
+| [`api-overview.md`](api-overview.md) | Complete API reference | All endpoints |
+| [`calendar.md`](calendar.md) | Calendar module | `/api/calendar/*` |
+| [`categories.md`](categories.md) | Category management | `/api/categories/*` |
+| [`files.md`](files.md) | File management | `/api/files/*`, `/api/file-folders/*` |
+| [`passwords.md`](passwords.md) | Password manager | `/api/passwords/*` |
+| [`settings.md`](settings.md) | User settings | `/api/settings/*` |
+| [`wishlist.md`](wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
+| [`wiki.md`](wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
+| [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
+| [`geogebra-calculator.md`](geogebra-calculator.md) | Math graphing | Frontend component |
+
+### Security & Operations
+
+| Document | Description | Topics |
+|----------|-------------|--------|
+| [`security.md`](security.md) | Security implementation | JWT, encryption, headers, CORS |
+| [`deployment.md`](deployment.md) | Deployment guide | Docker, Nginx, SSL |
+
+## Documentation by Role
+
+### For Developers
+
+Start here if you're contributing code:
+
+1. [`development.md`](development.md) - Setup your environment
+2. [`backend-architecture.md`](backend-architecture.md) - Understand backend patterns
+3. [`frontend-architecture.md`](frontend-architecture.md) - Understand frontend patterns
+4. [`database-models.md`](database-models.md) - Review data structures
+5. [`api-overview.md`](api-overview.md) - API reference
+
+### For DevOps/SRE
+
+Start here if you're deploying or maintaining:
+
+1. [`deployment.md`](deployment.md) - Deployment options
+2. [`security.md`](security.md) - Security configuration
+3. [`backend-architecture.md`](backend-architecture.md) - Server structure
+
+### For API Consumers
+
+Start here if you're integrating with the API:
+
+1. [`api-overview.md`](api-overview.md) - Complete API reference
+2. [`authentication.md`](authentication.md) - Authentication flow
+
+### For Security Review
+
+1. [`security.md`](security.md) - Security measures
+2. [`authentication.md`](authentication.md) - Auth implementation
+3. [`backend-architecture.md`](backend-architecture.md) - Middleware and validation
+
+## Module Quick Reference
+
+### Authentication & Users
+- [`authentication.md`](authentication.md) - JWT, sessions, cookies
+- [`settings.md`](settings.md) - User preferences
+- [`user-following.md`](user-following.md) - Social features
+
+### Content Management
+- [`calendar.md`](calendar.md) - Events and scheduling
+- [`files.md`](files.md) - File storage and management
+- [`wiki.md`](wiki.md) - Knowledge base
+
+### Personal Tools
+- [`passwords.md`](passwords.md) - Password vault
+- [`wishlist.md`](wishlist.md) - Gift registry
+- [`geogebra-calculator.md`](geogebra-calculator.md) - Math graphing
+
+### Organization
+- [`categories.md`](categories.md) - Event categories
+
+## Search Tips
+
+- Use `grep` to search across docs: `grep -r "JWT" doc/`
+- Each doc has a table of contents for easy navigation
+- Code examples use syntax highlighting
+- Error codes and API endpoints are documented
+
+## Contributing to Documentation
+
+When adding features:
+
+1. Update relevant module docs (e.g., `calendar.md`)
+2. Update `api-overview.md` if adding endpoints
+3. Update `database-models.md` if adding models
+4. Add architecture notes to `backend-architecture.md` or `frontend-architecture.md`
+
+## Documentation Standards
+
+- Markdown format
+- Code blocks with language tags
+- Tables for structured data
+- Links between related docs
+- Error codes documented
+
+## Missing Documentation?
+
+If you find gaps in documentation:
+
+1. Check the main [`../README.md`](../README.md)
+2. Review source code comments
+3. Check this index for related topics
+4. Create an issue for documentation requests
+
+---
+
+**Last Updated**: April 2026  
+**Version**: 2.3.0
