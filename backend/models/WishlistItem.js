@@ -83,7 +83,6 @@ const wishlistItemSchema = new mongoose.Schema({
 wishlistItemSchema.index({ user: 1, category: 1 });
 wishlistItemSchema.index({ user: 1, status: 1 });
 wishlistItemSchema.index({ category: 1, isPublic: 1 });
-wishlistItemSchema.index({ shareToken: 1 });
 wishlistItemSchema.index({ user: 1, wishlist: 1 });
 
 // Static method to generate unique share token

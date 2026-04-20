@@ -1,8 +1,8 @@
 At the start of every response, write this "Yes sir!"
 Before making any changes, determine the scope of the changes and read the appropriate documentation files in the root directory and in /doc to understand the project structure. Always follow the existing project structure and coding conventions.
-Make the smallest change necessary to accomplish the task. Do not refactor, reorganize, or rename things unless explicitly instructed.
+Make the smallest change necessary to accomplish the task. Do not refactor, reorganize, or rename things unless necessary.
 After making changes, re-read every modified file and verify that the changes are correct and complete. Check for errors, inconsistencies, missing imports, broken references, and missing details.
-At the end of every task, update the documentation files in the root directory and in /doc to reflect the changes. Always include every essential detail needed to understand the changes and to get a full understanding in the future. Documentation must be kept in sync with the code — never leave it outdated.
+At the end of every response, update the documentation files in the root directory and in /doc to reflect the changes. Always include every essential detail needed to understand the changes and to get a full understanding in the future. Documentation must be kept in sync with the code — never leave it outdated.
 
 
 ## Commands - These are simple comands the user can use to control the assistant more easily. They are case insensitive and can be used in any order or alone. Ignore this section if none of the commands are the message given.

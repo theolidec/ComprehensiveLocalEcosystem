@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import { useWiki } from '../../contexts/WikiContext';
 import { Save, Eye, EyeOff, Loader2, ArrowLeft, Plus, X, Info } from 'lucide-react';
 
 const WikiPageEditor = () => {
-  const { slug, pageSlug } = useParams();
+  const { slug, pageSlug: routePageSlug } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  const isNew = location.pathname.endsWith('/new');
+  const pageSlug = isNew ? 'new' : routePageSlug;
   const { currentPage, loading, error, getPage, createPage, updatePage, pages, fetchPages, getCategories } = useWiki();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -23,7 +26,6 @@ const WikiPageEditor = () => {
   const [showPreview, setShowPreview] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const isNew = pageSlug === 'new';
 
   useEffect(() => {
     fetchPages(slug);

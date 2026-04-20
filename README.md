@@ -58,6 +58,22 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Object Management**: Add, edit, delete, and label mathematical objects
 - **Command Interface**: Text-based input for rapid object creation
 
+### Wiki System
+- **Wiki Spaces**: Create multiple wiki workspaces for different projects
+- **Hierarchical Pages**: Parent-child page relationships for organized structure
+- **Version Control**: Full page history with diff viewing and restore capability
+- **Access Control**: Owner, Admin, Editor, Viewer role-based permissions
+- **Public/Private Wikis**: Share wikis publicly or keep them private
+- **Categories**: Organize pages with custom categories
+- **Full-Text Search**: Search within wiki content
+- **Backlinks**: Track pages linking to the current page
+- **Watchlist**: Monitor pages for changes
+- **Infoboxes**: Structured data templates for pages
+- **Redirects**: Page aliases and redirects support
+- **Recent Changes**: Activity feed for wiki edits
+- **Markdown Support**: Rich markdown editing with live preview
+- **WikiLinks**: Internal linking with `[[Page Name]]` syntax
+
 ### Wishlist System
 - **Item Management**: Create, edit, delete wishlist items with rich details
 - **Public/Private Items**: Share items via unique shareable links
@@ -345,6 +361,60 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 | `DELETE` | `/:id/permanent` | Permanently delete folder | Yes |
 | `POST` | `/:id/restore` | Restore folder from trash | Yes |
 
+### Wiki Routes (`/api/wikis`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `POST` | `/` | Create new wiki | Yes |
+| `GET` | `/` | List my wikis | Yes |
+| `GET` | `/public` | List public wikis | No |
+| `GET` | `/:slug` | Get wiki details | Yes |
+| `PUT` | `/:slug` | Update wiki | Yes |
+| `DELETE` | `/:slug` | Delete wiki | Yes |
+| `GET` | `/:slug/members` | List wiki members | Yes |
+| `POST` | `/:slug/members` | Add member to wiki | Yes |
+| `DELETE` | `/:slug/members/:userId` | Remove member from wiki | Yes |
+
+### Wiki Page Routes (`/api/wikis/:slug/pages`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `POST` | `/` | Create new page | Yes |
+| `GET` | `/` | Get page tree | Yes |
+| `GET` | `/all` | List all pages | Yes |
+| `GET` | `/:pageSlug` | Get page content | Yes |
+| `PUT` | `/:pageSlug` | Update page | Yes |
+| `DELETE` | `/:pageSlug` | Delete page | Yes |
+| `GET` | `/:pageSlug/history` | Get page history | Yes |
+| `GET` | `/:pageSlug/history/:versionId` | Get specific version | Yes |
+| `POST` | `/:pageSlug/restore/:versionId` | Restore version | Yes |
+| `GET` | `/:pageSlug/diff` | Compare versions | Yes |
+| `GET` | `/:pageSlug/backlinks` | Get linking pages | Yes |
+| `POST` | `/:pageSlug/move` | Move/rename page | Yes |
+| `POST` | `/:pageSlug/redirect` | Create redirect | Yes |
+| `POST` | `/:pageSlug/watch` | Add to watchlist | Yes |
+| `DELETE` | `/:pageSlug/watch` | Remove from watchlist | Yes |
+
+### Wiki Category Routes (`/api/wikis/:slug/categories`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | List categories | Yes |
+| `POST` | `/` | Create category | Yes |
+
+### Wiki Watchlist Routes (`/api/wikis/:slug/watchlist`)
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/` | Get watchlist | Yes |
+
+### Wiki Search & Activity Routes
+
+| Method | Endpoint | Description | Authentication |
+|--------|----------|-------------|----------------|
+| `GET` | `/api/wikis/:slug/search` | Search wiki pages | Yes |
+| `GET` | `/api/wikis/:slug/recent-changes` | Get recent changes | Yes |
+
 ### System Routes
 
 | Method | Endpoint | Description |
@@ -431,6 +501,18 @@ Authorization: Bearer <access_token>
 6. **Inequalities:** Graph regions with `y > x^2` or `x^2 + y^2 < 25`
 7. **Navigation:** Use mouse wheel to zoom, drag to pan, save states
 
+### Wiki Management
+1. **Access:** Navigate to `/wikis` from the sidebar or quick access
+2. **Create Wiki:** Click "New Wiki" to create a workspace
+3. **Add Pages:** Create pages with hierarchical structure (parent/child relationships)
+4. **Edit Content:** Use markdown editor with live preview at `/wiki/:slug/edit/:pageSlug`
+5. **Version History:** View and restore previous versions at `/wiki/:slug/history/:pageSlug`
+6. **Categories:** Organize pages with custom categories
+7. **Search:** Find pages using the full-text search
+8. **Watchlist:** Monitor pages for changes
+9. **Recent Changes:** View activity feed at `/wiki/:slug/recent-changes`
+10. **Permissions:** Manage members with Owner, Admin, Editor, and Viewer roles
+
 ### Form Validation Requirements
 - **Email:** Valid email format required
 - **Password:** Minimum 6 characters
@@ -474,7 +556,9 @@ ComprehensiveLocalEcosystem/
 │   │   ├── fileFolderController.js  # File folder management
 │   │   ├── passwordController.js    # Password management
 │   │   ├── passwordCategoryController.js # Password categories
-│   │   └── settingsController.js    # User settings management
+│   │   ├── settingsController.js    # User settings management
+│   │   ├── wikiController.js        # Wiki workspace management
+│   │   └── wikiPageController.js    # Wiki page operations
 │   ├── middleware/
 │   │   └── auth.js              # Authentication middleware
 │   ├── models/
@@ -491,7 +575,13 @@ ComprehensiveLocalEcosystem/
 │   │   ├── WishlistCategory.js  # Wishlist category model
 │   │   ├── WishlistReservation.js # Reservation model
 │   │   ├── UserFollow.js        # User following model
-│   │   └── PasswordCategory.js  # Password category model
+│   │   ├── PasswordCategory.js  # Password category model
+│   │   ├── Wiki.js              # Wiki workspace model
+│   │   ├── WikiPage.js          # Wiki page model
+│   │   ├── WikiVersion.js       # Wiki version history model
+│   │   ├── WikiPermission.js    # Wiki permission model
+│   │   ├── WikiCategory.js      # Wiki category model
+│   │   └── WikiWatch.js         # Wiki watchlist model
 │   ├── routes/
 │   │   ├── auth.js              # Authentication routes
 │   │   ├── calendar.js          # Calendar API routes
@@ -504,7 +594,9 @@ ComprehensiveLocalEcosystem/
 │   │   ├── wishlistCategories.js # Wishlist category routes
 │   │   ├── wishlists.js         # Wishlist management routes
 │   │   ├── follow.js            # User following routes
-│   │   └── settings.js          # Settings routes
+│   │   ├── settings.js          # Settings routes
+│   │   ├── wikis.js             # Wiki routes
+│   │   └── wikiPages.js         # Wiki page routes
 │   ├── services/                # Business logic services
 │   ├── logs/                    # Log files directory
 │   ├── uploads/                 # File uploads directory
@@ -555,6 +647,14 @@ ComprehensiveLocalEcosystem/
 │   │   │   │   ├── ReservationModal.js   # Reservation modal
 │   │   │   │   ├── WishlistShareModal.js # Share link modal
 │   │   │   │   └── PublicWishlistItem.js # Public item view
+│   │   │   ├── Wiki/
+│   │   │   │   ├── WikiList.js        # Wiki list component
+│   │   │   │   ├── WikiView.js        # Wiki viewer component
+│   │   │   │   ├── WikiPageView.js    # Wiki page viewer
+│   │   │   │   ├── WikiPageEditor.js  # Wiki page editor
+│   │   │   │   ├── WikiPageHistory.js # Wiki page history
+│   │   │   │   ├── WikiSettings.js    # Wiki settings
+│   │   │   │   └── WikiRecentChanges.js # Wiki recent changes
 │   │   │   ├── Math/
 │   │   │   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
 │   │   │   │   └── GeoGebraCalculator.css # Calculator styles
@@ -567,7 +667,8 @@ ComprehensiveLocalEcosystem/
 │   │   │   ├── SettingsContext.js     # Settings state management
 │   │   │   ├── CalendarActionsContext.js  # Calendar actions
 │   │   │   ├── PageActionsContext.js  # Page actions
-│   │   │   └── NotificationContext.js # Notification state management
+│   │   │   ├── NotificationContext.js # Notification state management
+│   │   │   └── WikiContext.js         # Wiki state management
 │   │   ├── services/
 │   │   │   ├── calendarAPI.js         # Calendar API client
 │   │   │   ├── categoryAPI.js         # Category API client
@@ -575,7 +676,8 @@ ComprehensiveLocalEcosystem/
 │   │   │   ├── passwordAPI.js         # Password API client
 │   │   │   ├── settingsAPI.js         # Settings API client
 │   │   │   ├── wishlistAPI.js         # Wishlist API client
-│   │   │   └── wishlistCategoryAPI.js # Wishlist category API client
+│   │   │   ├── wishlistCategoryAPI.js # Wishlist category API client
+│   │   │   └── wikiAPI.js             # Wiki API client
 │   │   ├── utils/
 │   │   │   ├── GraphingEngine.js      # Canvas-based graphing engine
 │   │   │   └── MathParser.js          # Mathematical expression parser
@@ -673,6 +775,9 @@ curl -X POST http://localhost:3001/api/wishlist \
 - GeoGebra Calculator with interactive graphing
 - GraphingEngine with multiple object types support
 - MathParser for expression evaluation
+- Wiki System with hierarchical pages and version control
+- Wiki access control with role-based permissions
+- Wiki full-text search and watchlist features
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -737,7 +842,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.3.0
-**Last Updated**: 2026-04-17
+**Version**: 2.4.0
+**Last Updated**: 2026-04-20
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

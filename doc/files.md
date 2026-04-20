@@ -91,7 +91,7 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 | GET | `/:id/content` | Read text file |
 | PUT | `/:id/content` | Write text file |
 
-### Folders (`/api/folders`)
+### Folders (`/api/file-folders`)
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/` | Create folder |

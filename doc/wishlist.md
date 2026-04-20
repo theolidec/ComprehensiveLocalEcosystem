@@ -112,17 +112,22 @@ Gift registry and wishlist management system with templates, categories, items, 
 ### Items
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/wishlists/:id/items` | Add item |
-| GET | `/api/wishlists/:id/items` | List items |
-| PUT | `/api/wishlist-items/:id` | Update item |
-| DELETE | `/api/wishlist-items/:id` | Delete item |
+| GET | `/api/wishlist` | List my items |
+| GET | `/api/wishlist/stats` | Get item stats |
+| GET | `/api/wishlist/analytics` | Get detailed analytics |
+| GET | `/api/wishlist/:id` | Get single item |
+| POST | `/api/wishlist` | Create item |
+| PUT | `/api/wishlist/:id` | Update item |
+| DELETE | `/api/wishlist/:id` | Delete item |
+| POST | `/api/wishlist/:id/share` | Share/unshare item |
 
 ### Reservations
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/wishlist-items/:id/reserve` | Reserve item |
-| DELETE | `/api/wishlist-items/:id/reserve` | Cancel reservation |
-| GET | `/api/wishlists/:id/reservations` | View reservations (owner) |
+| POST | `/api/wishlist/:id/reserve` | Reserve item |
+| GET | `/api/wishlist/:id/reservations` | View reservations (owner) |
+| DELETE | `/api/wishlist/reservations/:reservationId` | Cancel reservation |
+| GET | `/api/wishlist/public/:token` | Get public item by share token |
 
 ## Frontend
 - **File**: `frontend/src/components/Pages/Wishlist/` - Wishlist management

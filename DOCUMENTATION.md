@@ -56,6 +56,23 @@ This is a full-featured web application ecosystem combining robust authenticatio
   - **State Management**: Save and restore calculator states
   - **Command Interface**: Text-based input for rapid object creation
 
+- **Wiki System**
+  - **Wiki Spaces**: Create multiple wiki workspaces for different projects
+  - **Hierarchical Pages**: Parent-child page relationships for organized structure
+  - **Version Control**: Full page history with diff viewing and restore capability
+  - **Access Control**: Owner, Admin, Editor, Viewer role-based permissions with frontend `permissions` state
+  - **Permission Methods**: Async `canView()` and `canEdit()` methods on Wiki model
+  - **Public/Private Wikis**: Share wikis publicly or keep them private
+  - **Categories**: Organize pages with custom categories
+  - **Full-Text Search**: Search within wiki content
+  - **Backlinks**: Track pages linking to the current page
+  - **Watchlist**: Monitor pages for changes
+  - **Infoboxes**: Structured data templates for pages
+  - **Redirects**: Page aliases and redirects support
+  - **Recent Changes**: Activity feed for wiki edits
+  - **Markdown Support**: Rich markdown editing with live preview
+  - **WikiLinks**: Internal linking with `[[Page Name]]` syntax
+
 ### Backend Features
 - **MongoDB Integration**: Scalable database with Mongoose ODM
 - **Refresh Token System**: Automatic token rotation with device tracking
@@ -769,6 +786,217 @@ Get public profile of a user with their public wishlists.
 }
 ```
 
+### Wiki Endpoints
+
+#### POST `/api/wikis`
+Create a new wiki workspace.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "name": "Project Documentation",
+  "description": "Team knowledge base",
+  "visibility": "private",
+  "icon": "📚",
+  "color": "#3B82F6"
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "wiki": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "slug": "project-documentation",
+    "name": "Project Documentation",
+    "description": "Team knowledge base",
+    "visibility": "private",
+    "owner": "64f8a1b2c3d4e5f6a7b8c9d1"
+  }
+}
+```
+
+#### GET `/api/wikis`
+List wikis owned by or accessible to the authenticated user.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "wikis": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "slug": "project-documentation",
+      "name": "Project Documentation",
+      "visibility": "private",
+      "pageCount": 15
+    }
+  ]
+}
+```
+
+#### GET `/api/wikis/:slug/pages`
+Get the page tree for a wiki.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "pages": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Home",
+      "slug": "home",
+      "isHomePage": true,
+      "children": [
+        {
+          "id": "64f8a1b2c3d4e5f6a7b8c9d1",
+          "title": "Getting Started",
+          "slug": "getting-started"
+        }
+      ]
+    }
+  ]
+}
+```
+
+#### POST `/api/wikis/:slug/pages`
+Create a new wiki page.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "title": "Getting Started",
+  "content": "# Getting Started\n\nWelcome to the wiki!",
+  "parent": "64f8a1b2c3d4e5f6a7b8c9d0",
+  "categories": ["64f8a1b2c3d4e5f6a7b8c9d2"]
+}
+```
+
+**Response (201):**
+```json
+{
+  "success": true,
+  "page": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d3",
+    "title": "Getting Started",
+    "slug": "getting-started",
+    "content": "# Getting Started\n\nWelcome to the wiki!",
+    "excerpt": "Welcome to the wiki!"
+  }
+}
+```
+
+#### GET `/api/wikis/:slug/pages/:pageSlug`
+Get a specific wiki page.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "page": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "title": "Getting Started",
+    "slug": "getting-started",
+    "content": "# Getting Started\n\nWelcome!",
+    "lastEditedBy": "64f8a1b2c3d4e5f6a7b8c9d1",
+    "lastEditedAt": "2024-01-15T10:30:00.000Z",
+    "viewCount": 42
+  }
+}
+```
+
+#### GET `/api/wikis/:slug/pages/:pageSlug/history`
+Get version history for a page.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "versions": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "version": 3,
+      "title": "Getting Started",
+      "editSummary": "Added installation instructions",
+      "editedBy": "64f8a1b2c3d4e5f6a7b8c9d1",
+      "createdAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+#### POST `/api/wikis/:slug/pages/:pageSlug/restore/:versionId`
+Restore a page to a previous version.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Page restored successfully",
+  "page": { ... }
+}
+```
+
+#### GET `/api/wikis/:slug/search`
+Search within a wiki.
+
+**Authentication Required:** Yes
+
+**Query Parameters:**
+- `q` - Search query string
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "results": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Getting Started",
+      "slug": "getting-started",
+      "excerpt": "...search term found here..."
+    }
+  ]
+}
+```
+
+#### GET `/api/wikis/:slug/recent-changes`
+Get recent changes for a wiki.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "changes": [
+    {
+      "page": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "title": "Getting Started",
+      "action": "edited",
+      "editedBy": "64f8a1b2c3d4e5f6a7b8c9d1",
+      "editedAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
 ## 🔒 Security Implementation
 
 ### Token Management
@@ -810,12 +1038,11 @@ backend/
 │   ├── categoryController.js      # Category management
 │   ├── fileController.js          # File management
 │   ├── fileFolderController.js    # File folder management
-│   ├── followController.js        # User following management
 │   ├── passwordController.js      # Password management
 │   ├── passwordCategoryController.js  # Password categories
 │   ├── settingsController.js      # User settings management
-│   ├── wishlistController.js      # Wishlist management
-│   └── wishlistCategoryController.js  # Wishlist categories
+│   ├── wikiController.js          # Wiki workspace management
+│   ├── wikiPageController.js      # Wiki page operations
 ├── middleware/
 │   └── auth.js              # Authentication middleware
 ├── models/
@@ -832,23 +1059,31 @@ backend/
 │   ├── WishlistCategory.js  # Wishlist category model
 │   ├── WishlistReservation.js # Reservation model
 │   ├── UserFollow.js        # User following model
-│   └── PasswordCategory.js  # Password category model
-├── routes/
-│   ├── auth.js              # Authentication routes
-│   ├── calendar.js          # Calendar API routes
-│   ├── categories.js        # Category routes
-│   ├── files.js             # File routes
-│   ├── fileFolders.js       # File folder routes
-│   ├── passwords.js         # Password routes
-│   ├── passwordCategories.js  # Password category routes
-│   ├── wishlist.js          # Wishlist routes
-│   ├── wishlistCategories.js    # Wishlist category routes
-│   ├── wishlists.js         # Wishlist management routes
-│   ├── follow.js            # User following routes
-│   └── settings.js          # Settings routes
+│   ├── PasswordCategory.js  # Password category model
+│   ├── Wiki.js              # Wiki workspace model
+│   ├── WikiPage.js          # Wiki page model
+│   ├── WikiVersion.js       # Wiki version history model
+│   ├── WikiPermission.js    # Wiki permission model
+│   ├── WikiCategory.js      # Wiki category model
+│   └── WikiWatch.js         # Wiki watchlist model
+│   ├── routes/
+│   │   ├── auth.js              # Authentication routes
+│   │   ├── calendar.js          # Calendar API routes
+│   │   ├── categories.js        # Category routes
+│   │   ├── files.js             # File routes
+│   │   ├── fileFolders.js       # File folder routes
+│   │   ├── passwords.js         # Password routes
+│   │   ├── passwordCategories.js  # Password category routes
+│   │   ├── wishlist.js          # Wishlist routes
+│   │   ├── wishlistCategories.js    # Wishlist category routes
+│   │   ├── wishlists.js         # Wishlist management routes
+│   │   ├── follow.js            # User following routes
+│   │   ├── settings.js          # Settings routes
+│   │   ├── wikis.js             # Wiki routes
+│   │   └── wikiPages.js         # Wiki page routes
 ├── services/                # Business logic services
 │   ├── passwordService.js   # Password encryption service
-│   └── wishlistService.js   # Wishlist business logic
+│   └── recurringEventService.js   # Recurring event expansion
 ├── logs/                    # Log files directory
 ├── uploads/                 # File uploads directory
 ├── server.js                # Express server setup
@@ -896,6 +1131,14 @@ frontend/src/
 │   │   │   ├── ReservationModal.js  # Reservation modal
 │   │   │   ├── WishlistShareModal.js # Share link modal
 │   │   │   └── PublicWishlistItem.js # Public item view
+│   │   ├── Wiki/
+│   │   │   ├── WikiList.js          # Wiki list component
+│   │   │   ├── WikiView.js          # Wiki viewer component
+│   │   │   ├── WikiPageView.js      # Wiki page viewer
+│   │   │   ├── WikiPageEditor.js    # Wiki page editor
+│   │   │   ├── WikiPageHistory.js   # Wiki page history
+│   │   │   ├── WikiSettings.js      # Wiki settings
+│   │   │   └── WikiRecentChanges.js # Wiki recent changes
 │   │   ├── Math/
 │   │   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
 │   │   │   └── GeoGebraCalculator.css # Calculator styles
@@ -908,7 +1151,8 @@ frontend/src/
 │   │   ├── SettingsContext.js     # Settings state management
 │   │   ├── CalendarActionsContext.js  # Calendar actions
 │   │   ├── PageActionsContext.js  # Page actions
-│   │   └── NotificationContext.js # Notification state management
+│   │   ├── NotificationContext.js # Notification state management
+│   │   └── WikiContext.js         # Wiki state management
 │   ├── services/
 │   │   ├── calendarAPI.js         # Calendar API client
 │   │   ├── categoryAPI.js         # Category API client
@@ -916,7 +1160,8 @@ frontend/src/
 │   │   ├── passwordAPI.js         # Password API client
 │   │   ├── settingsAPI.js         # Settings API client
 │   │   ├── wishlistAPI.js         # Wishlist API client
-│   │   └── wishlistCategoryAPI.js   # Wishlist category API client
+│   │   ├── wishlistCategoryAPI.js   # Wishlist category API client
+│   │   └── wikiAPI.js             # Wiki API client
 │   ├── utils/
 │   │   ├── GraphingEngine.js      # Canvas-based graphing engine
 │   │   └── MathParser.js          # Mathematical expression parser
@@ -1689,7 +1934,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.3.0
-**Last Updated**: 2026-04-17
+**Version**: 2.4.0
+**Last Updated**: 2026-04-20
 **Status**: Production Ready
-**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events
+**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events, Wiki System

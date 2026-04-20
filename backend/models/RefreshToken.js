@@ -31,9 +31,7 @@ const refreshTokenSchema = new mongoose.Schema({
 });
 
 // Index for better performance
-refreshTokenSchema.index({ token: 1 });
 refreshTokenSchema.index({ user: 1 });
-refreshTokenSchema.index({ expiresAt: 1 });
 
 // Static method to create and save refresh token
 refreshTokenSchema.statics.createToken = async function(user, deviceInfo = {}) {

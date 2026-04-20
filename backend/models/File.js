@@ -80,7 +80,6 @@ const fileSchema = new mongoose.Schema({
 fileSchema.index({ userId: 1, isDeleted: 1 });
 fileSchema.index({ userId: 1, folderId: 1 });
 fileSchema.index({ userId: 1, isFavorite: 1 });
-fileSchema.index({ shareToken: 1 });
 
 fileSchema.statics.getUserFiles = function(userId, folderId = null, includeDeleted = false) {
   const query = { userId };

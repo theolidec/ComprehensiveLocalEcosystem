@@ -19,7 +19,8 @@ const createPage = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
+    logger.info(`createPage canEdit: wiki=${wikiSlug}, user=${req.user._id}, canEdit=${canEdit}, owner=${wiki.owner._id}`);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to create pages',
@@ -28,6 +29,7 @@ const createPage = async (req, res) => {
     }
     
     const pageSlug = await WikiPage.generateSlug(wiki._id, title);
+    logger.info(`Generated slug: ${pageSlug} for title: ${title}`);
     
     const page = new WikiPage({
       wiki: wiki._id,
@@ -46,7 +48,7 @@ const createPage = async (req, res) => {
     
     await WikiVersion.createVersion(page, req.user, 'Page created');
     
-    logger.info(`Wiki page created: ${page.title} in ${wiki.name}`);
+    logger.info(`Wiki page created: ${page.title} (slug: ${page.slug}) in ${wiki.name}`);
     
     res.status(201).json({
       message: 'Page created successfully',
@@ -54,6 +56,13 @@ const createPage = async (req, res) => {
     });
   } catch (error) {
     logger.error('Create page error:', error);
+    logger.error('Error details:', {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+      wikiSlug,
+      userId: req.user?._id
+    });
     
     if (error.code === 11000) {
       return res.status(400).json({
@@ -62,8 +71,16 @@ const createPage = async (req, res) => {
       });
     }
     
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        error: 'Validation failed',
+        details: Object.values(error.errors).map(e => e.message),
+        code: 'VALIDATION_ERROR'
+      });
+    }
+    
     res.status(500).json({
-      error: 'Failed to create page',
+      error: 'Failed to create page: ' + error.message,
       code: 'PAGE_CREATE_ERROR'
     });
   }
@@ -82,7 +99,7 @@ const getPages = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -112,17 +129,20 @@ const getPages = async (req, res) => {
 const getPage = async (req, res) => {
   try {
     const { slug: wikiSlug, pageSlug } = req.params;
+    logger.info(`getPage called: wikiSlug=${wikiSlug}, pageSlug=${pageSlug}, userId=${req.user?._id}`);
     
     const wiki = await Wiki.findOne({ slug: wikiSlug });
     
     if (!wiki) {
+      logger.error(`Wiki not found: ${wikiSlug}`);
       return res.status(404).json({
         error: 'Wiki not found',
         code: 'WIKI_NOT_FOUND'
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
+    logger.info(`canView result for wiki ${wikiSlug}: ${canView}, owner=${wiki.owner._id}, user=${req.user?._id}`);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -134,6 +154,7 @@ const getPage = async (req, res) => {
       .populate('categories', 'name slug color')
       .populate('lastEditedBy', 'name');
     
+    logger.info(`Page lookup: wikiId=${wiki._id}, pageSlug=${pageSlug}, found=${!!page}`);
     if (!page) {
       return res.status(404).json({
         error: 'Page not found',
@@ -147,7 +168,7 @@ const getPage = async (req, res) => {
     const headings = page.extractHeadings();
     const links = page.extractLinks();
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     let role = null;
     if (req.user) {
       role = await WikiPermission.getUserRole(wiki._id, req.user._id);
@@ -189,7 +210,7 @@ const updatePage = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to edit this page',
@@ -263,7 +284,7 @@ const deletePage = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to delete this page',
@@ -328,7 +349,7 @@ const getPageHistory = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -384,7 +405,7 @@ const getVersion = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -437,7 +458,7 @@ const getDiff = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -493,7 +514,7 @@ const restoreVersion = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to edit this page',
@@ -559,7 +580,7 @@ const getBacklinks = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -621,7 +642,7 @@ const searchWiki = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -676,7 +697,7 @@ const getCategories = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -714,7 +735,7 @@ const createCategory = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to create categories',
@@ -770,7 +791,7 @@ const movePage = async (req, res) => {
       });
     }
 
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to move this page',
@@ -843,7 +864,7 @@ const createRedirect = async (req, res) => {
       });
     }
 
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to create redirects',
@@ -1038,7 +1059,7 @@ const getRecentChanges = async (req, res) => {
       });
     }
 
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -1079,7 +1100,7 @@ const getAllPages = async (req, res) => {
       });
     }
 
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',

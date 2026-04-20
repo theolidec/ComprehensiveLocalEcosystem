@@ -220,28 +220,29 @@ curl -X POST http://localhost:3001/api/files/upload \
 | GET | `/public/:token` | No | View public item |
 | POST | `/:id/reserve` | Optional | Reserve/purchase item |
 | GET | `/:id/reservations` | Yes | Get reservations |
-| DELETE | `/reservations/:id` | Optional | Cancel reservation |
+| DELETE | `/reservations/:reservationId` | Optional | Cancel reservation |
 
 ### Base: `/api/wishlist-categories`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/` | Yes | List categories |
-| GET | `/templates` | Yes | Get templates |
 | POST | `/` | Yes | Create category |
 | PUT | `/:id` | Yes | Update category |
 | DELETE | `/:id` | Yes | Delete category |
+| POST | `/init` | Yes | Initialize default categories |
 
 ### Base: `/api/wishlists`
 
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
+| GET | `/templates` | No | Get available templates |
+| POST | `/from-template` | Yes | Create wishlist from template |
 | GET | `/` | Yes | List my wishlists |
 | POST | `/` | Yes | Create wishlist |
 | GET | `/:id` | Yes | Get wishlist |
 | PUT | `/:id` | Yes | Update wishlist |
 | DELETE | `/:id` | Yes | Delete wishlist |
-| GET | `/:id/public` | No | Public view |
 
 **WishlistItem Object**:
 ```json

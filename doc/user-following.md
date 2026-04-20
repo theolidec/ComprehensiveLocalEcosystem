@@ -28,7 +28,7 @@ Social feature allowing users to follow each other and manage follower relations
 - Duplicate follow returns existing record silently
 
 ## API Endpoints
-Base: `/api/users`
+Base: `/api/follow`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|

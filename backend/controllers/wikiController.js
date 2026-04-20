@@ -155,7 +155,7 @@ const getWiki = async (req, res) => {
       });
     }
     
-    const canView = wiki.canView(req.user);
+    const canView = await wiki.canView(req.user);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -163,7 +163,7 @@ const getWiki = async (req, res) => {
       });
     }
     
-    const canEdit = wiki.canEdit(req.user);
+    const canEdit = await wiki.canEdit(req.user);
     let role = null;
     if (req.user) {
       role = await WikiPermission.getUserRole(wiki._id, req.user._id);

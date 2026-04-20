@@ -14,6 +14,19 @@
 - Command-based object creation interface
 - Accessible at `/calculator`
 
+### Wiki System (Completed - April 2026)
+- Full wiki/knowledge base system with hierarchical pages
+- Version control with full page history and restore capability
+- Role-based access control (Owner, Admin, Editor, Viewer)
+- Public and private wiki support
+- Full-text search within wiki content
+- Backlinks tracking and watchlist functionality
+- Recent changes activity feed
+- Markdown editing with live preview
+- WikiLinks syntax for internal linking (`[[Page Name]]`)
+- Page categories and infobox templates
+- Accessible at `/wikis` and `/wiki/:slug`
+
 ### Recurring Events Service (Completed - April 2026)
 - Support for recurring event patterns (daily, weekly, monthly, yearly)
 - Event instance generation and management
@@ -299,18 +312,19 @@
 
 | Component | Count |
 |-----------|-------|
-| Backend Models | 14 |
-| Backend Routes | 12 |
-| Backend Controllers | 7 |
+| Backend Models | 20 |
+| Backend Routes | 14 |
+| Backend Controllers | 9 |
 | Backend Services | 2 |
 | Frontend Pages | 20 |
-| Frontend Components | 40+ |
-| Frontend Contexts | 5 |
-| API Endpoints | 85+ |
+| Frontend Components | 48+ |
+| Frontend Contexts | 6 |
+| API Endpoints | 100+ |
 | Supported File Types | 60+ |
 
 ---
 
-**Version**: 2.3.0  
+**Version**: 2.4.0  
+**Last Updated**: 2026-04-20
 **Status**: Production Ready with noted security recommendations  
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

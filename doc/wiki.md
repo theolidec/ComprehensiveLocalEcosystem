@@ -147,13 +147,78 @@ The Wiki module provides a comprehensive wiki/knowledge base system with hierarc
 
 ## Frontend Components
 
-### Wiki Pages
-- **File**: `frontend/src/components/Pages/Wiki/` - Wiki space management
-- **File**: `frontend/src/components/Pages/WikiPage.js` - Page editor/viewer
-- **File**: `frontend/src/components/Pages/WikiEditor.js` - Markdown editor
+### Wiki Components (src/components/Wiki/)
+| Component | File | Description |
+|-----------|------|-------------|
+| WikiList | `WikiList.js` | Wiki directory listing |
+| WikiView | `WikiView.js` | Wiki home with page tree |
+| WikiPageView | `WikiPageView.js` | Page viewer with markdown rendering |
+| WikiPageEditor | `WikiPageEditor.js` | Create/edit pages |
+| WikiPageHistory | `WikiPageHistory.js` | Version history viewer |
+| WikiSettings | `WikiSettings.js` | Wiki configuration |
+| WikiRecentChanges | `WikiRecentChanges.js` | Activity feed |
+
+### Wiki Context (src/contexts/WikiContext.js)
+Centralized state management for wiki operations:
+
+```javascript
+const { 
+  wikis,           // List of all wikis (owned, team, public)
+  currentWiki,     // Currently selected wiki
+  currentPage,     // Currently viewed page
+  pages,           // Page tree for current wiki
+  loading,         // Loading state
+  error,           // Error message
+  permissions,     // { canView, canEdit, role, isOwner }
+  
+  // Actions
+  fetchWikis,
+  getWiki,
+  createWiki,
+  updateWiki,
+  deleteWiki,
+  
+  // Page operations
+  fetchPages,
+  getPage,
+  createPage,
+  updatePage,
+  deletePage,
+  movePage,
+  
+  // Wiki features
+  getPageHistory,
+  restoreVersion,
+  searchWiki,
+  getBacklinks,
+  getCategories,
+  addToWatchlist,
+  removeFromWatchlist
+} = useWiki();
+```
+
+**Note**: The `permissions` object is populated when `getWiki()` is called and determines UI actions like showing/hiding the "New Page" button.
 
 ### Services
 - **File**: `frontend/src/services/wikiAPI.js`
+
+## Frontend Routing
+
+Wiki routes must be defined in a specific order to avoid path conflicts:
+
+```javascript
+// Route order matters - more specific routes first
+<Route path="/wiki/:slug" element={<WikiView />} />
+<Route path="/wiki/:slug/new" element={<WikiPageEditor />} />  // Create page
+<Route path="/wiki/:slug/:pageSlug" element={<WikiPageView />} />  // View page
+<Route path="/wiki/:slug/edit/:pageSlug" element={<WikiPageEditor />} />  // Edit page
+```
+
+**Important**: The `/wiki/:slug/new` route must be declared **before** `/wiki/:slug/:pageSlug` in React Router, otherwise the `:pageSlug` pattern will match "new" first. Additionally, the `/wiki/:slug/new` route does not define a `:pageSlug` param, so `WikiPageEditor` uses `useLocation().pathname.endsWith('/new')` to detect new-page mode instead of relying on route params.
+
+### Backend Validation
+
+The wiki page routes use `express-validator` with `optional({ nullable: true })` on fields that may be `null` (e.g. `parentId`, `infobox`). The `{ nullable: true }` option is required because `optional()` only skips `undefined` values by default — `null` values would otherwise fail validation (e.g. `isMongoId()` fails on `null`).
 
 ## Backend Structure
 
@@ -164,6 +229,22 @@ The Wiki module provides a comprehensive wiki/knowledge base system with hierarc
 ### Routes
 - **Wikis**: `backend/routes/wikis.js`
 - **Wiki Pages**: `backend/routes/wikiPages.js`
+
+### Permission Methods (Wiki Model)
+Both `canView()` and `canEdit()` methods are async and check user permissions:
+
+```javascript
+// Check if user can view wiki
+const canView = await wiki.canView(user);
+
+// Check if user can edit/create pages
+const canEdit = await wiki.canEdit(user);
+```
+
+These methods handle:
+- Owner check (automatically allowed)
+- Public wiki visibility
+- WikiPermission records (admin/editor roles)
 
 ## Permission Roles
 | Role | Permissions |

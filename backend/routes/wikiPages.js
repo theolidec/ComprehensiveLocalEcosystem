@@ -9,12 +9,12 @@ const router = express.Router({ mergeParams: true });
 router.post('/', authenticateToken, [
   body('title').trim().notEmpty().withMessage('Page title is required')
     .isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
-  body('content').optional().isString(),
-  body('parentId').optional().isMongoId(),
-  body('order').optional().isInt({ min: 0 }),
-  body('tags').optional().isArray(),
-  body('categoryIds').optional().isArray(),
-  body('infobox').optional().isObject()
+  body('content').optional({ nullable: true }).isString(),
+  body('parentId').optional({ nullable: true }).isMongoId(),
+  body('order').optional({ nullable: true }).isInt({ min: 0 }),
+  body('tags').optional({ nullable: true }).isArray(),
+  body('categoryIds').optional({ nullable: true }).isArray(),
+  body('infobox').optional({ nullable: true }).isObject()
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -59,14 +59,14 @@ router.get('/:pageSlug', optionalAuth, async (req, res) => {
 });
 
 router.put('/:pageSlug', authenticateToken, [
-  body('title').optional().trim().isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
-  body('content').optional().isString(),
-  body('parentId').optional(),
-  body('order').optional().isInt({ min: 0 }),
-  body('tags').optional().isArray(),
-  body('categoryIds').optional().isArray(),
-  body('infobox').optional(),
-  body('editSummary').optional().isLength({ max: 500 })
+  body('title').optional({ nullable: true }).trim().isLength({ max: 200 }).withMessage('Title cannot exceed 200 characters'),
+  body('content').optional({ nullable: true }).isString(),
+  body('parentId').optional({ nullable: true }),
+  body('order').optional({ nullable: true }).isInt({ min: 0 }),
+  body('tags').optional({ nullable: true }).isArray(),
+  body('categoryIds').optional({ nullable: true }).isArray(),
+  body('infobox').optional({ nullable: true }),
+  body('editSummary').optional({ nullable: true }).isLength({ max: 500 })
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {

@@ -267,27 +267,39 @@ Manages wiki state with comprehensive wiki operations.
   currentPage: Page | null,
   pages: Page[],
   recentChanges: Change[],
-  loading: boolean
+  loading: boolean,
+  error: string | null,
+  permissions: {
+    canView: boolean,
+    canEdit: boolean,
+    role: string,
+    isOwner: boolean
+  } | null
 }
 
 // Methods (partial list)
 fetchWikis()
 fetchPublicWikis()
+getWiki(slug)              // Also populates permissions
 createWiki(data)
 updateWiki(slug, data)
 deleteWiki(slug)
-fetchWikiPages(slug)
+fetchPages(slug)
+getPage(wikiSlug, pageSlug)
 createPage(wikiSlug, data)
 updatePage(wikiSlug, pageSlug, data)
 deletePage(wikiSlug, pageSlug)
 getPageHistory(wikiSlug, pageSlug)
 restoreVersion(wikiSlug, pageSlug, versionId)
 searchWiki(wikiSlug, query)
-addWikiMember(wikiSlug, userId, role)
-removeWikiMember(wikiSlug, userId)
-watchPage(wikiSlug, pageSlug)
-unwatchPage(wikiSlug, pageSlug)
+getBacklinks(wikiSlug, pageSlug)
+getCategories(wikiSlug)
+movePage(wikiSlug, pageSlug, newTitle)
+addToWatchlist(wikiSlug, pageSlug)
+removeFromWatchlist(wikiSlug, pageSlug)
 ```
+
+**Note**: The `permissions` object is populated by `getWiki()` and controls UI elements like the "New Page" button visibility based on `permissions.canEdit`.
 
 ## Services Layer
 
@@ -350,10 +362,22 @@ React Router DOM v6 configuration:
     </ProtectedRoute>
   } />
   
+  {/* Wiki routes - order matters! */}
+  <Route path="/wiki/:slug" element={<ProtectedRoute><WikiView /></ProtectedRoute>} />
+  <Route path="/wiki/:slug/new" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
+  <Route path="/wiki/:slug/:pageSlug" element={<ProtectedRoute><WikiPageView /></ProtectedRoute>} />
+  <Route path="/wiki/:slug/edit/:pageSlug" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
+  
   {/* Redirects */}
   <Route path="/pass" element={<Navigate to="/passwords" />} />
 </Routes>
 ```
+
+### Route Order Importance
+
+**Wiki Routes**: The `/wiki/:slug/new` route must be declared **before** `/wiki/:slug/:pageSlug`. React Router matches routes in order, and `:pageSlug` would otherwise match "new" as a page slug instead of the new page creation route.
+
+**Important**: The `/wiki/:slug/new` route does not define a `:pageSlug` param, so `useParams()` returns only `{ slug }` with no `pageSlug`. `WikiPageEditor` uses `useLocation().pathname.endsWith('/new')` to detect new-page mode instead of relying on `pageSlug === 'new'` from route params. When on the new-page route, `pageSlug` is set to `'new'` locally so all downstream logic (save, back navigation, etc.) works correctly.
 
 ### ProtectedRoute Component
 

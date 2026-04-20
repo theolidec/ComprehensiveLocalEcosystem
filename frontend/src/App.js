@@ -253,6 +253,17 @@ function AppContent() {
             </div>
           </ProtectedRoute>
         } />
+        <Route path="/wiki/:slug/new" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <div style={{ flex: 1, height: 'calc(100vh - 120px)' }}>
+                <WikiPageEditor />
+              </div>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
         <Route path="/wiki/:slug/:pageSlug" element={
           <ProtectedRoute>
             <div key={location.pathname}>

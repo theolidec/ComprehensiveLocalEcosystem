@@ -131,5 +131,13 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: April 2026  
-**Version**: 2.3.0
+**Last Updated**: April 20, 2026  
+**Version**: 2.4.0
+
+## Recent Changes
+
+### Wiki System Updates (v2.3.1)
+- **WikiContext**: Added `permissions` state for role-based UI controls
+- **Routing**: Fixed `/wiki/:slug/new` route order to prevent path conflicts
+- **Permission Methods**: Documented async `canView()` and `canEdit()` methods in Wiki model
+- **Frontend Integration**: WikiView component now uses `permissions.canEdit` to show/hide "New Page" button
