@@ -1,5 +1,5 @@
 # Comprehensive Local Ecosystem - Oasis
-
+##### Written using Windsurf (https://windsurf.com/)
 A full-featured web application ecosystem combining robust authentication, dynamic calendar management, secure password storage, wishlist management with social features, and modern user interface design. Built with React (frontend) and Node.js/Express (backend) implementing industry best practices for security, scalability, and user experience.
 
 ## Key Features
