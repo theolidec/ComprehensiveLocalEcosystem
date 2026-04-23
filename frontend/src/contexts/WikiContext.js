@@ -185,22 +185,17 @@ export const WikiProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('getPage called:', wikiSlug, pageSlug);
       const response = await fetch(`${API_URLS.WIKIS}/${wikiSlug}/pages/${pageSlug}`, {
         credentials: 'include'
       });
-      console.log('getPage response status:', response.status);
       if (!response.ok) {
         const data = await response.json();
-        console.error('getPage error:', data);
         throw new Error(data.error || 'Failed to fetch page');
       }
       const data = await response.json();
-      console.log('getPage success:', data);
       setCurrentPage(data.page);
       return data;
     } catch (err) {
-      console.error('getPage exception:', err);
       setError(err.message);
       throw err;
     } finally {
@@ -212,25 +207,20 @@ export const WikiProvider = ({ children }) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Creating page:', wikiSlug, pageData);
       const response = await fetch(`${API_URLS.WIKIS}/${wikiSlug}/pages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify(pageData)
       });
-      console.log('Create page response status:', response.status);
       if (!response.ok) {
         const data = await response.json();
-        console.error('Create page error response:', data);
         throw new Error(data.error || 'Failed to create page');
       }
       const data = await response.json();
-      console.log('Create page success:', data);
       await fetchPages(wikiSlug);
       return data;
     } catch (err) {
-      console.error('Create page exception:', err);
       setError(err.message);
       throw err;
     } finally {

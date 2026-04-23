@@ -144,9 +144,7 @@ const CalendarApp = () => {
   const fetchCategories = useCallback(async () => {
     if (!isAuthenticated) return;
     try {
-      console.log('Fetching categories...');
       const fetchedCategories = await categoryAPI.getCategories();
-      console.log('Fetched categories:', fetchedCategories);
       const allCategory = { id: 'all', name: 'All Categories', color: '#6B7280', icon: '📅' };
       const formattedCategories = fetchedCategories.map(cat => ({
         id: cat.name.toLowerCase(),
@@ -155,7 +153,6 @@ const CalendarApp = () => {
         icon: cat.icon
       }));
       const finalCategories = [allCategory, ...formattedCategories];
-      console.log('Final categories:', finalCategories);
       setCategories(finalCategories);
     } catch (err) {
       console.error('Error fetching categories:', err);

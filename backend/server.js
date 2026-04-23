@@ -157,11 +157,9 @@ process.on('SIGINT', () => {
 
 // Start server with HTTPS support
 if (USE_HTTPS && SSL_CERT_PATH && SSL_KEY_PATH) {
-  console.log(`[HTTPS] Attempting to start with cert: ${SSL_CERT_PATH}, key: ${SSL_KEY_PATH}`);
   try {
     const certContent = fs.readFileSync(SSL_CERT_PATH);
     const keyContent = fs.readFileSync(SSL_KEY_PATH);
-    console.log(`[HTTPS] Cert file size: ${certContent.length}, Key file size: ${keyContent.length}`);
     
     const httpsOptions = {
       cert: certContent,
@@ -175,7 +173,6 @@ if (USE_HTTPS && SSL_CERT_PATH && SSL_KEY_PATH) {
       logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
     });
   } catch (error) {
-    console.error('[HTTPS] Error:', error);
     logger.error('Failed to start HTTPS server:', error.message);
     logger.error('Stack:', error.stack);
     logger.info('Falling back to HTTP server');
