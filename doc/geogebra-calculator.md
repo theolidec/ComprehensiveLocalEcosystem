@@ -39,8 +39,6 @@ The GeoGebra Calculator provides interactive mathematical graphing capabilities 
 **File Locations**:
 - Main component: `frontend/src/components/Math/GeoGebraCalculator.js`
 - Styles: `frontend/src/components/Math/GeoGebraCalculator.css`
-- Graphing engine: `frontend/src/utils/GraphingEngine.js`
-- Math parser: `frontend/src/utils/MathParser.js`
 
 ## Supported Object Types
 
@@ -286,52 +284,7 @@ if (saved) {
 }
 ```
 
-## API Reference
-
-### GraphingEngine
-
-**File**: `frontend/src/utils/GraphingEngine.js`
-
-```javascript
-// Create engine instance
-const engine = new GraphingEngine(canvas, {
-  width: 800,
-  height: 600,
-  theme: 'light'
-});
-
-// Set view bounds
-engine.setBounds(xMin, xMax, yMin, yMax);
-
-// Add objects
-engine.addFunction(func, color);
-engine.addPoint(x, y, label, color);
-engine.addCircle(centerX, centerY, radius, color);
-
-// Render
-engine.render();
-
-// Clear
-engine.clear();
-```
-
-### MathParser
-
-**File**: `frontend/src/utils/MathParser.js`
-
-```javascript
-// Parse expression
-const parser = new MathParser();
-const ast = parser.parse('x^2 + 2*x + 1');
-
-// Evaluate with variable
-const result = parser.evaluate(ast, { x: 3 });  // 16
-
-// Check if valid
-const isValid = parser.isValid('sin(x) + 1');  // true
-```
-
-### Component Methods
+## Component Methods
 
 ```javascript
 // Access via ref

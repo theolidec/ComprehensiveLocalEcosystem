@@ -99,7 +99,6 @@ Gift registry and wishlist management system with templates, categories, items, 
 | GET | `/api/wishlists/:id` | Get wishlist |
 | PUT | `/api/wishlists/:id` | Update |
 | DELETE | `/api/wishlists/:id` | Delete |
-| GET | `/api/wishlists/:id/public` | Public view |
 
 ### Categories
 | Method | Endpoint | Description |
@@ -141,3 +140,35 @@ Gift registry and wishlist management system with templates, categories, items, 
 - Owners see all items but not reserver identities
 - Public view hides reservation details
 - Reservations marked as anonymous hide reserver name
+
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `WISHLISTS_FETCH_ERROR` | Failed to fetch wishlists |
+| `WISHLIST_NOT_FOUND` | Wishlist doesn't exist |
+| `WISHLIST_CREATE_ERROR` | Failed to create wishlist |
+| `WISHLIST_UPDATE_ERROR` | Failed to update wishlist |
+| `WISHLIST_DELETE_ERROR` | Failed to delete wishlist |
+| `DUPLICATE_NAME` | Wishlist name already exists |
+| `DEFAULT_PROTECTED` | Cannot modify/delete default wishlist |
+| `ITEMS_FETCH_ERROR` | Failed to fetch wishlist items |
+| `ITEM_NOT_FOUND` | Item doesn't exist |
+| `ITEM_CREATE_ERROR` | Failed to create item |
+| `ITEM_UPDATE_ERROR` | Failed to update item |
+| `ITEM_DELETE_ERROR` | Failed to delete item |
+| `SHARE_ERROR` | Failed to toggle sharing |
+| `RESERVE_ERROR` | Failed to reserve item |
+| `RESERVATION_NOT_FOUND` | Reservation doesn't exist |
+| `CANCEL_RESERVATION_ERROR` | Failed to cancel reservation |
+| `ALREADY_PURCHASED` | Item already purchased |
+| `ACCESS_DENIED` | Insufficient permissions |
+| `STATS_ERROR` | Failed to get statistics |
+| `ANALYTICS_ERROR` | Failed to get analytics |
+| `CATEGORY_CREATE_ERROR` | Failed to create category |
+| `CATEGORY_NOT_FOUND` | Category doesn't exist |
+| `CATEGORY_UPDATE_ERROR` | Failed to update category |
+| `CATEGORY_DELETE_ERROR` | Failed to delete category |
+| `DUPLICATE_CATEGORY_NAME` | Category name already exists |
+| `DEFAULT_CATEGORY_PROTECTED` | Cannot delete default category |
+| `VALIDATION_ERROR` | Input validation failed |
+| `SERVER_ERROR` | Internal server error |

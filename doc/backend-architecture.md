@@ -305,31 +305,131 @@ Services encapsulate reusable business logic outside controllers.
 
 ### Password Service (`services/passwordService.js`)
 
-AES-256-GCM encryption/decryption for password manager:
+AES-256-GCM encryption/decryption for password manager with secure key derivation.
+
+**Purpose**: Provides military-grade encryption for stored passwords with per-user salt for additional security.
+
+**Key Features**:
+- **AES-256-GCM Encryption**: Industry-standard authenticated encryption
+- **PBKDF2 Key Derivation**: 100,000 iterations with SHA-256 for secure key generation
+- **Per-User Salt**: Each user has a unique salt combined with master key
+- **Password Generator**: Configurable secure password generation
+
+**Configuration**:
+```javascript
+ALGORITHM = 'aes-256-gcm'
+IV_LENGTH = 16
+AUTH_TAG_LENGTH = 16
+SALT_LENGTH = 32
+KEY_LENGTH = 32
+ITERATIONS = 100000
+```
+
+**Methods**:
 
 ```javascript
-// Encryption
-encryptPassword(password, userSalt) {
-  const key = deriveKey(process.env.PASSWORD_MASTER_KEY, userSalt);
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
-  // ... returns encrypted string
-}
+// Encrypt a plaintext password
+encrypt(plaintext, userSalt)
+// Returns: 'salt:iv:authTag:encrypted' (hex encoded)
 
-// Decryption
-decryptPassword(encrypted, userSalt) {
-  // ... returns plaintext
-}
+// Decrypt an encrypted password
+decrypt(encryptedData, userSalt)
+// Returns: plaintext password
+
+// Generate secure random password
+generatePassword(length = 16, options = {})
+// Options: { uppercase, lowercase, numbers, symbols }
+```
+
+**Security Details**:
+- Master key from `PASSWORD_MASTER_KEY` environment variable
+- Random salt (32 bytes) for each encryption operation
+- Random IV (16 bytes) for each encryption operation
+- Auth tag (16 bytes) for integrity verification
+- Combined salt format: `userSalt + randomSalt` for key derivation
+
+**Usage Example**:
+```javascript
+const { encrypt, decrypt, generatePassword } = require('./services/passwordService');
+
+// Encrypt
+const encrypted = encrypt('myPassword123', userSalt);
+
+// Decrypt
+const decrypted = decrypt(encrypted, userSalt);
+
+// Generate
+const newPassword = generatePassword(20, { symbols: false });
 ```
 
 ### Recurring Event Service (`services/recurringEventService.js`)
 
-Expands recurring events into individual instances:
+Expands recurring events into individual instances for calendar display.
 
-- **Daily**: Every N days
-- **Weekly**: Specific days of week
-- **Monthly**: Same day each month
-- **Yearly**: Annual recurrence
+**Purpose**: Generates event instances based on recurring patterns for a given date range, handling edge cases like month boundaries and leap years.
+
+**Supported Patterns**:
+- **Daily**: Every day
+- **Weekly**: Every 7 days
+- **Monthly**: Same day each month (handles month-end cases)
+- **Yearly**: Same date each year (handles Feb 29 on leap years)
+
+**Key Methods**:
+
+```javascript
+// Generate all instances for a date range
+generateInstances(event, rangeStart, rangeEnd)
+// Returns: Array of event instances
+
+// Expand multiple events (mix of recurring and non-recurring)
+expandRecurringEvents(events, rangeStart, rangeEnd)
+// Returns: Sorted array of all instances
+
+// Find next occurrence from today
+getNextOccurrenceFromToday(event)
+// Returns: Date or null
+
+// Check if a specific date is an occurrence
+isRecurringOnDate(event, checkDate)
+// Returns: boolean
+
+// Get human-readable pattern description
+getPatternDescription(pattern)
+// Returns: e.g., "Every month"
+```
+
+**Features**:
+- **Instance Limits**: Maximum 100 instances to prevent infinite loops
+- **End Date Support**: Respects `recurringEndDate` if set
+- **Occurrence Limits**: Respects `recurringOccurrences` if set
+- **Edge Case Handling**:
+  - Month boundaries (Jan 31 → Feb 28/29)
+  - Leap years (Feb 29 → Feb 28 on non-leap years)
+  - Range optimization (finds first occurrence in range efficiently)
+- **Instance Metadata**: Each instance includes `originalEventId`, `isRecurringInstance`, and `recurringPattern`
+
+**Instance Structure**:
+```javascript
+{
+  _id: 'originalId_2024-01-15',
+  originalEventId: 'originalId',
+  date: new Date('2024-01-15'),
+  isRecurringInstance: true,
+  recurringPattern: 'weekly',
+  // ... other event fields
+}
+```
+
+**Usage Example**:
+```javascript
+const RecurringEventService = require('./services/recurringEventService');
+
+// Get instances for a month
+const events = await Event.find({ userId });
+const rangeStart = new Date('2024-01-01');
+const rangeEnd = new Date('2024-01-31');
+const allInstances = RecurringEventService.expandRecurringEvents(events, rangeStart, rangeEnd);
+```
 
 ## Error Handling
 

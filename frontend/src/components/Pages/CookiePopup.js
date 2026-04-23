@@ -32,21 +32,19 @@ const CookiePopup = () => {
         </div>
         <div className="cookie-popup-content">
           <p>
-            We use cookies to ensure our Service works properly. By continuing to use our 
+            We use essential cookies to ensure our Service works properly. These cookies are 
+            required for authentication and session management. By continuing to use our 
             application, you agree to our use of cookies as described in our{' '}
             <Link to="/cookies" onClick={() => setIsVisible(false)}>Cookie Policy</Link>.
           </p>
           <p className="cookie-popup-info">
-            Essential cookies are used for authentication and session management. 
-            They are httpOnly and secure.
+            <strong>Note:</strong> Essential cookies cannot be declined as they are necessary 
+            for the Service to function. They are httpOnly and secure.
           </p>
         </div>
         <div className="cookie-popup-actions">
           <button className="cookie-btn cookie-btn-accept" onClick={handleAccept}>
-            Accept
-          </button>
-          <button className="cookie-btn cookie-btn-decline" onClick={handleDecline}>
-            Decline
+            Acknowledge
           </button>
         </div>
       </div>

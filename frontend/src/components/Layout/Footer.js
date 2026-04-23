@@ -57,7 +57,7 @@ const Footer = () => {
               <div className="p-2 bg-blue-600 rounded-xl">
                 <Shield className="h-7 w-7 text-white" />
               </div>
-              <span className="text-2xl font-bold text-gray-900 dark:text-white">Oasis</span>
+              <span className="text-2xl font-bold text-gray-900 dark:text-white">Comprehensive Local Ecosystem</span>
             </div>
             <p className="text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
               Your personal sanctuary for digital life. <br />Secure, private, and completely under your control.
@@ -119,7 +119,7 @@ const Footer = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
-              <span>© 2024 Oasis. All rights reserved.</span>
+              <span>© 2024 Comprehensive Local Ecosystem. All rights reserved.</span>
               <span className="hidden md:inline">•</span>
               <span className="hidden md:inline">Self-hosted with love</span>
             </div>

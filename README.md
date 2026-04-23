@@ -1,4 +1,4 @@
-# Comprehensive Local Ecosystem - Oasis
+# Comprehensive Local Ecosystem
 ##### Written using Windsurf (https://windsurf.com/)
 A full-featured web application ecosystem combining robust authentication, dynamic calendar management, secure password storage, wishlist management with social features, and modern user interface design. Built with React (frontend) and Node.js/Express (backend) implementing industry best practices for security, scalability, and user experience.
 
@@ -215,493 +215,69 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 
 ## API Endpoints
 
-### Authentication Routes (`/api/auth`)
+For detailed API documentation including request/response examples, see [DOCUMENTATION.md](DOCUMENTATION.md) or [doc/api-overview.md](doc/api-overview.md).
 
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `POST` | `/register` | Register a new user | No |
-| `POST` | `/login` | User authentication | No |
-| `POST` | `/refresh` | Refresh access token | No (uses refresh token) |
-| `GET` | `/me` | Get current user info | Yes |
-| `POST` | `/logout` | Logout current session | Yes |
-| `POST` | `/logout-all` | Logout from all devices | Yes |
-| `POST` | `/forgot-password` | Request password reset | No |
-| `POST` | `/reset-password/:token` | Reset password with token | No |
-
-### Calendar Routes (`/api/calendar`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/events` | Get all calendar events | Yes |
-| `POST` | `/events` | Create new event | Yes |
-| `PUT` | `/events/:id` | Update existing event | Yes |
-| `DELETE` | `/events/:id` | Delete event | Yes |
-| `GET` | `/events/:id` | Get specific event | Yes |
-| `GET` | `/events/export` | Export events as JSON | Yes |
-| `POST` | `/events/import` | Import events from JSON | Yes |
-| `GET` | `/events/recurring` | Get recurring event instances | Yes |
-| `POST` | `/events/:id/recurring` | Create recurring event pattern | Yes |
-
-### Event Category Routes (`/api/categories`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all categories | Yes |
-| `POST` | `/` | Create new category | Yes |
-| `PUT` | `/:id` | Update category | Yes |
-| `DELETE` | `/:id` | Delete category | Yes |
-
-### Password Routes (`/api/passwords`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all passwords | Yes |
-| `POST` | `/` | Create new password entry | Yes |
-| `GET` | `/:id` | Get specific password | Yes |
-| `PUT` | `/:id` | Update password entry | Yes |
-| `DELETE` | `/:id` | Delete password | Yes |
-| `GET` | `/:id/decrypt` | Decrypt and view password | Yes |
-| `POST` | `/:id/favorite` | Toggle favorite status | Yes |
-| `GET` | `/export` | Export passwords (encrypted) | Yes |
-| `POST` | `/import` | Import passwords | Yes |
-
-### Password Category Routes (`/api/password-categories`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all password categories | Yes |
-| `POST` | `/` | Create new category | Yes |
-| `PUT` | `/:id` | Update category | Yes |
-| `DELETE` | `/:id` | Delete category | Yes |
-
-### Wishlist Routes (`/api/wishlist`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all wishlist items | Yes |
-| `POST` | `/` | Create new wishlist item | Yes |
-| `GET` | `/:id` | Get specific item | Yes |
-| `PUT` | `/:id` | Update wishlist item | Yes |
-| `DELETE` | `/:id` | Delete wishlist item | Yes |
-| `GET` | `/stats` | Get wishlist statistics | Yes |
-| `GET` | `/analytics` | Get detailed analytics | Yes |
-| `POST` | `/:id/share` | Toggle public sharing | Yes |
-| `GET` | `/public/:token` | Get public item (no auth) | No |
-| `POST` | `/:id/reserve` | Reserve/purchase item | Optional |
-| `GET` | `/:id/reservations` | Get item reservations | Yes |
-| `DELETE` | `/reservations/:id` | Cancel reservation | Optional |
-
-### Wishlist Category Routes (`/api/wishlist-categories`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all wishlist categories | Yes |
-| `GET` | `/templates` | Get available templates | Yes |
-| `POST` | `/` | Create new category | Yes |
-| `PUT` | `/:id` | Update category | Yes |
-| `DELETE` | `/:id` | Delete category | Yes |
-
-### Follow Routes (`/api/follow`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/:userId/followers` | Get user's followers | Yes |
-| `GET` | `/:userId/following` | Get users being followed | Yes |
-| `POST` | `/follow/:userId` | Follow a user | Yes |
-| `DELETE` | `/follow/:userId` | Unfollow a user | Yes |
-| `GET` | `/following/:userId` | Check if following | Yes |
-| `GET` | `/public/:userId` | Get public profile | Yes |
-| `GET` | `/search` | Search users | Yes |
-
-### Settings Routes (`/api/settings`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get user settings | Yes |
-| `PUT` | `/` | Update user settings | Yes |
-| `POST` | `/avatar` | Upload avatar | Yes |
-| `DELETE` | `/avatar` | Remove avatar | Yes |
-
-### File Routes (`/api/files`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all files with pagination | Yes |
-| `POST` | `/upload` | Upload a file | Yes |
-| `GET` | `/stats` | Get storage statistics | Yes |
-| `GET` | `/trash` | Get deleted files | Yes |
-| `DELETE` | `/trash/empty` | Permanently delete all trash | Yes |
-| `GET` | `/shared/:token` | Access shared file (public) | No |
-| `POST` | `/create-text` | Create text/markdown file | Yes |
-| `GET` | `/:id` | Get file metadata | Yes |
-| `GET` | `/:id/download` | Download file | Yes |
-| `GET` | `/:id/stream` | Stream file content | Yes |
-| `GET` | `/:id/dataurl` | Get file as data URL | Yes |
-| `GET` | `/:id/content` | Get text file content | Yes |
-| `PUT` | `/:id` | Update file metadata | Yes |
-| `PUT` | `/:id/content` | Update text file content | Yes |
-| `PUT` | `/:id/move` | Move file to folder | Yes |
-| `PUT` | `/:id/share` | Toggle public sharing | Yes |
-| `DELETE` | `/:id` | Soft delete file (move to trash) | Yes |
-| `DELETE` | `/:id/permanent` | Permanently delete file | Yes |
-| `POST` | `/:id/restore` | Restore file from trash | Yes |
-
-### File Folder Routes (`/api/file-folders`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get all folders | Yes |
-| `GET` | `/all` | Get all folders (flat list) | Yes |
-| `GET` | `/path/:id` | Get folder breadcrumb path | Yes |
-| `POST` | `/` | Create new folder | Yes |
-| `GET` | `/:id` | Get folder contents | Yes |
-| `PUT` | `/:id` | Update folder | Yes |
-| `PUT` | `/:id/move` | Move folder | Yes |
-| `DELETE` | `/:id` | Soft delete folder | Yes |
-| `DELETE` | `/:id/permanent` | Permanently delete folder | Yes |
-| `POST` | `/:id/restore` | Restore folder from trash | Yes |
-
-### Wiki Routes (`/api/wikis`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `POST` | `/` | Create new wiki | Yes |
-| `GET` | `/` | List my wikis | Yes |
-| `GET` | `/public` | List public wikis | No |
-| `GET` | `/:slug` | Get wiki details | Yes |
-| `PUT` | `/:slug` | Update wiki | Yes |
-| `DELETE` | `/:slug` | Delete wiki | Yes |
-| `GET` | `/:slug/members` | List wiki members | Yes |
-| `POST` | `/:slug/members` | Add member to wiki | Yes |
-| `DELETE` | `/:slug/members/:userId` | Remove member from wiki | Yes |
-
-### Wiki Page Routes (`/api/wikis/:slug/pages`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `POST` | `/` | Create new page | Yes |
-| `GET` | `/` | Get page tree | Yes |
-| `GET` | `/all` | List all pages | Yes |
-| `GET` | `/:pageSlug` | Get page content | Yes |
-| `PUT` | `/:pageSlug` | Update page | Yes |
-| `DELETE` | `/:pageSlug` | Delete page | Yes |
-| `GET` | `/:pageSlug/history` | Get page history | Yes |
-| `GET` | `/:pageSlug/history/:versionId` | Get specific version | Yes |
-| `POST` | `/:pageSlug/restore/:versionId` | Restore version | Yes |
-| `GET` | `/:pageSlug/diff` | Compare versions | Yes |
-| `GET` | `/:pageSlug/backlinks` | Get linking pages | Yes |
-| `POST` | `/:pageSlug/move` | Move/rename page | Yes |
-| `POST` | `/:pageSlug/redirect` | Create redirect | Yes |
-| `POST` | `/:pageSlug/watch` | Add to watchlist | Yes |
-| `DELETE` | `/:pageSlug/watch` | Remove from watchlist | Yes |
-
-### Wiki Category Routes (`/api/wikis/:slug/categories`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | List categories | Yes |
-| `POST` | `/` | Create category | Yes |
-
-### Wiki Watchlist Routes (`/api/wikis/:slug/watchlist`)
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/` | Get watchlist | Yes |
-
-### Wiki Search & Activity Routes
-
-| Method | Endpoint | Description | Authentication |
-|--------|----------|-------------|----------------|
-| `GET` | `/api/wikis/:slug/search` | Search wiki pages | Yes |
-| `GET` | `/api/wikis/:slug/recent-changes` | Get recent changes | Yes |
-
-### System Routes
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/health` | System health check |
-| `GET` | `/` | Server information |
-
-### Request/Response Examples
-
-**Register User:**
-```bash
-POST /api/auth/register
-Content-Type: application/json
-
-{
-  "name": "John Doe",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**Login User:**
-```bash
-POST /api/auth/login
-Content-Type: application/json
-
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-
-**Get User Info:**
-```bash
-GET /api/auth/me
-Authorization: Bearer <access_token>
-```
+**Quick API Reference:**
+- Authentication: `/api/auth/*` - Register, login, logout, password reset
+- Calendar: `/api/calendar/*` - Event management, categories
+- Passwords: `/api/passwords/*` - Secure password storage
+- Wishlist: `/api/wishlist/*` - Gift registry with sharing
+- Files: `/api/files/*` - File management and storage
+- Folders: `/api/file-folders/*` - Folder organization
+- Wiki: `/api/wikis/*` - Knowledge base system
+- Settings: `/api/settings/*` - User preferences
+- Follow: `/api/follow/*` - Social features
 
 ## Application Flow
 
-### Authentication Flow
-1. **Visit the application:** Open `http://localhost:3000` in your browser
-2. **Authentication:** Navigate to `/login` to access the authentication page
-3. **Register/Login:** Create a new account or login with existing credentials
-4. **Protected Access:** After successful login, you'll be redirected to the home page
+For detailed application flow and usage instructions, see [DOCUMENTATION.md](DOCUMENTATION.md).
 
-### Calendar Navigation
-1. **Home Dashboard:** Overview of events and quick access to calendar
-2. **Calendar System:** Full-featured calendar at `/calendar/month`
-3. **Event Management:** Click on any date to add events, or click existing events to edit/delete
-4. **Multiple Views:** Switch between month, week, and day views
-5. **Search & Filter:** Find events quickly using search and category filters
+**Quick Navigation:**
+- **Authentication**: `/login` and `/register` pages
+- **Calendar**: `/calendar/month` with multiple views
+- **Passwords**: `/passwords` for secure password management
+- **Wishlist**: `/wishlist` for gift registry
+- **Files**: `/files` or `/drive` for file management
+- **Calculator**: `/calculator` for GeoGebra graphing
+- **Wiki**: `/wikis` for knowledge base system
+- **Settings**: `/settings` for user preferences
 
-### Password Manager
-1. **Access:** Navigate to `/passwords` from the sidebar
-2. **Add Password:** Click "Add Password" to create new entries
-3. **Categories:** Organize passwords into custom categories
-4. **Encryption:** All passwords are encrypted with AES-256-GCM
-5. **Quick Access:** Use favorites and search for quick password lookup
+## Security
 
-### Wishlist Management
-1. **Access:** Navigate to `/wishlist` from the sidebar
-2. **Add Items:** Create wishlist items with title, description, price, URL
-3. **Categories:** Choose from Birthday, Christmas, Wedding, Baby Shower, Housewarming
-4. **Sharing:** Toggle public sharing to generate shareable links
-5. **Reservations:** Others can reserve or mark items as purchased
-6. **Following:** Follow other users to see their public wishlists
+For detailed security implementation, see [SECURITY.md](SECURITY.md) and [doc/security.md](doc/security.md).
 
-### File Management
-1. **Access:** Navigate to `/files` (or `/drive`) from the sidebar
-2. **Upload Files:** Drag & drop or click to upload files up to 500MB
-3. **Create Documents:** Create and edit text/markdown files with live preview
-4. **Organize:** Create folders, move files, add favorites and tags
-5. **Share:** Generate public shareable links for files
-6. **Trash:** Soft delete files with ability to restore or permanently delete
-7. **Document Viewer:** Click text/markdown files to edit with live preview at `/files/document/:id`
-
-### GeoGebra Calculator
-1. **Access:** Navigate to `/calculator` from the sidebar
-2. **Graph Functions:** Enter expressions like `f(x) = x^2 + 3x - 2`
-3. **Plot Points:** Create points with `A = (3, 4)`
-4. **Draw Shapes:** Add circles, polygons, and geometric objects
-5. **Parametric Curves:** Plot with `x(t) = cos(t), y(t) = sin(t)`
-6. **Inequalities:** Graph regions with `y > x^2` or `x^2 + y^2 < 25`
-7. **Navigation:** Use mouse wheel to zoom, drag to pan, save states
-
-### Wiki Management
-1. **Access:** Navigate to `/wikis` from the sidebar or quick access
-2. **Create Wiki:** Click "New Wiki" to create a workspace
-3. **Add Pages:** Create pages with hierarchical structure (parent/child relationships)
-4. **Edit Content:** Use markdown editor with live preview at `/wiki/:slug/edit/:pageSlug`
-5. **Version History:** View and restore previous versions at `/wiki/:slug/history/:pageSlug`
-6. **Categories:** Organize pages with custom categories
-7. **Search:** Find pages using the full-text search
-8. **Watchlist:** Monitor pages for changes
-9. **Recent Changes:** View activity feed at `/wiki/:slug/recent-changes`
-10. **Permissions:** Manage members with Owner, Admin, Editor, and Viewer roles
-
-### Form Validation Requirements
-- **Email:** Valid email format required
-- **Password:** Minimum 6 characters
-- **Name:** Minimum 2 characters required
-- **Real-time Feedback:** Validation messages appear as you type
-
-## Security Implementation
-
-### Token Management
-- **Access Tokens:** 15-minute expiration, stored in HttpOnly cookies
-- **Refresh Tokens:** 7-day expiration, database-tracked with rotation
-- **Device Tracking:** User agent and IP address logged for security
-
-### Rate Limiting
-- **General API:** 100 requests per 15 minutes per IP
-- **Authentication:** 5 attempts per 15 minutes per IP
-- **Token Refresh:** 10 attempts per 15 minutes per IP
-- **Password Reset:** 3 attempts per hour per IP
-- **Public Reservations:** 5 attempts per 15 minutes per IP
-
-### Account Protection
-- **Password Hashing:** bcrypt with 12 salt rounds
-- **Account Locking:** 2-hour lock after 5 failed attempts
-- **Session Management:** Individual and bulk logout capabilities
-- **Input Validation:** Comprehensive validation using express-validator
-- **Encryption:** AES-256-GCM for password storage
+**Key Security Features:**
+- JWT-based authentication with HttpOnly cookies
+- Rate limiting and account lockout protection
+- AES-256-GCM encryption for passwords
+- bcrypt password hashing with 12 salt rounds
+- Comprehensive input validation
 
 ## Project Structure
 
+For detailed project structure and architecture documentation, see [DOCUMENTATION.md](DOCUMENTATION.md), [doc/backend-architecture.md](doc/backend-architecture.md), and [doc/frontend-architecture.md](doc/frontend-architecture.md).
+
+**High-Level Structure:**
 ```
 ComprehensiveLocalEcosystem/
-├── backend/
-│   ├── config/
-│   │   ├── database.js          # MongoDB connection setup
-│   │   ├── logger.js            # Winston logging configuration
-│   │   └── rateLimiter.js       # Rate limiting configuration
-│   ├── controllers/
-│   │   ├── calendarController.js    # Calendar API logic
-│   │   ├── categoryController.js    # Category management
-│   │   ├── fileController.js        # File management
-│   │   ├── fileFolderController.js  # File folder management
-│   │   ├── passwordController.js    # Password management
-│   │   ├── passwordCategoryController.js # Password categories
-│   │   ├── settingsController.js    # User settings management
-│   │   ├── wikiController.js        # Wiki workspace management
-│   │   └── wikiPageController.js    # Wiki page operations
-│   ├── middleware/
-│   │   └── auth.js              # Authentication middleware
-│   ├── models/
-│   │   ├── User.js              # User model with security features
-│   │   ├── Password.js          # Password reset token model
-│   │   ├── RefreshToken.js      # Refresh token model
-│   │   ├── Event.js             # Calendar event model
-│   │   ├── Category.js          # Event category model
-│   │   ├── Settings.js          # User settings model
-│   │   ├── File.js              # File model
-│   │   ├── FileFolder.js        # File folder model
-│   │   ├── Wishlist.js          # Wishlist model
-│   │   ├── WishlistItem.js      # Wishlist item model
-│   │   ├── WishlistCategory.js  # Wishlist category model
-│   │   ├── WishlistReservation.js # Reservation model
-│   │   ├── UserFollow.js        # User following model
-│   │   ├── PasswordCategory.js  # Password category model
-│   │   ├── Wiki.js              # Wiki workspace model
-│   │   ├── WikiPage.js          # Wiki page model
-│   │   ├── WikiVersion.js       # Wiki version history model
-│   │   ├── WikiPermission.js    # Wiki permission model
-│   │   ├── WikiCategory.js      # Wiki category model
-│   │   └── WikiWatch.js         # Wiki watchlist model
-│   ├── routes/
-│   │   ├── auth.js              # Authentication routes
-│   │   ├── calendar.js          # Calendar API routes
-│   │   ├── categories.js        # Category routes
-│   │   ├── files.js             # File routes
-│   │   ├── fileFolders.js       # File folder routes
-│   │   ├── passwords.js         # Password routes
-│   │   ├── passwordCategories.js # Password category routes
-│   │   ├── wishlist.js          # Wishlist routes
-│   │   ├── wishlistCategories.js # Wishlist category routes
-│   │   ├── wishlists.js         # Wishlist management routes
-│   │   ├── follow.js            # User following routes
-│   │   ├── settings.js          # Settings routes
-│   │   ├── wikis.js             # Wiki routes
-│   │   └── wikiPages.js         # Wiki page routes
-│   ├── services/                # Business logic services
-│   ├── logs/                    # Log files directory
-│   ├── uploads/                 # File uploads directory
-│   ├── .env.example             # Environment variables template
-│   ├── package.json
-│   ├── server.js                # Express server setup
-│   └── tsconfig.json            # TypeScript configuration
-├── frontend/
-│   ├── public/
-│   │   ├── index.html           # Main HTML file
-│   │   ├── favicon.ico
-│   │   └── manifest.json
+├── backend/          # Node.js/Express API server
+│   ├── config/       # Database, logging, rate limiting
+│   ├── controllers/  # Business logic handlers
+│   ├── middleware/   # Authentication & validation
+│   ├── models/       # MongoDB/Mongoose schemas
+│   ├── routes/       # API route definitions
+│   ├── services/     # Business logic services
+│   └── server.js     # Express app entry point
+├── frontend/         # React client application
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── Auth/
-│   │   │   │   ├── AuthPage.js        # Login/Register container
-│   │   │   │   ├── Login.js           # Login form with validation
-│   │   │   │   ├── Register.js        # Registration form
-│   │   │   │   └── ProtectedRoute.js  # Route protection wrapper
-│   │   │   ├── Layout/
-│   │   │   │   ├── Header.js          # Navigation header
-│   │   │   │   ├── Footer.js          # Page footer
-│   │   │   │   ├── Sidebar.js         # Navigation sidebar
-│   │   │   │   ├── Row.js             # Layout row component
-│   │   │   │   └── Toast.js           # Toast notification component
-│   │   │   ├── Pages/
-│   │   │   │   ├── Calendar.js        # Full calendar system
-│   │   │   │   ├── CategoryManager.js # Category management UI
-│   │   │   │   ├── DocumentViewer.js  # Document editor/viewer
-│   │   │   │   ├── DocumentEditor.js  # Full-screen document editor
-│   │   │   │   ├── FileManager.js     # File management UI
-│   │   │   │   ├── PasswordManager.js # Password management UI
-│   │   │   │   ├── Settings.js        # User settings page
-│   │   │   │   ├── UserFollowing.js   # User following/social page
-│   │   │   │   ├── Hero.js            # Landing page hero
-│   │   │   │   ├── LandingPage.js     # Landing page container
-│   │   │   │   ├── Home.js            # Home dashboard
-│   │   │   │   ├── ProductGrid.js     # Product showcase
-│   │   │   │   ├── Features.js        # Features display
-│   │   │   │   ├── Privacy.js         # Privacy policy page
-│   │   │   │   ├── Terms.js           # Terms of service page
-│   │   │   │   ├── Cookies.js         # Cookie policy page
-│   │   │   │   ├── CookiePopup.js     # Cookie consent popup
-│   │   │   │   └── LinkNotFound.js    # 404 placeholder page
-│   │   │   ├── Wishlist/
-│   │   │   │   ├── Wishlist.js        # Main wishlist component
-│   │   │   │   ├── WishlistItemModal.js  # Item create/edit modal
-│   │   │   │   ├── ReservationModal.js   # Reservation modal
-│   │   │   │   ├── WishlistShareModal.js # Share link modal
-│   │   │   │   └── PublicWishlistItem.js # Public item view
-│   │   │   ├── Wiki/
-│   │   │   │   ├── WikiList.js        # Wiki list component
-│   │   │   │   ├── WikiView.js        # Wiki viewer component
-│   │   │   │   ├── WikiPageView.js    # Wiki page viewer
-│   │   │   │   ├── WikiPageEditor.js  # Wiki page editor
-│   │   │   │   ├── WikiPageHistory.js # Wiki page history
-│   │   │   │   ├── WikiSettings.js    # Wiki settings
-│   │   │   │   └── WikiRecentChanges.js # Wiki recent changes
-│   │   │   ├── Math/
-│   │   │   │   ├── GeoGebraCalculator.js  # Interactive graphing calculator
-│   │   │   │   └── GeoGebraCalculator.css # Calculator styles
-│   │   │   ├── CalendarHeader.js      # Calendar header component
-│   │   │   ├── CalendarSidebar.js     # Calendar sidebar component
-│   │   │   ├── EventForm.js           # Event creation form
-│   │   │   └── EventDetails.js        # Event details display
-│   │   ├── contexts/
-│   │   │   ├── AuthContext.js         # Authentication state management
-│   │   │   ├── SettingsContext.js     # Settings state management
-│   │   │   ├── CalendarActionsContext.js  # Calendar actions
-│   │   │   ├── PageActionsContext.js  # Page actions
-│   │   │   ├── NotificationContext.js # Notification state management
-│   │   │   └── WikiContext.js         # Wiki state management
-│   │   ├── services/
-│   │   │   ├── calendarAPI.js         # Calendar API client
-│   │   │   ├── categoryAPI.js         # Category API client
-│   │   │   ├── fileService.js         # File API client
-│   │   │   ├── passwordAPI.js         # Password API client
-│   │   │   ├── settingsAPI.js         # Settings API client
-│   │   │   ├── wishlistAPI.js         # Wishlist API client
-│   │   │   ├── wishlistCategoryAPI.js # Wishlist category API client
-│   │   │   └── wikiAPI.js             # Wiki API client
-│   │   ├── utils/
-│   │   │   ├── GraphingEngine.js      # Canvas-based graphing engine
-│   │   │   └── MathParser.js          # Mathematical expression parser
-│   │   ├── config/
-│   │   │   └── api.js                 # API endpoint configuration
-│   │   ├── types/
-│   │   │   └── auth.ts                # TypeScript type definitions
-│   │   ├── App.js                     # Main routing and app structure
-│   │   ├── App.css                    # Application styles
-│   │   ├── index.js                   # Application entry point
-│   │   └── index.css                  # Global styles
-│   ├── package.json
-│   ├── tailwind.config.js             # Tailwind CSS configuration
-│   └── .env.example                   # Frontend environment template
-├── DOCUMENTATION.md                   # Comprehensive technical documentation
-├── NEXT_STEPS.md                      # Security recommendations and roadmap
-├── GITHUB_WORKFLOW.md                 # GitHub workflow documentation
-├── SECURITY.md                        # Security policy
-├── PRIVACY.md                         # Privacy policy
-├── TERMS.md                           # Terms of service
-├── COOKIE_POLICY.md                   # Cookie policy
-├── LICENSE                            # MIT License
-├── package.json                       # Root package configuration
-└── setup.sh                           # Setup script
+│   │   ├── components/  # React components
+│   │   ├── contexts/     # React Context providers
+│   │   ├── services/     # API client services
+│   │   ├── utils/        # Utility functions
+│   │   └── config/       # Configuration files
+│   └── public/          # Static assets
+├── doc/               # Detailed documentation
+└── *.md              # Root documentation files
 ```
 
 ## Testing
@@ -821,7 +397,6 @@ curl http://localhost:3001/health
 ## Additional Documentation
 
 - **Technical Documentation:** [DOCUMENTATION.md](./DOCUMENTATION.md)
-- **Security Recommendations:** [NEXT_STEPS.md](./NEXT_STEPS.md)
 - **GitHub Workflow:** [GITHUB_WORKFLOW.md](./GITHUB_WORKFLOW.md)
 - **Security Policy:** [SECURITY.md](./SECURITY.md)
 - **Privacy Policy:** [PRIVACY.md](./PRIVACY.md)
@@ -842,7 +417,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.4.0
-**Last Updated**: 2026-04-20
+**Version**: 1.0.0
+**Last Updated**: 2026-04-23
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

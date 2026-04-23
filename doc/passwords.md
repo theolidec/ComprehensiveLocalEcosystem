@@ -119,3 +119,26 @@ Based on Shannon entropy:
 - AES-256-GCM authenticated encryption
 - Passwords never stored in plaintext
 - Decryption only on explicit request
+
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `PASSWORDS_FETCH_ERROR` | Failed to fetch passwords |
+| `PASSWORD_NOT_FOUND` | Password doesn't exist |
+| `PASSWORD_CREATE_ERROR` | Failed to create password |
+| `PASSWORD_UPDATE_ERROR` | Failed to update password |
+| `PASSWORD_DELETE_ERROR` | Failed to delete password |
+| `DECRYPT_ERROR` | Failed to decrypt password |
+| `ENCRYPT_ERROR` | Failed to encrypt password |
+| `FAVORITE_ERROR` | Failed to toggle favorite |
+| `EXPORT_ERROR` | Failed to export passwords |
+| `IMPORT_ERROR` | Failed to import passwords |
+| `INVALID_IMPORT_DATA` | Invalid import data format |
+| `CATEGORIES_FETCH_ERROR` | Failed to fetch categories |
+| `CATEGORY_CREATE_ERROR` | Failed to create category |
+| `CATEGORY_NOT_FOUND` | Category doesn't exist |
+| `CATEGORY_UPDATE_ERROR` | Failed to update category |
+| `CATEGORY_DELETE_ERROR` | Failed to delete category |
+| `DEFAULT_CATEGORY_PROTECTED` | Cannot delete default category |
+| `VALIDATION_ERROR` | Input validation failed |
+| `SERVER_ERROR` | Internal server error |

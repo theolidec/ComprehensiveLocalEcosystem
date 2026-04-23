@@ -1,10 +1,10 @@
 # Terms of Service
 
-**Last Updated:** April 17, 2026
+**Last Updated:** April 23, 2026
 
 ## 1. Acceptance of Terms
 
-By accessing and using Oasis ("the Service"), you accept and agree to be bound by the terms and provisions of this agreement.
+By accessing and using Comprehensive Local Ecosystem ("the Service"), you accept and agree to be bound by the terms and provisions of this agreement.
 
 ## 2. Description of Service
 
@@ -93,7 +93,7 @@ We may modify these terms at any time. Continued use of the Service after modifi
 
 ## 11. Governing Law
 
-These terms shall be governed by applicable laws. Any disputes shall be resolved in accordance with legal requirements.
+These terms shall be governed by the laws of Sweden. Any disputes shall be resolved in accordance with Swedish legal requirements.
 
 ## 12. Contact Information
 

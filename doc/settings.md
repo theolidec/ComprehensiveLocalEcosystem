@@ -158,3 +158,23 @@ Users can view all active sessions and revoke any session except current.
 - **Calendar Module**: Uses calendar settings (defaultView, weekStartsOn, timezone)
 - **Auth Module**: Session management via refresh tokens
 - **Frontend Theme**: Display.theme controls UI theme
+
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `SETTINGS_FETCH_ERROR` | Failed to fetch settings |
+| `SETTINGS_UPDATE_ERROR` | Failed to update settings |
+| `PROFILE_UPDATE_ERROR` | Failed to update profile |
+| `AVATAR_UPLOAD_ERROR` | Failed to upload avatar |
+| `AVATAR_DELETE_ERROR` | Failed to delete avatar |
+| `CALENDAR_SETTINGS_ERROR` | Failed to update calendar settings |
+| `NOTIFICATION_SETTINGS_ERROR` | Failed to update notification settings |
+| `DISPLAY_SETTINGS_ERROR` | Failed to update display settings |
+| `PRIVACY_SETTINGS_ERROR` | Failed to update privacy settings |
+| `SESSIONS_FETCH_ERROR` | Failed to fetch active sessions |
+| `SESSION_NOT_FOUND` | Session doesn't exist |
+| `SESSION_REVOKE_ERROR` | Failed to revoke session |
+| `RESET_ERROR` | Failed to reset settings |
+| `NOT_FOUND` | Settings not found |
+| `VALIDATION_ERROR` | Input validation failed |
+| `SERVER_ERROR` | Internal server error |

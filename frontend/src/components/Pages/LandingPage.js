@@ -22,7 +22,7 @@ const LandingPage = () => {
       <header className="bg-white dark:bg-gray-900 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Oasis</h1>
+            <h1 className="text-2xl font-bold text-blue-600 dark:text-blue-400">Comprehensive Local Ecosystem</h1>
           </div>
           <div className="flex gap-4">
             <button
@@ -143,7 +143,7 @@ const LandingPage = () => {
       <footer className="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-600 dark:text-gray-400 text-sm">
-            © 2026 Oasis. All rights reserved.
+            © 2026 Comprehensive Local Ecosystem. All rights reserved.
           </p>
           <div className="flex gap-6">
             <a href="/privacy" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 text-sm">

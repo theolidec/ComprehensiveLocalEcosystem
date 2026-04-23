@@ -85,7 +85,6 @@ Currently no versions are Security supported as this is a development project.
 # REQUIRED - Generate strong random strings (min 32 characters)
 JWT_SECRET=your_strong_jwt_secret_here
 JWT_REFRESH_SECRET=your_strong_refresh_secret_here
-SESSION_SECRET=your_session_secret_here
 
 # Database
 MONGODB_URI=mongodb://localhost:27017/full-system-architecture

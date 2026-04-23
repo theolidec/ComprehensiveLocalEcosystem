@@ -21,9 +21,9 @@ Manages custom event categories for the Calendar with color coding and icons.
 
 | Name | Color | Icon |
 |------|-------|------|
-| Work | #3B82F6 (Blue) | � |
+| Work | #3B82F6 (Blue) | 💼 |
 | Personal | #10B981 (Green) | 👤 |
-| Social | #F59E0B (Orange) | � |
+| Social | #F59E0B (Orange) | 🎉 |
 | Health | #EF4444 (Red) | 🏥 |
 | Education | #8B5CF6 (Purple) | 📚 |
 | Travel | #06B6D4 (Cyan) | ✈️ |
@@ -58,3 +58,18 @@ Manages custom event categories for the Calendar with color coding and icons.
 - Protected defaults (cannot delete/modify)
 - Usage check before deletion
 - Auto-create defaults for new users
+
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `CATEGORIES_FETCH_ERROR` | Failed to fetch categories |
+| `CATEGORY_NOT_FOUND` | Category doesn't exist |
+| `CATEGORY_CREATE_ERROR` | Failed to create category |
+| `CATEGORY_UPDATE_ERROR` | Failed to update category |
+| `CATEGORY_DELETE_ERROR` | Failed to delete category |
+| `DUPLICATE_CATEGORY` | Category name already exists |
+| `CANNOT_UPDATE_DEFAULT` | Cannot modify default category |
+| `CANNOT_DELETE_DEFAULT` | Cannot delete default category |
+| `CATEGORY_IN_USE` | Category is in use by events |
+| `VALIDATION_ERROR` | Input validation failed |
+| `SERVER_ERROR` | Internal server error |

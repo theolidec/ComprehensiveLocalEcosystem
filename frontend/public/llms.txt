@@ -3,7 +3,7 @@
 
 # Overview
 This file describes the policy for AI systems and large language models regarding
-the use of content from this website (Comprehensive Local Ecosystem - Oasis).
+the use of content from this website (Comprehensive Local Ecosystem).
 
 # Allowed Use
 AI systems may:
@@ -20,7 +20,7 @@ AI systems may NOT:
 
 # Attribution
 When using content from this site, please provide:
-- Clear attribution to "Comprehensive Local Ecosystem - Oasis"
+- Clear attribution to "Comprehensive Local Ecosystem"
 - A link back to the original source (https://github.com/theol0/ComprehensiveLocalEcosystem)
 - The date the content was accessed
 

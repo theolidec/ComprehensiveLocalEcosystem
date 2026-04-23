@@ -86,8 +86,8 @@ This is a full-featured web application ecosystem combining robust authenticatio
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
-- MongoDB 5.0+
+- Node.js 18+
+- MongoDB 6.0+
 - npm or yarn
 
 ## 🛠️ Installation & Setup
@@ -1006,9 +1006,9 @@ Get recent changes for a wiki.
 - **Device Tracking**: User agent and IP address logged for each token
 
 ### Rate Limiting
-- **General API**: 100 requests per 15 minutes per IP
-- **Authentication**: 5 attempts per 15 minutes per IP
-- **Token Refresh**: 10 attempts per 15 minutes per IP
+- **General API**: 1000 requests per 15 minutes per IP
+- **Authentication**: 20 attempts per 15 minutes per IP
+- **Token Refresh**: 50 attempts per 15 minutes per IP
 - **Password Reset**: 3 attempts per hour per IP
 - **User Actions**: 10 actions per hour per authenticated user
 
@@ -1934,7 +1934,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.4.0
-**Last Updated**: 2026-04-20
+**Version**: 1.0.0
+**Last Updated**: 2026-04-23
 **Status**: Production Ready
 **Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events, Wiki System

@@ -6,7 +6,7 @@ const Terms = () => {
     <div className="policy-page">
       <div className="policy-container">
         <h1>Terms of Service</h1>
-        <p className="last-updated">Last Updated: March 26, 2026</p>
+        <p className="last-updated">Last Updated: April 23, 2026</p>
 
         <section>
           <h2>1. Acceptance of Terms</h2>
@@ -24,6 +24,11 @@ const Terms = () => {
             <li>Calendar and event management</li>
             <li>Category organization for events</li>
             <li>User settings and preferences</li>
+            <li>Password manager with encrypted storage</li>
+            <li>File manager with upload, download, and sharing capabilities</li>
+            <li>Wishlist management with public sharing and reservations</li>
+            <li>Interactive graphing calculator for mathematical visualization</li>
+            <li>Social features including user following and public profiles</li>
           </ul>
         </section>
 
@@ -70,9 +75,11 @@ const Terms = () => {
           
           <h3>5.1 Your Content</h3>
           <ul>
-            <li>You retain ownership of content you create (calendar events, categories)</li>
+            <li>You retain ownership of content you create (calendar events, categories, files, passwords, wishlists, calculator states)</li>
             <li>You are responsible for content you submit to the Service</li>
             <li>You grant us license to use content for Service operation</li>
+            <li>File uploads must comply with all applicable laws and regulations</li>
+            <li>Public wishlist items may be viewed by other users</li>
           </ul>
           
           <h3>5.2 Content Guidelines</h3>
@@ -138,8 +145,8 @@ const Terms = () => {
         <section>
           <h2>11. Governing Law</h2>
           <p>
-            These terms shall be governed by applicable laws. Any disputes shall be resolved in 
-            accordance with legal requirements.
+            These terms shall be governed by the laws of Sweden. Any disputes shall be resolved in 
+            accordance with Swedish legal requirements.
           </p>
         </section>
 

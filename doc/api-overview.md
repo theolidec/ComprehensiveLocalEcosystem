@@ -76,7 +76,7 @@ GET /api/auth/me
 {
   "title": "Meeting",
   "description": "Team sync",
-  "date": "2026-04-20T10:00:00Z",
+  "date": "2026-04-23T10:00:00Z",
   "time": "10:00",
   "location": "Conference Room A",
   "category": "work",

@@ -59,3 +59,18 @@ Base: `/api/follow`
 - Follow/unfollow with one click
 - Pagination for large lists
 - Real-time counts
+
+## Error Codes
+| Code | Description |
+|------|-------------|
+| `FOLLOW_ERROR` | Failed to follow user |
+| `UNFOLLOW_ERROR` | Failed to unfollow user |
+| `SELF_FOLLOW` | Cannot follow yourself |
+| `FOLLOWERS_FETCH_ERROR` | Failed to fetch followers |
+| `FOLLOWING_FETCH_ERROR` | Failed to fetch following list |
+| `FOLLOW_STATUS_ERROR` | Failed to check follow status |
+| `USER_NOT_FOUND` | User doesn't exist |
+| `PROFILE_FETCH_ERROR` | Failed to fetch public profile |
+| `SEARCH_ERROR` | Failed to search users |
+| `VALIDATION_ERROR` | Input validation failed |
+| `SERVER_ERROR` | Internal server error |

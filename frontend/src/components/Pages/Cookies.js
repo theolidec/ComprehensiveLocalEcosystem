@@ -6,7 +6,7 @@ const Cookies = () => {
     <div className="policy-page">
       <div className="policy-container">
         <h1>Cookie Policy</h1>
-        <p className="last-updated">Last Updated: March 26, 2026</p>
+        <p className="last-updated">Last Updated: April 23, 2026</p>
 
         <section>
           <h2>1. Introduction</h2>

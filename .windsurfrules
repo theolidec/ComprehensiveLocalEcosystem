@@ -52,3 +52,14 @@ Analyze the current state of the project and determine the next logical steps to
 "Legal Review"
 Conduct a thorough legal review of the entire codebase, identifying potential legal issues, compliance risks, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
 
+"Accessibility Review"
+Conduct a thorough accessibility review of the entire codebase, identifying potential accessibility issues, compliance risks, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
+
+"Performance Review"
+Conduct a thorough performance review of the entire codebase, identifying potential performance issues, optimization opportunities, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
+
+"Code Review"
+Conduct a thorough code review of the entire codebase, identifying potential code issues, best practices, and areas for improvement. Flag anything that has drifted, is unclear, or is missing context.
+
+"Fix Theme"
+Fix any theme-related issues in the codebase, ensuring consistency and proper styling across all components.

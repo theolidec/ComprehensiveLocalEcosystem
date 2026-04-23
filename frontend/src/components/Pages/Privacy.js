@@ -6,7 +6,7 @@ const Privacy = () => {
     <div className="policy-page">
       <div className="policy-container">
         <h1>Privacy Policy</h1>
-        <p className="last-updated">Last Updated: March 26, 2026</p>
+        <p className="last-updated">Last Updated: April 23, 2026</p>
 
         <section>
           <h2>1. Introduction</h2>
@@ -29,6 +29,10 @@ const Privacy = () => {
             <li><strong>Account Information:</strong> Email address, name, and password (encrypted)</li>
             <li><strong>Login Data:</strong> Last login timestamp, login attempts, device information (IP address, user-agent)</li>
             <li><strong>Calendar Data:</strong> Events, categories, and preferences you create</li>
+            <li><strong>Password Manager Data:</strong> Encrypted passwords, password categories, and associated metadata</li>
+            <li><strong>File Manager Data:</strong> File metadata (names, sizes, types), folder structure, and user content</li>
+            <li><strong>Wishlist Data:</strong> Wishlist items, categories, reservations, and public sharing preferences</li>
+            <li><strong>Calculator Data:</strong> Saved calculator states and mathematical objects (stored locally)</li>
           </ul>
           
           <h3>2.2 Automatically Collected Information</h3>
@@ -105,6 +109,10 @@ const Privacy = () => {
             <li><strong>Authentication tokens:</strong> Automatically expire (15 minutes for access, 7 days for refresh)</li>
             <li><strong>Login history:</strong> Retained for security purposes</li>
             <li><strong>Calendar data:</strong> Retained until you delete it or your account</li>
+            <li><strong>Password data:</strong> Retained until you delete passwords or your account</li>
+            <li><strong>File data:</strong> Retained until you delete files or your account; trash items purged after 30 days</li>
+            <li><strong>Wishlist data:</strong> Retained until you delete items or your account</li>
+            <li><strong>Calculator states:</strong> Stored locally in browser, retained until cleared</li>
           </ul>
         </section>
 

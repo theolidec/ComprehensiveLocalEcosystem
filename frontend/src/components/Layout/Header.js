@@ -92,7 +92,7 @@ const Header = () => {
     if (location.pathname.startsWith('/wikis')) {
       return 'Wiki';
     }
-    return 'Oasis';
+    return 'Comprehensive Local Ecosystem';
   };
 
   return (

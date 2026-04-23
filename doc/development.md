@@ -55,7 +55,10 @@ ComprehensiveLocalEcosystem/
 npm run dev:all       # Start MongoDB + frontend + backend
 npm run dev:services  # Start MongoDB container only
 npm run dev           # Start frontend + backend (services must be running)
-npm run install:all   # Install dependencies in all directories
+npm start             # Start all services with Docker Compose
+npm stop              # Stop all services
+npm build             # Build Docker images
+npm logs              # View logs
 ```
 
 ### Backend
@@ -189,7 +192,7 @@ curl -X POST http://localhost:3001/api/calendar/events \
   -b cookies.txt \
   -d '{
     "title": "Meeting",
-    "date": "2026-04-20T10:00:00Z",
+    "date": "2026-04-23T10:00:00Z",
     "category": "work"
   }'
 ```

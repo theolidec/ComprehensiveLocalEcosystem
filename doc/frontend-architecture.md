@@ -76,7 +76,10 @@ components/
 │   ├── DocumentViewer.js    # File preview
 │   ├── DocumentEditor.js    # Text editor
 │   ├── UserFollowing.js     # Social/follow page
-│   ├── LandingPage.js       # Marketing page
+│   ├── LandingPage.js       # Marketing page container
+│   ├── Hero.js              # Landing page hero section
+│   ├── ProductGrid.js       # Product showcase grid
+│   ├── Features.js          # Features display section
 │   ├── Privacy.js           # Privacy policy
 │   ├── Terms.js             # Terms of service
 │   ├── Cookies.js           # Cookie policy
@@ -85,7 +88,8 @@ components/
 │   ├── CalendarHeader.js    # Calendar navigation
 │   ├── CalendarSidebar.js   # Calendar filters
 │   ├── EventForm.js         # Event editor
-│   └── EventDetails.js      # Event display
+│   ├── EventDetails.js      # Event display
+│   └── CategoryManager.js   # Event category management
 ├── Wiki/                    # Wiki system
 │   ├── WikiList.js          # Wiki directory
 │   ├── WikiView.js          # Wiki home

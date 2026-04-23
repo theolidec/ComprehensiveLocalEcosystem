@@ -131,8 +131,8 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: April 20, 2026  
-**Version**: 2.4.0
+**Last Updated**: April 23, 2026  
+**Version**: 1.0.0
 
 ## Recent Changes
 
