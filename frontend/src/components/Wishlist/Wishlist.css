@@ -500,6 +500,122 @@
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
+.export-dropdown {
+  position: relative;
+}
+
+.export-dropdown .export-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.export-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 1000;
+  min-width: 100px;
+}
+
+.export-dropdown:hover .export-menu {
+  display: block;
+}
+
+.export-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: background 0.15s ease;
+}
+
+.export-menu button:hover {
+  background: var(--bg-secondary);
+}
+
+.priority-dropdown {
+  position: relative;
+}
+
+.priority-dropdown .batch-action-btn.priority {
+  color: var(--text-secondary);
+}
+
+.priority-dropdown:hover .priority-menu {
+  display: block;
+}
+
+.priority-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 100;
+  min-width: 130px;
+}
+
+.priority-menu button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 14px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-primary);
+  transition: background 0.15s ease;
+}
+
+.priority-menu button:hover {
+  background: var(--bg-secondary);
+}
+
+.priority-menu button:first-child {
+  color: #ef4444;
+}
+
+.priority-menu button:nth-child(2) {
+  color: #f97316;
+}
+
+.priority-menu button:nth-child(3) {
+  color: #3b82f6;
+}
+
+.priority-menu button:nth-child(4) {
+  color: #6b7280;
+}
+
 /* Error Banner */
 .error-banner {
   display: flex;
@@ -2931,6 +3047,22 @@
 
 [data-theme="dark"] .public-wishlist-card {
   background: var(--bg-secondary);
+}
+
+[data-theme="dark"] .export-btn {
+  color: white;
+}
+
+[data-theme="dark"] .export-menu {
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .export-menu button {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .export-menu button:hover {
+  background: var(--bg-tertiary);
 }
 
 /* Responsive */

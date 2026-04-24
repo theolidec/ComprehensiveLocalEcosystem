@@ -117,9 +117,13 @@ const Settings = () => {
     });
     if (result.success) {
       showMessage('Display settings updated');
-      document.documentElement.setAttribute('data-theme', newTheme);
+      // Resolve 'system' theme to actual theme
+      const resolvedTheme = newTheme === 'system' 
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : newTheme;
+      document.documentElement.setAttribute('data-theme', resolvedTheme);
       localStorage.setItem('theme', newTheme);
-      // Only save to cookie if user allows
+      // Only save to cookie if user allows (save the raw value including 'system')
       if (settings.privacy?.allowThemeCookie !== false) {
         document.cookie = `theme=${newTheme};path=/;max-age=31536000;SameSite=Lax`;
       }

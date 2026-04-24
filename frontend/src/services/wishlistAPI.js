@@ -219,6 +219,38 @@ export const wishlistAPI = {
     } catch (error) {
       handleApiError(error);
     }
+  },
+
+  // Export wishlist to PDF
+  exportPDF: async (params = {}) => {
+    try {
+      const { category, status, priority, search, selectedItems } = params;
+      const queryParams = new URLSearchParams();
+
+      if (selectedItems && selectedItems.length > 0) {
+        queryParams.append('items', selectedItems.join(','));
+      } else {
+        if (category && category !== 'all') queryParams.append('category', category);
+        if (status && status !== 'all') queryParams.append('status', status);
+        if (priority && priority !== 'all') queryParams.append('priority', priority);
+        if (search) queryParams.append('search', search);
+      }
+
+      const url = `${API_URLS.WISHLIST_EXPORT_PDF}?${queryParams.toString()}`;
+      const response = await axios.get(url, { responseType: 'blob' });
+
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = `wishlist-${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 };
 

@@ -46,7 +46,7 @@ Gift registry and wishlist management system with templates, categories, items, 
   currency: String (enum: USD, EUR, GBP, CAD, AUD, NOK, SEK, DKK, default: 'USD'),
   priority: String (enum: low/medium/high/must-have, default: 'medium'),
   wishlist: ObjectId (ref: 'Wishlist', default: null),
-  category: String (default: 'Birthday'),
+  category: String (default: 'birthday'),
   imageUrl: String (trim),
   user: ObjectId (required, ref: 'User'),
   isPublic: Boolean (default: false),
@@ -103,8 +103,8 @@ Gift registry and wishlist management system with templates, categories, items, 
 ### Categories
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| POST | `/api/wishlists/:id/categories` | Create category |
-| GET | `/api/wishlists/:id/categories` | List categories |
+| GET | `/api/wishlist-categories` | List categories |
+| POST | `/api/wishlist-categories` | Create category |
 | PUT | `/api/wishlist-categories/:id` | Update category |
 | DELETE | `/api/wishlist-categories/:id` | Delete category |
 
@@ -114,6 +114,7 @@ Gift registry and wishlist management system with templates, categories, items, 
 | GET | `/api/wishlist` | List my items |
 | GET | `/api/wishlist/stats` | Get item stats |
 | GET | `/api/wishlist/analytics` | Get detailed analytics |
+| GET | `/api/wishlist/export/pdf` | Export wishlist to PDF |
 | GET | `/api/wishlist/:id` | Get single item |
 | POST | `/api/wishlist` | Create item |
 | PUT | `/api/wishlist/:id` | Update item |
@@ -129,12 +130,18 @@ Gift registry and wishlist management system with templates, categories, items, 
 | GET | `/api/wishlist/public/:token` | Get public item by share token |
 
 ## Frontend
-- **File**: `frontend/src/components/Pages/Wishlist/` - Wishlist management
-- **File**: `frontend/src/components/Pages/WishlistPublic.js` - Public view
+- **File**: `frontend/src/components/Wishlist/` - Wishlist management
+- **File**: `frontend/src/components/Wishlist/PublicWishlistItem.js` - Public view
 
 ## Backend
 - **Models**: `backend/models/Wishlist.js`, `WishlistCategory.js`, `WishlistItem.js`, `WishlistReservation.js`
-- **Routes**: `backend/routes/wishlists.js`, `wishlist.js`, `wishlistCategories.js`
+- **Routes**: 
+  - `wishlist.js` - Main router (imports sub-routes)
+  - `wishlistItems.js` - Item CRUD, stats, analytics, sharing
+  - `wishlistReservations.js` - Create/get/cancel reservations
+  - `wishlistPublic.js` - Public token-based access with caching
+  - `wishlists.js` - Wishlist management
+  - `wishlistCategories.js` - Category management
 
 ## Privacy
 - Owners see all items but not reserver identities

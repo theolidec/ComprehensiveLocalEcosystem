@@ -44,14 +44,22 @@ const getInitialTheme = () => {
   // Check cookies first (for login page support)
   const cookies = document.cookie.split(';');
   const themeCookie = cookies.find(c => c.trim().startsWith('theme='));
+  let theme = null;
   if (themeCookie) {
     const cookieTheme = themeCookie.split('=')[1];
-    if (cookieTheme) return cookieTheme;
+    if (cookieTheme) theme = cookieTheme;
   }
   // Fallback to localStorage
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) return savedTheme;
-  return 'light';
+  if (!theme) {
+    theme = localStorage.getItem('theme');
+  }
+  // Default to light
+  if (!theme) return 'light';
+  // Resolve 'system' theme to actual theme
+  if (theme === 'system') {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  return theme;
 };
 
 function RootRoute() {
@@ -78,6 +86,21 @@ function AppContent() {
   useEffect(() => {
     const theme = getInitialTheme();
     document.documentElement.setAttribute('data-theme', theme);
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleThemeChange = (e) => {
+      // Only auto-update if the user has 'system' theme selected
+      const currentTheme = localStorage.getItem('theme') || 
+        document.cookie.split(';').find(c => c.trim().startsWith('theme='))?.split('=')[1];
+      if (currentTheme === 'system') {
+        const newTheme = e.matches ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', newTheme);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleThemeChange);
+    return () => mediaQuery.removeEventListener('change', handleThemeChange);
   }, []);
 
   return (

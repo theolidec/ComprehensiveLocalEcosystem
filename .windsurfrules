@@ -63,3 +63,9 @@ Conduct a thorough code review of the entire codebase, identifying potential cod
 
 "Fix Theme"
 Fix any theme-related issues in the codebase, ensuring consistency and proper styling across all components.
+
+"Architecture Review"
+Review the overall project structure and identify any structural issues, anti-patterns, or areas that deviate from the established conventions.
+
+"API Review"
+Review all API endpoints, their inputs, outputs, and error handling for consistency and completeness.

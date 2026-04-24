@@ -4,7 +4,7 @@ import {
   Heart, ShoppingBag, ExternalLink, Edit2, Trash2,
   Star, X, CheckCircle, AlertCircle, Package,
   Check, Square, ChevronLeft, ChevronRight, Download,
-  Sparkles, Flame, Zap, Target
+  Sparkles, Flame, Zap, Target, FileText
 } from 'lucide-react';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import WishlistItemModal from './WishlistItemModal';
@@ -110,6 +110,12 @@ export default function Wishlist() {
         onClick: () => handleExport('csv'),
         closeOnClick: false
       },
+      {
+        icon: <FileText size={18} />,
+        label: 'Export PDF',
+        onClick: () => handleExport('pdf'),
+        closeOnClick: false
+      },
       ...(selectedItems.length > 0 ? [
         {
           icon: <Trash2 size={18} />,
@@ -198,11 +204,36 @@ export default function Wishlist() {
     }
   };
 
+  const handleBatchPriorityChange = async (newPriority) => {
+    try {
+      setLoading(true);
+      for (const id of selectedItems) {
+        await wishlistAPI.updateItem(id, { priority: newPriority });
+      }
+      setSelectedItems([]);
+      await fetchData();
+    } catch (err) {
+      setError(err.message || 'Failed to update priority');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handlePageChange = (newPage) => {
     setPagination(prev => ({ ...prev, page: newPage }));
   };
 
-  const handleExport = (format) => {
+  const handleExport = async (format) => {
+    if (format === 'pdf') {
+      await wishlistAPI.exportPDF({
+        category: selectedCategory,
+        priority: selectedPriority,
+        search: searchQuery,
+        selectedItems: selectedItems.length > 0 ? selectedItems : null
+      });
+      return;
+    }
+
     const exportData = filteredItems.map(item => ({
       Title: item.title,
       Description: item.description || '',
@@ -404,24 +435,55 @@ export default function Wishlist() {
               {selectedItems.length > 0 ? (
                 <div className="batch-actions-inline">
                   <span className="selected-count">{selectedItems.length}</span>
-                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('purchased')}>
+                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('purchased')} title="Mark as Purchased">
                     <ShoppingBag size={14} />
                   </button>
-                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('active')}>
+                  <button className="batch-action-btn" onClick={() => handleBatchStatusChange('active')} title="Mark as Active">
                     <CheckCircle size={14} />
                   </button>
-                  <button className="batch-action-btn delete" onClick={handleBatchDelete}>
+                  <div className="priority-dropdown">
+                    <button className="batch-action-btn priority" title="Set Priority">
+                      <Star size={14} />
+                    </button>
+                    <div className="priority-menu">
+                      <button onClick={() => handleBatchPriorityChange('must-have')} title="Must Have">
+                        <Zap size={12} /> Must Have
+                      </button>
+                      <button onClick={() => handleBatchPriorityChange('high')} title="High">
+                        <Flame size={12} /> High
+                      </button>
+                      <button onClick={() => handleBatchPriorityChange('medium')} title="Medium">
+                        <Target size={12} /> Medium
+                      </button>
+                      <button onClick={() => handleBatchPriorityChange('low')} title="Low">
+                        <Star size={12} /> Low
+                      </button>
+                    </div>
+                  </div>
+                  <button className="batch-action-btn delete" onClick={handleBatchDelete} title="Delete">
                     <Trash2 size={14} />
                   </button>
-                  <button className="batch-action-btn clear" onClick={() => setSelectedItems([])}>
+                  <button className="batch-action-btn clear" onClick={() => setSelectedItems([])} title="Clear Selection">
                     <X size={14} />
                   </button>
                 </div>
               ) : (
-                <button className="export-btn" onClick={() => handleExport('csv')}>
-                  <Download size={14} />
-                  Export
-                </button>
+                <div className="export-dropdown">
+                  <button className="export-btn">
+                    <Download size={14} />
+                    Export
+                  </button>
+                  <div className="export-menu">
+                    <button onClick={() => handleExport('csv')}>
+                      <Download size={14} />
+                      CSV
+                    </button>
+                    <button onClick={() => handleExport('pdf')}>
+                      <FileText size={14} />
+                      PDF
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           )}

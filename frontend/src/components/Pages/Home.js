@@ -9,6 +9,27 @@ function Home() {
   const { isAuthenticated } = useAuth();
   const [todayEvents, setTodayEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 60000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
+  const formatTime = (date) => {
+    return date.toLocaleTimeString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
 
   useEffect(() => {
     const fetchTodayEvents = async () => {
@@ -114,9 +135,14 @@ function Home() {
         {isAuthenticated && (
           <div className="mb-12">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Today's Events
-              </h2>
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  Today's Events
+                </h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400" style={{ alignSelf: 'center', marginTop: '2px' }}>
+                  {formatTime(currentTime)} · {formatDate(currentTime)}
+                </span>
+              </div>
               <button
                 onClick={() => navigate('/calendar/day')}
                 className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"

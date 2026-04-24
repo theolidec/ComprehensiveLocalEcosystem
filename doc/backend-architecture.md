@@ -74,7 +74,10 @@ backend/
 │   ├── settings.js
 │   ├── wikiPages.js
 │   ├── wikis.js
-│   ├── wishlist.js
+│   ├── wishlist.js          # Main router (imports sub-routes)
+│   ├── wishlistItems.js     # Item CRUD, stats, analytics
+│   ├── wishlistReservations.js  # Reservation operations
+│   ├── wishlistPublic.js    # Public token-based access
 │   ├── wishlistCategories.js
 │   └── wishlists.js
 ├── services/            # Business logic services

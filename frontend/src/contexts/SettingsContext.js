@@ -72,15 +72,18 @@ export const SettingsProvider = ({ children }) => {
     try {
       const data = await settingsAPI.getSettings();
       dispatch({ type: 'LOAD_SETTINGS', payload: data.settings });
-      // Sync theme to cookie for login page support (if user allows)
+      // Sync theme to cookie for login page support (if user allows) - save the raw value (including 'system')
       const theme = data.settings?.display?.theme;
       const allowCookie = data.settings?.privacy?.allowThemeCookie;
       if (theme && allowCookie !== false && typeof document !== 'undefined') {
         document.cookie = `theme=${theme};path=/;max-age=31536000;SameSite=Lax`;
       }
-      // Apply theme to document
+      // Apply resolved theme to document
       if (theme && typeof document !== 'undefined') {
-        document.documentElement.setAttribute('data-theme', theme);
+        const resolvedTheme = theme === 'system' 
+          ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+          : theme;
+        document.documentElement.setAttribute('data-theme', resolvedTheme);
       }
     } catch (error) {
       dispatch({ type: 'SET_ERROR', payload: error.response?.data?.error || 'Failed to load settings' });
