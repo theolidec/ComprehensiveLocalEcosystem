@@ -48,7 +48,7 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Large File Support**: Up to 500MB per file
 - **Secure Storage**: Files stored with unique hashed filenames
 
-### GeoGebra Calculator (NEW)
+### GeoGebra Calculator
 - **Interactive Graphing**: Plot functions, equations, and inequalities
 - **Multiple Object Types**: Functions, parametric curves, points, circles, polygons, implicit equations
 - **Advanced Mathematics**: Support for inequalities, conic sections, geometric shapes
