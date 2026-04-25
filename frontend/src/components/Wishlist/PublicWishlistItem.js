@@ -7,6 +7,18 @@ const currencySymbols = {
   USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', NOK: 'kr', SEK: 'kr', DKK: 'kr'
 };
 
+const currenciesWithSymbolRight = ['SEK', 'NOK', 'DKK'];
+
+const formatPrice = (price, currency) => {
+  if (!price) return null;
+  const symbol = currencySymbols[currency] || '$';
+  const formattedPrice = price.toFixed(2);
+  if (currenciesWithSymbolRight.includes(currency)) {
+    return `${formattedPrice} ${symbol}`;
+  }
+  return `${symbol}${formattedPrice}`;
+};
+
 const priorityConfig = {
   'must-have': { color: '#ef4444', label: 'Must Have' },
   'high': { color: '#f97316', label: 'High' },
@@ -115,10 +127,15 @@ export default function PublicWishlistItem() {
             )}
 
             <div className="public-wishlist-meta">
-              {item.price && (
+              {item.price ? (
                 <span className="public-wishlist-price">
                   <DollarSign size={16} />
-                  {currencySymbols[item.currency] || '$'}{item.price.toFixed(2)}
+                  {formatPrice(item.price, item.currency)}
+                </span>
+              ) : (
+                <span className="public-wishlist-price no-price">
+                  <DollarSign size={16} />
+                  Price on request
                 </span>
               )}
               <span 

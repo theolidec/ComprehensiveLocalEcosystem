@@ -42,6 +42,7 @@ const API_ENDPOINTS = {
     ANALYTICS: '/api/wishlist/analytics',
     PUBLIC: '/api/wishlist/public',
     EXPORT_PDF: '/api/wishlist/export/pdf',
+    IMPORT_CSV: '/api/wishlist/import/csv',
   },
 
   // Wishlist categories endpoints
@@ -87,6 +88,7 @@ export const API_URLS = {
   WISHLIST_ANALYTICS: createApiUrl(API_ENDPOINTS.WISHLIST.ANALYTICS),
   WISHLIST_PUBLIC: createApiUrl(API_ENDPOINTS.WISHLIST.PUBLIC),
   WISHLIST_EXPORT_PDF: createApiUrl(API_ENDPOINTS.WISHLIST.EXPORT_PDF),
+  WISHLIST_IMPORT_CSV: createApiUrl(API_ENDPOINTS.WISHLIST.IMPORT_CSV),
   WISHLIST_CATEGORIES: createApiUrl(API_ENDPOINTS.WISHLIST_CATEGORIES),
   WISHLISTS: createApiUrl(API_ENDPOINTS.WISHLISTS),
   FOLLOW: createApiUrl(API_ENDPOINTS.FOLLOW),

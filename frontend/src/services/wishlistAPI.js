@@ -251,6 +251,16 @@ export const wishlistAPI = {
     } catch (error) {
       handleApiError(error);
     }
+  },
+
+  // Import wishlist from CSV
+  importCSV: async (csv) => {
+    try {
+      const response = await axios.post(API_URLS.WISHLIST_IMPORT_CSV, { csv });
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
   }
 };
 

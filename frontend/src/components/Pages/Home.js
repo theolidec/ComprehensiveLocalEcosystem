@@ -37,8 +37,11 @@ function Home() {
       setEventsLoading(true);
       try {
         const today = new Date();
-        const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).toISOString();
-        const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59).toISOString();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const startOfDay = `${year}-${month}-${day}T00:00:00`;
+        const endOfDay = `${year}-${month}-${day}T23:59:59`;
         const events = await calendarAPI.getEvents({ startDate: startOfDay, endDate: endOfDay });
         setTodayEvents(events || []);
       } catch (err) {

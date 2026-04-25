@@ -107,8 +107,8 @@ const Header = () => {
               <span className="text-xl font-bold text-gray-900 dark:text-white">{getHeaderTitle()}</span>
             </div>
             {isAuthenticated && isHomePage && (
-              <div style={{ paddingLeft: '16px', alignItems: 'center'}}>
-                <h2 style={{ fontSize: '1.125rem', fontWeight: 600, color: 'var(--text-primary, #111827)', margin: 0, lineHeight: 1}}>
+              <div style={{ paddingLeft: '16px', alignItems: 'center', paddingTop: '2px'}}>
+                <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary, #111827)', margin: 0, lineHeight: 1}}>
                   Welcome, {user?.name?.split(' ')[0] || 'User'}!
                 </h2>
               </div>

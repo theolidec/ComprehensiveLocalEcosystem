@@ -4,7 +4,7 @@ import {
   Heart, ShoppingBag, ExternalLink, Edit2, Trash2,
   Star, X, CheckCircle, AlertCircle, Package,
   Check, Square, ChevronLeft, ChevronRight, Download,
-  Sparkles, Flame, Zap, Target, FileText
+  Sparkles, Flame, Zap, Target, FileText, Upload
 } from 'lucide-react';
 import { wishlistAPI } from '../../services/wishlistAPI';
 import WishlistItemModal from './WishlistItemModal';
@@ -29,6 +29,18 @@ const categoryConfig = {
 
 const currencySymbols = {
   USD: '$', EUR: '€', GBP: '£', CAD: 'C$', AUD: 'A$', NOK: 'kr', SEK: 'kr', DKK: 'kr'
+};
+
+const currenciesWithSymbolRight = ['SEK', 'NOK', 'DKK'];
+
+const formatPrice = (price, currency) => {
+  if (!price) return null;
+  const symbol = currencySymbols[currency] || '$';
+  const formattedPrice = price.toFixed(2);
+  if (currenciesWithSymbolRight.includes(currency)) {
+    return `${formattedPrice} ${symbol}`;
+  }
+  return `${symbol}${formattedPrice}`;
 };
 
 export default function Wishlist() {
@@ -108,6 +120,12 @@ export default function Wishlist() {
         icon: <Download size={18} />,
         label: 'Export CSV',
         onClick: () => handleExport('csv'),
+        closeOnClick: false
+      },
+      {
+        icon: <Upload size={18} />,
+        label: 'Import CSV',
+        onClick: () => fileInputRef.current?.click(),
         closeOnClick: false
       },
       {
@@ -260,6 +278,28 @@ export default function Wishlist() {
     }
   };
 
+  const fileInputRef = React.useRef(null);
+
+  const handleImportCSV = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const result = await wishlistAPI.importCSV(text);
+      if (result.imported > 0) {
+        await fetchData();
+        alert(`Successfully imported ${result.imported} items!`);
+      }
+      if (result.errors?.length > 0) {
+        alert(`Import completed with errors:\n${result.errors.join('\n')}`);
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to import CSV');
+    }
+    e.target.value = '';
+  };
+
   const handleShareItem = (item) => {
     setShareModalItem(item);
   };
@@ -330,6 +370,13 @@ export default function Wishlist() {
 
   return (
     <div className="wishlist-container">
+      <input
+        type="file"
+        ref={fileInputRef}
+        accept=".csv"
+        style={{ display: 'none' }}
+        onChange={handleImportCSV}
+      />
       {/* Hero Section - Redesigned */}
       <div className="wishlist-hero-new">
         <div className="hero-bg-pattern"></div>
@@ -339,7 +386,7 @@ export default function Wishlist() {
               <p className="wishlist-subtitle">
                 <span className="item-count">{items.length} wishes</span>
                 <span className="divider">•</span>
-                <span className="total-value">{currencySymbols.USD}{getTotalValue().toFixed(2)} total</span>
+                <span className="total-value">{getTotalValue().toFixed(2)} total</span>
               </p>
             </div>
           </div>
@@ -614,10 +661,13 @@ export default function Wishlist() {
 
                   {/* Price & Link */}
                   <div className="card-footer">
-                    {item.price && (
+                    {item.price ? (
                       <div className="card-price">
-                        <span className="currency">{currencySymbols[item.currency] || '$'}</span>
-                        <span className="amount">{item.price.toFixed(2)}</span>
+                        <span className="amount">{formatPrice(item.price, item.currency)}</span>
+                      </div>
+                    ) : (
+                      <div className="card-price no-price">
+                        <span className="amount">Price on request</span>
                       </div>
                     )}
                     {item.url && (
@@ -697,8 +747,24 @@ export default function Wishlist() {
       )}
 
       {/* Pagination */}
-      {pagination.totalPages > 1 && (
+      {pagination.totalPages >= 1 && (
         <div className="pagination">
+          <div className="page-size-selector">
+            <label>Show:</label>
+            <select 
+              value={pagination.limit} 
+              onChange={(e) => {
+                setPagination(prev => ({ ...prev, limit: parseInt(e.target.value), page: 1 }));
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={30}>30</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={200}>200</option>
+            </select>
+          </div>
           <button 
             className="page-btn"
             onClick={() => handlePageChange(pagination.page - 1)}

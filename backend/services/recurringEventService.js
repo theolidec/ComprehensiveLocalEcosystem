@@ -42,11 +42,15 @@ class RecurringEventService {
     }
 
     // If event start date is before range start, find first occurrence in range
+    let initialInstanceCount = 0;
     if (currentDate < startRange) {
-      currentDate = this.findFirstOccurrenceInRange(event, startRange);
+      const firstInRange = this.findFirstOccurrenceInRange(event, startRange);
+      // Calculate how many occurrences happened before the range
+      initialInstanceCount = this.getOccurrenceCount(eventDate, firstInRange, event.recurringPattern);
+      currentDate = firstInRange;
     }
 
-    while (currentDate <= effectiveEndDate && instanceCount < maxOccurrences && instanceCount < MAX_INSTANCES) {
+    while (currentDate <= effectiveEndDate && (instanceCount + initialInstanceCount) < maxOccurrences && instanceCount < MAX_INSTANCES) {
       const instance = this.createEventInstance(event, currentDate);
       instances.push(instance);
       instanceCount++;
@@ -122,6 +126,29 @@ class RecurringEventService {
     }
 
     return nextDate;
+  }
+
+  /**
+   * Calculate the number of occurrences between two dates
+   * @param {Date} startDate - The event start date
+   * @param {Date} targetDate - The target date to count up to
+   * @param {String} pattern - The recurring pattern
+   * @returns {Number} Number of occurrences
+   */
+  static getOccurrenceCount(startDate, targetDate, pattern) {
+    if (!startDate || !targetDate || startDate >= targetDate) {
+      return 0;
+    }
+
+    let count = 0;
+    let current = new Date(startDate);
+
+    while (current < targetDate) {
+      count++;
+      current = this.getNextOccurrence(current, pattern);
+    }
+
+    return count;
   }
 
   /**

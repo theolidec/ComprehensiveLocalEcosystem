@@ -50,13 +50,31 @@ router.get('/', authenticateToken, async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const [items, total] = await Promise.all([
-      WishlistItem.find(query)
-        .populate('reservations', 'reservedBy status reservedAt message')
-        .sort({ priority: -1, createdAt: -1 })
-        .skip(skip)
-        .limit(limitNum),
+      WishlistItem.aggregate([
+        { $match: query },
+        {
+          $addFields: {
+            priorityOrder: { $arrayElemAt: [[0, 1, 2, 3], { $indexOfArray: [['must-have', 'high', 'medium', 'low'], '$priority'] }] }
+          }
+        },
+        { $sort: { priorityOrder: 1, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limitNum },
+        { $lookup: { from: 'wishlistreservations', localField: '_id', foreignField: 'wishlistItem', as: 'reservations' } },
+        { $project: { reservations: { reservedBy: 1, status: 1, reservedAt: 1, message: 1 } } }
+      ]),
       WishlistItem.countDocuments(query)
     ]);
+
+    if (items.length > 0) {
+      const itemIds = items.map(i => i._id);
+      const populatedItems = await WishlistItem.find({ _id: { $in: itemIds } })
+        .populate('reservations', 'reservedBy status reservedAt message');
+      const sortedMap = new Map(populatedItems.map(i => [i._id.toString(), i]));
+      for (let i = 0; i < items.length; i++) {
+        items[i] = sortedMap.get(items[i]._id.toString());
+      }
+    }
 
     res.json({ 
       items,
@@ -201,6 +219,7 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
       }
       doc.fillColor('#000');
 
+      doc.moveTo(50, y + 11).lineTo(540, y + 11).stroke('#eee');
       y += 16;
     });
 
@@ -215,11 +234,16 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
           doc.addPage();
           y = 50;
         }
-        doc.fillColor('#0066cc');
-        doc.text(`${idx + 1}. ${item.title}: `, 50, y, { continued: true });
-        doc.text(item.url, { link: item.url });
         doc.fillColor('#000');
-        y += 14;
+        const titleStr = `${idx + 1}. ${item.title}: `;
+        const titleWidth = doc.widthOfString(titleStr);
+        const urlWidth = 490 - titleWidth;
+        doc.text(titleStr, 50, y, { continued: true });
+        doc.fillColor('#0066cc');
+        const urlY = doc.text(item.url, { link: item.url, width: urlWidth });
+        const linesWrapped = Math.ceil(doc.widthOfString(item.url) / urlWidth);
+        doc.fillColor('#000');
+        y += Math.max(14, linesWrapped * 12);
       });
     }
 
@@ -239,6 +263,98 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
       error: 'Failed to generate PDF',
       code: 'SERVER_ERROR'
     });
+  }
+});
+
+router.post('/import/csv', authenticateToken, async (req, res) => {
+  try {
+    const { csv } = req.body;
+    if (!csv || typeof csv !== 'string') {
+      return res.status(400).json({ error: 'CSV content is required', code: 'VALIDATION_ERROR' });
+    }
+
+    const lines = csv.trim().split('\n');
+    if (lines.length < 2) {
+      return res.status(400).json({ error: 'CSV must have header and at least one data row', code: 'VALIDATION_ERROR' });
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+    const headerMap = {
+      'Title': 'title',
+      'Description': 'description',
+      'Price': 'price',
+      'Currency': 'currency',
+      'Priority': 'priority',
+      'Category': 'category',
+      'Status': 'status',
+      'URL': 'url'
+    };
+
+    const validPriorities = ['low', 'medium', 'high', 'must-have'];
+    const validStatuses = ['active', 'purchased', 'archived'];
+    const validCategories = ['birthday', 'christmas', 'other'];
+    const validCurrencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NOK', 'SEK', 'DKK'];
+
+    const items = [];
+    const errors = [];
+
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].match(/(".*?"|[^,]+)(?=\s*,|\s*$)/g) || [];
+      const row = values.map(v => v.trim().replace(/^"|"$/g, ''));
+
+      if (row.length === 0 || row.every(v => !v)) continue;
+
+      const item = { user: req.user._id };
+      headers.forEach((header, idx) => {
+        const field = headerMap[header];
+        if (field && row[idx]) {
+          if (field === 'price') {
+            const price = parseFloat(row[idx]);
+            if (!isNaN(price)) item.price = price;
+          } else if (field === 'priority') {
+            const priority = row[idx].toLowerCase();
+            if (validPriorities.includes(priority)) item.priority = priority;
+          } else if (field === 'status') {
+            const status = row[idx].toLowerCase();
+            if (validStatuses.includes(status)) item.status = status;
+          } else if (field === 'category') {
+            const category = row[idx].toLowerCase();
+            if (validCategories.includes(category)) item.category = category;
+          } else if (field === 'currency') {
+            const currency = row[idx].toUpperCase();
+            if (validCurrencies.includes(currency)) item.currency = currency;
+          } else {
+            item[field] = row[idx];
+          }
+        }
+      });
+
+      if (!item.title) {
+        errors.push(`Row ${i + 1}: Title is required`);
+        continue;
+      }
+      if (!item.category) item.category = 'other';
+      if (!item.priority) item.priority = 'medium';
+      if (!item.status) item.status = 'active';
+      if (!item.currency) item.currency = 'USD';
+
+      items.push(item);
+    }
+
+    if (items.length === 0) {
+      return res.status(400).json({
+        error: 'No valid items found in CSV',
+        code: 'VALIDATION_ERROR',
+        details: errors
+      });
+    }
+
+    const created = await WishlistItem.insertMany(items);
+    logger.info(`CSV import: ${created.length} items by ${req.user.email}`);
+    res.json({ imported: created.length, errors });
+  } catch (error) {
+    logger.error('CSV import error:', error);
+    res.status(500).json({ error: 'Failed to import CSV', code: 'SERVER_ERROR' });
   }
 });
 

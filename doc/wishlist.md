@@ -115,6 +115,7 @@ Gift registry and wishlist management system with templates, categories, items, 
 | GET | `/api/wishlist/stats` | Get item stats |
 | GET | `/api/wishlist/analytics` | Get detailed analytics |
 | GET | `/api/wishlist/export/pdf` | Export wishlist to PDF |
+| POST | `/api/wishlist/import/csv` | Import wishlist from CSV |
 | GET | `/api/wishlist/:id` | Get single item |
 | POST | `/api/wishlist` | Create item |
 | PUT | `/api/wishlist/:id` | Update item |
