@@ -23,6 +23,11 @@ const fileService = {
     return response.data;
   },
 
+  getAllFiles: async () => {
+    const response = await axios.get(`${API_URL}/api/files/all`);
+    return response.data;
+  },
+
   getFile: async (id) => {
     const response = await axios.get(`${API_URL}/api/files/${id}`);
     return response.data;

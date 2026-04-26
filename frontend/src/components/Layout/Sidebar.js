@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import './Sidebar.css';
 
 const Sidebar = ({ inline = false }) => {
-  const { items, customContent } = usePageActions();
+  const { items, customContent, customContent2 } = usePageActions();
 
   if (inline) {
     return (
@@ -28,6 +28,11 @@ const Sidebar = ({ inline = false }) => {
         {customContent && (
           <div className="sidebar-custom-content">
             {customContent}
+          </div>
+        )}
+        {customContent2 && (
+          <div className="sidebar-custom-content sidebar-custom-content-2">
+            {customContent2}
           </div>
         )}
       </aside>
@@ -55,6 +60,11 @@ const Sidebar = ({ inline = false }) => {
       {customContent && (
         <div className="sidebar-custom-content">
           {customContent}
+        </div>
+      )}
+      {customContent2 && (
+        <div className="sidebar-custom-content sidebar-custom-content-2">
+          {customContent2}
         </div>
       )}
     </aside>

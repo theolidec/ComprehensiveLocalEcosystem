@@ -14,19 +14,21 @@ export const PageActionsProvider = ({ children }) => {
   const [actions, setActions] = useState({
     items: [],
     customContent: null,
+    customContent2: null,
     isOpen: false
   });
 
-  const registerPageActions = useCallback((newActions, customContent = null) => {
+  const registerPageActions = useCallback((newActions, customContent = null, customContent2 = null) => {
     setActions({
       items: newActions,
       customContent,
-      isOpen: newActions.length > 0 || customContent !== null
+      customContent2,
+      isOpen: newActions.length > 0 || customContent !== null || customContent2 !== null
     });
   }, []);
 
   const clearPageActions = useCallback(() => {
-    setActions({ items: [], customContent: null, isOpen: false });
+    setActions({ items: [], customContent: null, customContent2: null, isOpen: false });
   }, []);
 
   const toggleSidebar = useCallback(() => {

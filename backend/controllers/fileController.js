@@ -108,6 +108,19 @@ const fileController = {
     }
   },
 
+  getAllFiles: async (req, res) => {
+    try {
+      const files = await File.find({ userId: req.user._id, isDeleted: false })
+        .sort({ originalName: 1 })
+        .limit(1000);
+      
+      res.json({ files });
+    } catch (error) {
+      logger.error('Get all files error:', error);
+      res.status(500).json({ error: 'Failed to get all files', code: 'GET_ALL_FILES_ERROR' });
+    }
+  },
+
   getFile: async (req, res) => {
     try {
       const file = await File.findOne({ _id: req.params.id, userId: req.user._id });

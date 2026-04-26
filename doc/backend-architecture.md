@@ -173,15 +173,15 @@ const getItems = async (req, res) => {
 
 | Controller | Purpose | File Size |
 |------------|---------|-----------|
-| `calendarController.js` | Event CRUD, recurring events, import/export | ~420 lines |
+| `calendarController.js` | Event CRUD, recurring events, import/export | ~350 lines |
 | `categoryController.js` | Category CRUD operations | ~150 lines |
 | `fileController.js` | File upload, download, streaming, sharing | ~500 lines |
-| `fileFolderController.js` | Folder management, organization | ~300 lines |
-| `passwordController.js` | Password CRUD, encryption, favorites | ~250 lines |
-| `passwordCategoryController.js` | Password category management | ~120 lines |
-| `settingsController.js` | User settings, profile, sessions | ~270 lines |
-| `wikiController.js` | Wiki space management, permissions | ~400 lines |
-| `wikiPageController.js` | Wiki pages, versions, history | ~800 lines |
+| `fileFolderController.js` | Folder management, organization | ~250 lines |
+| `passwordController.js` | Password CRUD, encryption, favorites | ~230 lines |
+| `passwordCategoryController.js` | Password category management | ~100 lines |
+| `settingsController.js` | User settings, profile, sessions | ~250 lines |
+| `wikiController.js` | Wiki space management, permissions | ~360 lines |
+| `wikiPageController.js` | Wiki pages, versions, history | ~900 lines |
 
 ## Middleware
 

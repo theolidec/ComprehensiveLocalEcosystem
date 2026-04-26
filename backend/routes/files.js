@@ -115,6 +115,7 @@ const upload = multer({
 router.post('/upload', authenticateToken, upload.single('file'), fileController.uploadFile);
 
 router.get('/', authenticateToken, fileController.getFiles);
+router.get('/all', authenticateToken, fileController.getAllFiles);
 router.get('/stats', authenticateToken, fileController.getStorageStats);
 router.get('/trash', authenticateToken, fileController.getTrash);
 

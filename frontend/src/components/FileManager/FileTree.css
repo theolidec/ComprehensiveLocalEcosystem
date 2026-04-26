@@ -1,0 +1,178 @@
+.file-tree-container {
+  width: 100%;
+  max-width: 280px;
+  border: 1px solid #e4e4e7;
+  border-radius: 8px;
+  padding: 12px;
+  background: #fff;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.file-tree-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: #71717a;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 4px 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #e4e4e7;
+}
+
+.file-tree {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-tree-loading,
+.file-tree-empty {
+  padding: 16px;
+  text-align: center;
+  color: #71717a;
+  font-size: 14px;
+}
+
+.tree-item {
+  position: relative;
+  margin-top: 2px;
+}
+
+.tree-folder-header {
+  display: flex;
+  align-items: center;
+}
+
+.tree-toggle-btn {
+  background: none;
+  border: none;
+  padding: 2px;
+  cursor: pointer !important;
+  color: #71717a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.tree-toggle-btn .toggle-placeholder {
+  opacity: 0.3;
+}
+
+.tree-toggle-btn:hover {
+  background-color: #f4f4f5;
+}
+
+.tree-label,
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #09090b;
+  transition: background-color 0.15s;
+  user-select: none;
+  flex: 1;
+  min-width: 0;
+}
+
+.tree-label:hover,
+.file-item:hover {
+  background-color: #f4f4f5;
+}
+
+.tree-label.is-selected,
+.file-item.is-selected {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  font-weight: 500;
+}
+
+.tree-label-text,
+.file-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-icon {
+  color: #71717a;
+  flex-shrink: 0;
+}
+
+.tree-children {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  padding-left: 16px;
+}
+
+.root-item .tree-label {
+  font-weight: 500;
+}
+
+.tree-label.drag-over,
+.tree-folder-header.drag-over,
+.tree-label.is-selected.drag-over {
+  background-color: #dbeafe !important;
+  border: 2px dashed #3b82f6;
+}
+
+.file-item:active {
+  opacity: 0.5;
+  cursor: grabbing;
+}
+
+@media (prefers-color-scheme: dark) {
+  .file-tree-container {
+    background: #1f2937;
+    border-color: #374151;
+  }
+
+  .file-tree-header {
+    color: #9ca3af;
+    border-color: #374151;
+  }
+
+  .tree-label,
+  .file-item {
+    color: #f9fafb;
+  }
+
+  .tree-label:hover,
+  .file-item:hover {
+    background-color: #374151;
+  }
+
+  .tree-label.is-selected,
+  .file-item.is-selected {
+    background-color: #312e81;
+    color: #c7d2fe;
+  }
+
+  .tree-toggle-btn {
+    color: #9ca3af;
+  }
+
+  .tree-toggle-btn:hover {
+    background-color: #374151;
+  }
+
+  .file-icon {
+    color: #9ca3af;
+  }
+
+  .tree-label.drag-over,
+  .tree-folder-header.drag-over,
+  .tree-label.is-selected.drag-over {
+    background-color: #1e3a5f !important;
+    border-color: #60a5fa;
+  }
+}

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import fileStorageService from '../../services/fileService';
 import { usePageActions } from '../../contexts/PageActionsContext';
+import FileTree from '../FileManager/FileTree';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:3443';
 
@@ -150,6 +151,19 @@ const FileManager = () => {
       </div>
     );
 
+    const fileTreeWidget = !showTrash ? (
+      <FileTree 
+        currentFolder={currentFolder} 
+        onNavigate={(folder) => {
+          setCurrentFolder(folder._id);
+          setBreadcrumbs(folder._id === null 
+            ? [{ _id: null, name: 'My Files' }]
+            : [...breadcrumbs, folder]
+          );
+        }}
+      />
+    ) : null;
+
     registerPageActions([
       {
         icon: <Edit3 size={18} />,
@@ -166,9 +180,9 @@ const FileManager = () => {
         label: 'Upload File',
         onClick: () => document.querySelector('input[type="file"]')?.click()
       }
-    ], storageWidget);
+    ], fileTreeWidget, storageWidget);
     return () => clearPageActions();
-  }, [registerPageActions, clearPageActions, stats]);
+  }, [registerPageActions, clearPageActions, stats, currentFolder, breadcrumbs, showTrash]);
 
   const handleFileUpload = async (e) => {
     const uploadedFiles = e.target.files;
@@ -521,7 +535,7 @@ const FileManager = () => {
               <Home className="h-4 w-4" />
             </button>
             {breadcrumbs.map((crumb, index) => (
-              <React.Fragment key={crumb._id || 'root'}>
+              <React.Fragment key={`crumb-${crumb._id || 'root'}-${index}`}>
                 <ChevronRight className="h-4 w-4 text-gray-400" />
                 <button
                   onClick={() => handleBreadcrumbClick(index)}
@@ -579,7 +593,7 @@ const FileManager = () => {
             <div className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4' : 'space-y-2'}>
               {trashFiles.map((file) => (
                 <div
-                  key={file._id}
+                  key={`trash-${file._id}`}
                   className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow ${
                     viewMode === 'list' ? 'flex items-center justify-between' : ''
                   }`}
@@ -629,7 +643,7 @@ const FileManager = () => {
               <div className={viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4' : 'space-y-2'}>
                 {folders.map((folder) => (
                   <div
-                    key={folder._id}
+                    key={`folder-${folder._id}`}
                     onClick={() => handleFolderClick(folder)}
                     className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer ${
                       viewMode === 'list' ? 'flex items-center justify-between' : ''
@@ -646,7 +660,7 @@ const FileManager = () => {
                 ))}
                 {filteredFiles.map((file) => (
                   <div
-                    key={file._id}
+                    key={`file-${file._id}`}
                     className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow ${
                       viewMode === 'list' ? 'flex items-center justify-between' : ''
                     }`}
