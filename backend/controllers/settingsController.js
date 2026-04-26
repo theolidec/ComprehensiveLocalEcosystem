@@ -18,7 +18,7 @@ const settingsController = {
 
   updateSettings: async (req, res) => {
     try {
-      const allowedUpdates = ['profile', 'calendar', 'notifications', 'display', 'privacy'];
+      const allowedUpdates = ['profile', 'calendar', 'notifications', 'display', 'privacy', 'wishlist'];
       const updates = {};
       
       for (const key of allowedUpdates) {
@@ -207,6 +207,36 @@ const settingsController = {
     }
   },
 
+  updateWishlistSettings: async (req, res) => {
+    try {
+      const allowedFields = ['defaultItemsPerPage', 'saveItemsPerPageCookie'];
+      
+      const updates = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updates[`wishlist.${field}`] = req.body[field];
+        }
+      }
+
+      const settings = await Settings.findOneAndUpdate(
+        { userId: req.user._id },
+        { $set: updates },
+        { new: true, runValidators: true }
+      );
+
+      res.json({
+        message: 'Wishlist settings updated successfully',
+        wishlist: settings.wishlist
+      });
+    } catch (error) {
+      logger.error('Update wishlist settings error:', error);
+      res.status(500).json({ 
+        error: 'Failed to update wishlist settings',
+        code: 'SERVER_ERROR'
+      });
+    }
+  },
+
   getActiveSessions: async (req, res) => {
     try {
       const sessions = await RefreshToken.find({ 
@@ -269,7 +299,8 @@ const settingsController = {
             calendar: Settings.schema.paths.calendar.defaultValue,
             notifications: Settings.schema.paths.notifications.defaultValue,
             display: Settings.schema.paths.display.defaultValue,
-            privacy: Settings.schema.paths.privacy.defaultValue
+            privacy: Settings.schema.paths.privacy.defaultValue,
+            wishlist: Settings.schema.paths.wishlist.defaultValue
           }
         }
       );

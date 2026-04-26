@@ -6,6 +6,9 @@
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;
   --bg-tertiary: #f3f4f6;
+  --bg-hover: #f3f4f6;
+  --bg-danger-hover: rgba(239, 68, 68, 0.1);
+  --bg-success-hover: rgba(16, 185, 129, 0.1);
   --text-primary: #111827;
   --text-secondary: #374151;
   --text-muted: #6b7280;
@@ -21,6 +24,9 @@
   --bg-primary: #111827;
   --bg-secondary: #1f2937;
   --bg-tertiary: #374151;
+  --bg-hover: #374151;
+  --bg-danger-hover: rgba(239, 68, 68, 0.2);
+  --bg-success-hover: rgba(16, 185, 129, 0.2);
   --text-primary: #f9fafb;
   --text-secondary: #e5e7eb;
   --text-muted: #9ca3af;

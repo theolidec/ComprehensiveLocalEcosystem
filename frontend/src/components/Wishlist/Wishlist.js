@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Gift, Plus, Search, Share2, Lock,
   Heart, ShoppingBag, ExternalLink, Edit2, Trash2,
@@ -12,7 +12,20 @@ import WishlistShareModal from './WishlistShareModal';
 import ReservationModal from './ReservationModal';
 import { wishlistCategoryAPI } from '../../services/wishlistCategoryAPI';
 import { usePageActions } from '../../contexts/PageActionsContext';
+import { useSettings } from '../../contexts/SettingsContext';
 import './Wishlist.css';
+
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+};
+
+const setCookie = (name, value, days = 365) => {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${value};expires=${expires};path=/;SameSite=Lax`;
+};
 
 const priorityConfig = {
   'must-have': { color: '#ef4444', label: 'Must Have', icon: Zap },
@@ -45,6 +58,8 @@ const formatPrice = (price, currency) => {
 
 export default function Wishlist() {
   const { registerPageActions, clearPageActions } = usePageActions();
+  const { settings, loading: settingsLoading } = useSettings();
+  
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [stats, setStats] = useState(null);
@@ -55,6 +70,22 @@ export default function Wishlist() {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [pagination, setPagination] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
+  
+  // Initialize limit from settings/cookie after mount
+  useEffect(() => {
+    const defaultLimit = settings?.wishlist?.defaultItemsPerPage || 20;
+    const saveCookie = settings?.wishlist?.saveItemsPerPageCookie;
+    
+    // Only use cookie if saveItemsPerPageCookie is explicitly true (not undefined or false)
+    if (saveCookie === true && typeof document !== 'undefined') {
+      const cookieLimit = getCookie('wishlistItemsPerPage');
+      if (cookieLimit) {
+        setPagination(prev => ({ ...prev, limit: parseInt(cookieLimit) }));
+        return;
+      }
+    }
+    setPagination(prev => ({ ...prev, limit: defaultLimit }));
+  }, [settings]);
   const [selectedItems, setSelectedItems] = useState([]);
   const [viewMode, setViewMode] = useState('grid');
   
@@ -64,19 +95,33 @@ export default function Wishlist() {
   const [shareModalItem, setShareModalItem] = useState(null);
   const [reservationModalItem, setReservationModalItem] = useState(null);
   const [copiedLink, setCopiedLink] = useState(null);
+  
+  const paginationRef = useRef(pagination);
+  paginationRef.current = pagination;
 
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
       
+      // Get limit from settings directly to avoid stale closure
+      const defaultLimit = settings?.wishlist?.defaultItemsPerPage || 20;
+      const saveCookie = settings?.wishlist?.saveItemsPerPageCookie;
+      let limit;
+      if (saveCookie === true && typeof document !== 'undefined') {
+        const cookieLimit = getCookie('wishlistItemsPerPage');
+        limit = cookieLimit ? parseInt(cookieLimit) : defaultLimit;
+      } else {
+        limit = defaultLimit;
+      }
+      
       const [itemsData, statsData, categoriesData] = await Promise.all([
         wishlistAPI.getItems({
           category: selectedCategory,
           priority: selectedPriority,
           search: searchQuery,
-          page: pagination.page,
-          limit: pagination.limit
+          page: paginationRef.current.page,
+          limit
         }),
         wishlistAPI.getStats(),
         wishlistCategoryAPI.getCategories()
@@ -86,18 +131,20 @@ export default function Wishlist() {
       setStats(statsData);
       setCategories(categoriesData);
       if (itemsData.pagination) {
-        setPagination(prev => ({ ...prev, ...itemsData.pagination }));
+        setPagination(prev => ({ ...prev, ...itemsData.pagination, limit }));
       }
     } catch (err) {
       setError(err.message || 'Failed to load wishlist');
     } finally {
       setLoading(false);
     }
-  }, [selectedCategory, selectedPriority, debouncedSearch, pagination.page, pagination.limit]);
+  }, [selectedCategory, selectedPriority, debouncedSearch, settings]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (!settingsLoading) {
+      fetchData();
+    }
+  }, [fetchData, settingsLoading]);
 
   // Debounce search input
   useEffect(() => {
@@ -252,7 +299,24 @@ export default function Wishlist() {
       return;
     }
 
-    const exportData = filteredItems.map(item => ({
+    let exportItems = filteredItems;
+    if (format === 'csv') {
+      try {
+        const allItemsData = await wishlistAPI.getItems({
+          category: selectedCategory === 'all' ? undefined : selectedCategory,
+          priority: selectedPriority === 'all' ? undefined : selectedPriority,
+          search: debouncedSearch || undefined,
+          page: 1,
+          limit: 1000
+        });
+        exportItems = allItemsData?.items || [];
+      } catch (err) {
+        alert('Failed to export: ' + err.message);
+        return;
+      }
+    }
+
+    const exportData = exportItems.map(item => ({
       Title: item.title,
       Description: item.description || '',
       Price: item.price || '',
@@ -265,7 +329,8 @@ export default function Wishlist() {
     }));
 
     if (format === 'csv') {
-      const headers = Object.keys(exportData[0] || {}).join(',');
+      const defaultHeaders = { Title: '', Description: '', Price: '', Currency: '', Priority: '', Category: '', Status: '', URL: '', 'Created At': '' };
+      const headers = Object.keys(exportData[0] || defaultHeaders).join(',');
       const rows = exportData.map(row => Object.values(row).map(v => `"${v}"`).join(','));
       const csv = [headers, ...rows].join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
@@ -595,6 +660,147 @@ export default function Wishlist() {
             </button>
           )}
         </div>
+      ) : viewMode === 'list' ? (
+        <div className="wishlist-table-wrapper">
+          <table className="wishlist-table">
+            <thead>
+              <tr>
+                <th className="col-select">
+                  <input
+                    type="checkbox"
+                    checked={selectedItems.length === filteredItems.length && filteredItems.length > 0}
+                    onChange={toggleSelectAll}
+                  />
+                </th>
+                <th className="col-priority">Priority</th>
+                <th className="col-title">Title</th>
+                <th className="col-category">Category</th>
+                <th className="col-price">Price</th>
+                <th className="col-status">Status</th>
+                <th className="col-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredItems.map((item) => {
+                const categoryStyle = getCategoryStyle(item.category);
+                const CategoryIcon = categoryStyle.icon;
+                const PriorityIcon = priorityConfig[item.priority].icon;
+                const isPurchased = item.status === 'purchased';
+                const hasReservations = item.reservations && item.reservations.length > 0;
+                
+                return (
+                  <tr 
+                    key={item._id} 
+                    className={`${isPurchased ? 'purchased' : ''} ${selectedItems.includes(item._id) ? 'selected' : ''}`}
+                  >
+                    <td className="col-select">
+                      <input
+                        type="checkbox"
+                        checked={selectedItems.includes(item._id)}
+                        onChange={() => toggleItemSelection(item._id)}
+                      />
+                    </td>
+                    <td className="col-priority">
+                      <div 
+                        className="priority-badge"
+                        style={{ background: `${priorityConfig[item.priority].color}20`, color: priorityConfig[item.priority].color }}
+                        title={priorityConfig[item.priority].label}
+                      >
+                        <PriorityIcon size={12} />
+                        <span>{priorityConfig[item.priority].label}</span>
+                      </div>
+                    </td>
+                    <td className="col-title">
+                      <div className="title-cell">
+                        {item.imageUrl && (
+                          <img src={item.imageUrl} alt="" className="title-thumb" />
+                        )}
+                        <div className="title-content">
+                          <span className="title-text">{item.title}</span>
+                          {item.description && (
+                            <span className="title-desc">{item.description}</span>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="col-category">
+                      <div 
+                        className="category-badge-table"
+                        style={{ background: `${categoryStyle.color}15`, color: categoryStyle.color }}
+                      >
+                        <CategoryIcon size={12} />
+                        <span>{categoryStyle.label}</span>
+                      </div>
+                    </td>
+                    <td className="col-price">
+                      {item.price ? (
+                        <span className="price-cell">{formatPrice(item.price, item.currency)}</span>
+                      ) : (
+                        <span className="price-cell no-price">Price on request</span>
+                      )}
+                    </td>
+                    <td className="col-status">
+                      {isPurchased ? (
+                        <span className="status-badge purchased">
+                          <ShoppingBag size={12} />
+                          Purchased
+                        </span>
+                      ) : hasReservations ? (
+                        <span className="status-badge reserved" onClick={() => handleViewReservations(item)}>
+                          <Heart size={12} />
+                          {item.reservations.length} reserved
+                        </span>
+                      ) : (
+                        <span className="status-badge active">Active</span>
+                      )}
+                    </td>
+                    <td className="col-actions">
+                      <div className="table-actions">
+                        <button
+                          className={`table-action-btn ${isPurchased ? 'active' : ''}`}
+                          onClick={() => toggleItemStatus(item)}
+                          title={isPurchased ? 'Mark as not purchased' : 'Mark as purchased'}
+                        >
+                          <ShoppingBag size={14} />
+                        </button>
+                        <button
+                          className="table-action-btn"
+                          onClick={() => handleShareItem(item)}
+                          title="Share"
+                        >
+                          {item.isPublic ? <Share2 size={14} /> : <Lock size={14} />}
+                        </button>
+                        {hasReservations && (
+                          <button
+                            className="table-action-btn"
+                            onClick={() => handleViewReservations(item)}
+                            title="Reservations"
+                          >
+                            <Heart size={14} />
+                          </button>
+                        )}
+                        <button
+                          className="table-action-btn"
+                          onClick={() => handleEditItem(item)}
+                          title="Edit"
+                        >
+                          <Edit2 size={14} />
+                        </button>
+                        <button
+                          className="table-action-btn delete"
+                          onClick={() => handleDeleteItem(item._id)}
+                          title="Delete"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       ) : (
         <div className={`wishlist-items ${viewMode}`}>
           {filteredItems.map((item, index) => {
@@ -611,7 +817,6 @@ export default function Wishlist() {
                 className={`wishlist-card ${isPurchased ? 'purchased' : ''} ${selectedItems.includes(item._id) ? 'selected' : ''}`}
                 style={{ '--delay': `${index * 0.03}s` }}
               >
-                {/* Card Image */}
                 {item.imageUrl && (
                   <div className="card-image">
                     <img src={item.imageUrl} alt={item.title} />
@@ -624,9 +829,7 @@ export default function Wishlist() {
                   </div>
                 )}
                 
-                {/* Card Content */}
                 <div className="card-body">
-                  {/* Selection & Priority */}
                   <div className="card-header">
                     <div className="card-checkbox">
                       <input
@@ -644,7 +847,6 @@ export default function Wishlist() {
                     </div>
                   </div>
 
-                  {/* Category Badge */}
                   <div 
                     className="category-badge"
                     style={{ background: `${categoryStyle.color}15`, color: categoryStyle.color }}
@@ -653,13 +855,11 @@ export default function Wishlist() {
                     <span>{categoryStyle.label}</span>
                   </div>
 
-                  {/* Title & Description */}
                   <h3 className="card-title">{item.title}</h3>
                   {item.description && (
                     <p className="card-description">{item.description}</p>
                   )}
 
-                  {/* Price & Link */}
                   <div className="card-footer">
                     {item.price ? (
                       <div className="card-price">
@@ -682,7 +882,6 @@ export default function Wishlist() {
                     )}
                   </div>
 
-                  {/* Reservations */}
                   {hasReservations && !isPurchased && (
                     <div className="reservation-badge" onClick={() => handleViewReservations(item)}>
                       <Heart size={12} />
@@ -690,7 +889,6 @@ export default function Wishlist() {
                     </div>
                   )}
 
-                  {/* Purchased By */}
                   {isPurchased && purchasedReservation && (
                     <div className="purchased-by">
                       <ShoppingBag size={12} />
@@ -699,7 +897,6 @@ export default function Wishlist() {
                   )}
                 </div>
 
-                {/* Card Actions */}
                 <div className="card-actions">
                   <button
                     className={`card-action-btn purchase ${isPurchased ? 'active' : ''}`}
@@ -754,7 +951,11 @@ export default function Wishlist() {
             <select 
               value={pagination.limit} 
               onChange={(e) => {
-                setPagination(prev => ({ ...prev, limit: parseInt(e.target.value), page: 1 }));
+                const newLimit = parseInt(e.target.value);
+                if (settings?.wishlist?.saveItemsPerPageCookie !== false) {
+                  setCookie('wishlistItemsPerPage', newLimit);
+                }
+                setPagination(prev => ({ ...prev, limit: newLimit, page: 1 }));
               }}
             >
               <option value={10}>10</option>

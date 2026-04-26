@@ -49,7 +49,10 @@ The Settings module provides comprehensive user preference management including 
   privacy: {
     shareCalendar: Boolean,
     showBusyStatus: Boolean,
-    allowThemeCookie: Boolean
+    allowThemeCookie: Boolean (default: true)
+  },
+  wishlist: {
+    defaultItemsPerPage: Number (default: 20, min: 10, max: 200)
   },
   createdAt: Date,
   updatedAt: Date
@@ -77,6 +80,7 @@ The Settings module provides comprehensive user preference management including 
 | privacy.shareCalendar | false |
 | privacy.showBusyStatus | true |
 | privacy.allowThemeCookie | true |
+| wishlist.defaultItemsPerPage | 20 (10-200) |
 
 ## API Endpoints
 
@@ -90,6 +94,7 @@ The Settings module provides comprehensive user preference management including 
 | PUT | `/notifications` | Update notification prefs |
 | PUT | `/display` | Update display prefs |
 | PUT | `/privacy` | Update privacy prefs |
+| PUT | `/wishlist` | Update wishlist prefs |
 | DELETE | `/reset` | Reset all to defaults |
 
 ### Sessions (`/api/settings/sessions`)

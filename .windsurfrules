@@ -32,7 +32,7 @@ Before touching any code, outline the full scope of the changes. List every file
 Estimate the size and risk of the requested change and list which files will be affected. Lighter than Plan — no approval needed, just an overview.
 
 "Clean Up" / "Cleanup"
-Remove dead code, debug statements, unused imports, and TODO comments. Do not change any logic.
+Remove dead code, debug statements, unused imports, and outdated TODO comments. Do not change any logic.
 
 "Refactor" [target]
 Restructuring is explicitly intentional. The agent has permission to reorganize, rename, and restructure the specified target while preserving all existing behavior.

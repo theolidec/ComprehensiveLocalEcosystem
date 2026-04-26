@@ -16,7 +16,7 @@ By accessing or using our Service, you agree to this Privacy Policy. If you do n
 - **Calendar Data**: Events, categories, and preferences you create
 - **Password Manager Data**: Encrypted passwords, password categories, and associated metadata
 - **File Manager Data**: File metadata (names, sizes, types), folder structure, and user content
-- **Wishlist Data**: Wishlist items, categories, reservations, and public sharing preferences
+- **Wishlist Data**: Wishlist items, categories, reservations, public sharing preferences, and display settings (such as default items per page and cookie persistence preferences)
 - **Calculator Data**: Saved calculator states and mathematical objects (stored locally)
 
 ### 2.2 Automatically Collected Information

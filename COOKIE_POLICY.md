@@ -1,6 +1,6 @@
 # Cookie Policy
 
-**Last Updated:** April 23, 2026
+**Last Updated:** April 26, 2026
 
 ## 1. Introduction
 
@@ -19,6 +19,7 @@ These cookies are necessary for the Service to function:
 |-------------|---------|----------|
 | accessToken | Authentication - maintains your logged-in session | 15 minutes |
 | refreshToken | Token refresh - allows automatic session renewal | 7 days |
+| wishlistItemsPerPage | Remembers your preferred number of items to display per page in the wishlist (can be disabled in settings) | 1 year |
 
 - **Type**: httpOnly cookies
 - **Security**: Secure (HTTPS only in production)
@@ -37,6 +38,9 @@ We use cookies to:
 - Automatically refresh your access token
 - Track device sessions for security
 - Prevent unauthorized access
+- Remember display preferences (e.g., wishlist items per page)
+
+**Note on User Preferences**: Some display settings (e.g., wishlist items per page) are stored in cookies for immediate availability. You can disable the wishlist items per page cookie in your Wishlist Settings - when disabled, the default value from your account settings will always be used. Other preferences such as default items per page, theme preferences, and other personalized options are stored in your user account in our database. Database-stored preferences are associated with your account and sync across devices when you log in.
 
 ## 5. Managing Cookies
 

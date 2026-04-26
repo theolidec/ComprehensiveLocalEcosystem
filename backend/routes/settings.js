@@ -28,7 +28,8 @@ router.put('/', settingsLimiter, [
   body('calendar').optional().isObject(),
   body('notifications').optional().isObject(),
   body('display').optional().isObject(),
-  body('privacy').optional().isObject()
+  body('privacy').optional().isObject(),
+  body('wishlist').optional().isObject()
 ], validateSettingsUpdate, settingsController.updateSettings);
 
 router.put('/profile', settingsLimiter, [
@@ -64,6 +65,10 @@ router.put('/privacy', settingsLimiter, [
   body('shareCalendar').optional().isBoolean(),
   body('showBusyStatus').optional().isBoolean()
 ], validateSettingsUpdate, settingsController.updatePrivacySettings);
+
+router.put('/wishlist', settingsLimiter, [
+  body('defaultItemsPerPage').optional().isInt({ min: 10, max: 200 })
+], validateSettingsUpdate, settingsController.updateWishlistSettings);
 
 router.get('/sessions', settingsController.getActiveSessions);
 

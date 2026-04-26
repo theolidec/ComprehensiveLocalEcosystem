@@ -48,6 +48,10 @@ const defaultSettings = {
     shareCalendar: false,
     showBusyStatus: true,
     allowThemeCookie: true
+  },
+  wishlist: {
+    defaultItemsPerPage: 20,
+    saveItemsPerPageCookie: true
   }
 };
 
@@ -156,6 +160,17 @@ export const SettingsProvider = ({ children }) => {
     }
   };
 
+  const updateWishlistSettings = async (wishlist) => {
+    try {
+      const data = await settingsAPI.updateWishlistSettings(wishlist);
+      const newSettings = { ...state.settings, wishlist: data.wishlist };
+      dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
   const resetSettings = async () => {
     try {
       const data = await settingsAPI.resetSettings();
@@ -197,6 +212,7 @@ export const SettingsProvider = ({ children }) => {
     updateNotificationSettings,
     updateDisplaySettings,
     updatePrivacySettings,
+    updateWishlistSettings,
     resetSettings,
     clearError,
     getActiveSessions,

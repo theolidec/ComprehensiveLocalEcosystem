@@ -37,6 +37,11 @@ const settingsAPI = {
     return response.data;
   },
 
+  updateWishlistSettings: async (wishlist) => {
+    const response = await axios.put(`${API_URLS.SETTINGS}/wishlist`, wishlist);
+    return response.data;
+  },
+
   getActiveSessions: async () => {
     const response = await axios.get(`${API_URLS.SETTINGS}/sessions`);
     return response.data;

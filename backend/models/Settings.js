@@ -114,6 +114,18 @@ const settingsSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     }
+  },
+  wishlist: {
+    defaultItemsPerPage: {
+      type: Number,
+      min: 10,
+      max: 200,
+      default: 20
+    },
+    saveItemsPerPageCookie: {
+      type: Boolean,
+      default: true
+    }
   }
 }, {
   timestamps: true,

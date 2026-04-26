@@ -295,6 +295,9 @@ curl -X POST http://localhost:3001/api/files/upload \
 | PUT | `/notifications` | Yes | Update notification preferences |
 | PUT | `/display` | Yes | Update display preferences |
 | PUT | `/privacy` | Yes | Update privacy settings |
+| PUT | `/wishlist` | Yes | Update wishlist settings |
+| GET | `/sessions` | Yes | List active sessions |
+| DELETE | `/sessions/:sessionId` | Yes | Revoke a session |
 | DELETE | `/reset` | Yes | Reset to defaults |
 | POST | `/avatar` | Yes | Upload avatar |
 | DELETE | `/avatar` | Yes | Remove avatar |

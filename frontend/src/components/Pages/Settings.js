@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
-import { User, Calendar, Bell, Palette, Lock, RotateCcw, Monitor, Trash2, RefreshCw } from 'lucide-react';
+import { User, Calendar, Bell, Palette, Lock, RotateCcw, Monitor, Trash2, RefreshCw, Gift } from 'lucide-react';
 import './Settings.css';
 
 const Settings = () => {
-  const { settings, loading, updateProfile, updateCalendarSettings, updateNotificationSettings, updateDisplaySettings, updatePrivacySettings, resetSettings, getActiveSessions, revokeSession } = useSettings();
+  const { settings, loading, updateProfile, updateCalendarSettings, updateNotificationSettings, updateDisplaySettings, updatePrivacySettings, updateWishlistSettings, resetSettings, getActiveSessions, revokeSession } = useSettings();
   const { registerPageActions, clearPageActions } = usePageActions();
   const [activeTab, setActiveTab] = useState('profile');
   const [message, setMessage] = useState(null);
@@ -205,6 +205,12 @@ const Settings = () => {
         label: 'Privacy',
         onClick: () => setActiveTab('privacy'),
         variant: activeTab === 'privacy' ? 'primary' : 'default'
+      },
+      {
+        icon: <Gift size={18} />,
+        label: 'Wishlist',
+        onClick: () => setActiveTab('wishlist'),
+        variant: activeTab === 'wishlist' ? 'primary' : 'default'
       },
       {
         icon: <Monitor size={18} />,
@@ -490,6 +496,53 @@ const Settings = () => {
                   Allows your theme preference to persist on the login page
                 </small>
               </label>
+            </div>
+            <button type="submit" className="save-btn">Save Changes</button>
+          </form>
+        )}
+
+        {activeTab === 'wishlist' && (
+          <form className="settings-form" onSubmit={async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const result = await updateWishlistSettings({
+              defaultItemsPerPage: parseInt(formData.get('defaultItemsPerPage')),
+              saveItemsPerPageCookie: formData.get('saveItemsPerPageCookie') === 'on'
+            });
+            if (result.success) showMessage('Wishlist settings updated');
+            else showMessage(result.error, 'error');
+          }}>
+            <h2>Wishlist Settings</h2>
+            <div className="form-group">
+              <label htmlFor="defaultItemsPerPage">Default Items Per Page</label>
+              <select
+                id="defaultItemsPerPage"
+                name="defaultItemsPerPage"
+                defaultValue={settings?.wishlist?.defaultItemsPerPage || 20}
+              >
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={30}>30</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={200}>200</option>
+              </select>
+              <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: '4px' }}>
+                Default number of wishlist items to display per page
+              </small>
+            </div>
+            <div className="form-group">
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input
+                  type="checkbox"
+                  name="saveItemsPerPageCookie"
+                  defaultChecked={settings?.wishlist?.saveItemsPerPageCookie !== false}
+                />
+                Save items per page selection
+              </label>
+              <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: '4px' }}>
+                When enabled, your selection will be remembered in a cookie. Disable to always use the default value.
+              </small>
             </div>
             <button type="submit" className="save-btn">Save Changes</button>
           </form>
