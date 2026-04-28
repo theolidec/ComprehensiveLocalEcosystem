@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useAuth } from './AuthContext';
 import settingsAPI from '../services/settingsAPI';
+import userRightsAPI from '../services/userRightsAPI';
 
 const SettingsContext = createContext();
 
@@ -203,6 +204,56 @@ export const SettingsProvider = ({ children }) => {
     }
   };
 
+  const getUserData = async () => {
+    try {
+      const data = await userRightsAPI.getUserData();
+      return { success: true, data };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
+  const updateUserData = async (data) => {
+    try {
+      const result = await userRightsAPI.updateUserData(data);
+      return { success: true, ...result };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
+  const deleteAccount = async (password) => {
+    try {
+      await userRightsAPI.deleteAccount(password);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
+  const exportUserData = async () => {
+    try {
+      const response = await userRightsAPI.exportUserData();
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      const contentDisposition = response.headers['content-disposition'];
+      let fileName = 'user-data-export.json';
+      if (contentDisposition) {
+        const fileNameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (fileNameMatch) fileName = fileNameMatch[1];
+      }
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error || 'Failed to export data' };
+    }
+  };
+
   const value = {
     ...state,
     loadSettings,
@@ -216,7 +267,11 @@ export const SettingsProvider = ({ children }) => {
     resetSettings,
     clearError,
     getActiveSessions,
-    revokeSession
+    revokeSession,
+    getUserData,
+    updateUserData,
+    deleteAccount,
+    exportUserData
   };
 
   return (

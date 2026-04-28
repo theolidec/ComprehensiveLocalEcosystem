@@ -169,6 +169,26 @@ const publicReservationLimiter = rateLimit({
   }
 });
 
+// User data rate limiter (for data access, export, delete)
+const userDataLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each user to 10 data operations per hour
+  message: {
+    error: 'Too many data operations, please try again later.',
+    code: 'USER_DATA_RATE_LIMIT_EXCEEDED'
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (req, res) => {
+    logger.warn(`User data rate limit exceeded for user: ${req.user?._id}, Path: ${req.path}`);
+    res.status(429).json({
+      error: 'Too many data operations, please try again later.',
+      code: 'USER_DATA_RATE_LIMIT_EXCEEDED',
+      retryAfter: Math.round(req.rateLimit.resetTime / 1000)
+    });
+  }
+});
+
 module.exports = {
   generalLimiter,
   authLimiter,
@@ -176,5 +196,6 @@ module.exports = {
   tokenRefreshLimiter,
   userActionLimiter,
   settingsLimiter,
-  publicReservationLimiter
+  publicReservationLimiter,
+  userDataLimiter
 };

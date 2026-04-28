@@ -23,6 +23,7 @@ const filesRoutes = require('./routes/files');
 const fileFoldersRoutes = require('./routes/fileFolders');
 const wikiRoutes = require('./routes/wikis');
 const wikiPageRoutes = require('./routes/wikiPages');
+const userRightsRoutes = require('./routes/userRights');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -112,6 +113,7 @@ app.use('/api/files', filesRoutes);
 app.use('/api/file-folders', fileFoldersRoutes);
 app.use('/api/wikis', wikiRoutes);
 app.use('/api/wikis/:slug/pages', wikiPageRoutes);
+app.use('/api/user', userRightsRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

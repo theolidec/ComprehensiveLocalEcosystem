@@ -30,7 +30,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`categories.md`](categories.md) | Category management | `/api/categories/*` |
 | [`files.md`](files.md) | File management | `/api/files/*`, `/api/file-folders/*` |
 | [`passwords.md`](passwords.md) | Password manager | `/api/passwords/*` |
-| [`settings.md`](settings.md) | User settings | `/api/settings/*` |
+| [`settings.md`](settings.md) | User settings & GDPR rights | `/api/settings/*`, `/api/user/*` |
 | [`wishlist.md`](wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
 | [`wiki.md`](wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
 | [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
@@ -80,7 +80,7 @@ Start here if you're integrating with the API:
 
 ### Authentication & Users
 - [`authentication.md`](authentication.md) - JWT, sessions, cookies
-- [`settings.md`](settings.md) - User preferences
+- [`settings.md`](settings.md) - User preferences, GDPR user rights (view/export/correct/delete data)
 - [`user-following.md`](user-following.md) - Social features
 
 ### Content Management
@@ -131,10 +131,24 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: April 26, 2026  
+**Last Updated**: April 27, 2026  
 **Version**: 1.0.0
 
 ## Recent Changes
+
+### User Rights / GDPR Implementation (v2.4.0)
+- **Backend**: Added `/api/user/*` endpoints for GDPR compliance
+  - `GET /api/user/data` - Access all user data
+  - `PUT /api/user/data` - Correct name/email
+  - `DELETE /api/user/account` - Delete account (requires password)
+  - `GET /api/user/export` - Export all data as JSON
+- **Frontend**: Added Account tab to Settings page
+  - View My Data section
+  - Download My Data (JSON export)
+  - Update Email form
+  - Delete Account with password confirmation
+- **Rate Limiting**: Added `userDataLimiter` (10 req/hour)
+- **Documentation**: Updated settings.md and api-overview.md
 
 ### Wiki System Updates (v2.3.1)
 - **WikiContext**: Added `permissions` state for role-based UI controls

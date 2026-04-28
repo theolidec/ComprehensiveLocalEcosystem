@@ -57,6 +57,13 @@ const API_ENDPOINTS = {
   // Wiki endpoints
   WIKIS: '/api/wikis',
   WIKIS_PUBLIC: '/api/wikis/public',
+
+  // User rights endpoints (GDPR)
+  USER: {
+    DATA: '/api/user/data',
+    ACCOUNT: '/api/user/account',
+    EXPORT: '/api/user/export',
+  },
 };
 
 // Create full URLs for endpoints
@@ -94,4 +101,7 @@ export const API_URLS = {
   FOLLOW: createApiUrl(API_ENDPOINTS.FOLLOW),
   WIKIS: createApiUrl(API_ENDPOINTS.WIKIS),
   WIKIS_PUBLIC: createApiUrl(API_ENDPOINTS.WIKIS_PUBLIC),
+  USER_DATA: createApiUrl(API_ENDPOINTS.USER.DATA),
+  USER_ACCOUNT: createApiUrl(API_ENDPOINTS.USER.ACCOUNT),
+  USER_EXPORT: createApiUrl(API_ENDPOINTS.USER.EXPORT),
 };

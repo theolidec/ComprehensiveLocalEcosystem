@@ -10,6 +10,7 @@ The Settings module provides comprehensive user preference management including 
 - **Display**: Theme, language, compact mode
 - **Privacy**: Sharing controls, theme cookies
 - **Session Management**: View and revoke active sessions
+- **Account & Data**: User rights (GDPR) - view, export, correct, delete data
 - **Reset to Defaults**: One-click settings reset
 
 ## Data Model
@@ -103,17 +104,72 @@ The Settings module provides comprehensive user preference management including 
 | GET | `/` | List active sessions |
 | DELETE | `/:sessionId` | Revoke session |
 
+### User Rights / Data Management (`/api/user`)
+These endpoints implement GDPR user rights for data access, correction, deletion, and portability.
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/data` | Get all user data (access right) |
+| PUT | `/data` | Update name/email (correction right) |
+| DELETE | `/account` | Delete account and all data (deletion right) |
+| GET | `/export` | Export all data as JSON (portability right) |
+
+**Rate Limit**: 10 requests per hour per user
+
+#### GET /api/user/data Response
+```json
+{
+  "user": {
+    "id": "...",
+    "email": "user@example.com",
+    "name": "John Doe",
+    "isActive": true,
+    "lastLogin": "2026-04-27T...",
+    "createdAt": "2026-01-15T...",
+    "updatedAt": "2026-04-27T..."
+  },
+  "settings": { ... },
+  "activeSessions": [
+    {
+      "id": "...",
+      "deviceInfo": { "userAgent": "...", "ip": "..." },
+      "createdAt": "2026-04-27T...",
+      "expiresAt": "2026-05-04T..."
+    }
+  ]
+}
+```
+
+#### DELETE /api/user/account Request
+```json
+{
+  "password": "your-current-password"
+}
+```
+
+#### GET /api/user/export Response
+Downloads a JSON file containing all user data:
+- User account info
+- Settings
+- Calendar events and categories
+- Passwords and categories
+- Wishlists, items, and reservations
+- Following/followers
+- Files and folders
+- Wikis
+
 ## Frontend Components
 
 ### Settings Page
 - **File**: `frontend/src/components/Pages/Settings.js`
-- **Size**: ~650 lines
+- **Size**: ~840 lines
 - **Features**:
-  - Tabbed interface (Profile, Calendar, Notifications, Display, Privacy, Sessions)
+  - Tabbed interface (Profile, Calendar, Notifications, Display, Privacy, Wishlist, Sessions, **Account**)
   - Real-time form validation
   - Avatar upload
   - Theme preview
   - Session list with revoke action
+  - **Account tab**: View data, export data, update email, delete account
   - Reset confirmation modal
 
 ### Context Provider
@@ -146,6 +202,17 @@ The Settings module provides comprehensive user preference management including 
 
 ### Routes
 - **File**: `backend/routes/settings.js`
+
+### User Rights Controller
+- **File**: `backend/controllers/userRightsController.js`
+- Key methods:
+  - `getUserData()` - Retrieve all user data (access right)
+  - `updateUserData()` - Update name/email (correction right)
+  - `deleteAccount()` - Delete account and all data (deletion right)
+  - `exportUserData()` - Export all data as JSON (portability right)
+
+### User Rights Routes
+- **File**: `backend/routes/userRights.js`
 
 ## Session Management
 Sessions are tracked via RefreshToken model:
@@ -183,3 +250,9 @@ Users can view all active sessions and revoke any session except current.
 | `NOT_FOUND` | Settings not found |
 | `VALIDATION_ERROR` | Input validation failed |
 | `SERVER_ERROR` | Internal server error |
+| `USER_DATA_FETCH_ERROR` | Failed to fetch user data |
+| `USER_DATA_UPDATE_ERROR` | Failed to update user data |
+| `EMAIL_EXISTS` | Email already in use |
+| `ACCOUNT_DELETE_ERROR` | Failed to delete account |
+| `INVALID_CREDENTIALS` | Invalid password for account deletion |
+| `USER_DATA_RATE_LIMIT_EXCEEDED` | Too many data operations |

@@ -21,6 +21,7 @@ By accessing or using our Service, you agree to this Privacy Policy. If you do n
 
 ### 2.2 Automatically Collected Information
 - **Device Information**: IP address, browser type, operating system
+- **Session Tracking**: IP addresses and User-Agent strings are stored in refresh tokens to track device sessions and prevent unauthorized access
 - **Usage Data**: Access times, pages viewed, features used
 - **Cookies**: Authentication tokens (access and refresh tokens stored as httpOnly cookies)
 
@@ -59,13 +60,19 @@ We do not sell, trade, or otherwise transfer your personal information to outsid
 ## 6. Your Rights
 
 You have the right to:
-- Access your personal data
-- Correct inaccurate data
-- Request deletion of your data
-- Export your data
-- Opt-out of marketing communications
+- **Access** your personal data - View all data we hold about you
+- **Correct** inaccurate data - Update your name or email address
+- **Request deletion** of your data - Permanently delete your account and all associated data
+- **Export** your data - Download a complete copy of your data in JSON format
 
-To exercise these rights, please contact us through the application.
+To exercise these rights, use the built-in features in your account settings or contact us through the application.
+
+### Using Your Rights
+
+- **Access**: Go to Settings → Account → View My Data
+- **Correct**: Go to Settings → Account → Edit Profile
+- **Export**: Go to Settings → Account → Download My Data
+- **Delete**: Go to Settings → Account → Delete Account (requires password confirmation)
 
 ## 7. Data Retention
 

@@ -4,8 +4,8 @@
 Gift registry and wishlist management system with templates, categories, items, and reservation tracking for collaborative gift giving.
 
 ## Features
-- **Templates**: Birthday, Christmas, Wedding, Baby Shower, Housewarming
-- **Categories**: Organize items by category
+- **Item Categories**: Birthday, Christmas, Other
+- **Categories**: Custom categories for organizing wishlists
 - **Item Management**: Add/edit/delete items with links, prices, priorities
 - **Reservations**: Others can reserve items without owner seeing
 - **Public Sharing**: Share wishlists via link
@@ -29,12 +29,15 @@ Gift registry and wishlist management system with templates, categories, items, 
 ### WishlistCategory
 ```javascript
 {
-  name: String,
-  wishlist: ObjectId,
-  color: String,
-  order: Number
+  name: String (required, max 50),
+  color: String (hex, default: '#8b5cf6'),
+  icon: String (default: 'gift'),
+  user: ObjectId (required, ref: 'User'),
+  isDefault: Boolean (default: false)
 }
 ```
+
+**Indexes**: `{ user: 1, name: 1 }` (unique)
 
 ### WishlistItem
 ```javascript
@@ -78,15 +81,15 @@ Gift registry and wishlist management system with templates, categories, items, 
 }
 ```
 
-## Templates
+## Categories (Item-level)
 
-| Template | Color | Icon | Default Categories |
-|----------|-------|------|-------------------|
-| Birthday | Purple | 🎁 | Gifts, Experience, Decorations, Food |
-| Christmas | Green | 🎁 | Gifts, Decorations, Food, Traditions |
-| Wedding | Pink | ❤️ | Registry, Honeymoon, Decorations, Guest List |
-| Baby Shower | Orange | 👶 | Gifts, Decorations, Food, Games |
-| Housewarming | Blue | 🏠 | Appliances, Decor, Furniture, Essentials |
+| Category | Color | Description |
+|----------|-------|-------------|
+| Birthday | Purple | Birthday gifts |
+| Christmas | Green | Christmas gifts |
+| Other | Gray | Other items |
+
+**Note**: The system currently supports three item categories: `birthday`, `christmas`, and `other`. Custom categories can be created via `/api/wishlist-categories` for organizing wishlist items within a wishlist container.
 
 ## API Endpoints
 
@@ -107,6 +110,7 @@ Gift registry and wishlist management system with templates, categories, items, 
 | POST | `/api/wishlist-categories` | Create category |
 | PUT | `/api/wishlist-categories/:id` | Update category |
 | DELETE | `/api/wishlist-categories/:id` | Delete category |
+| POST | `/api/wishlist-categories/init` | Initialize default categories |
 
 ### Items
 | Method | Endpoint | Description |
@@ -153,7 +157,7 @@ Gift registry and wishlist management system with templates, categories, items, 
 | Code | Description |
 |------|-------------|
 | `WISHLISTS_FETCH_ERROR` | Failed to fetch wishlists |
-| `WISHLIST_NOT_FOUND` | Wishlist doesn't exist |
+| `NOT_FOUND` | Resource doesn't exist |
 | `WISHLIST_CREATE_ERROR` | Failed to create wishlist |
 | `WISHLIST_UPDATE_ERROR` | Failed to update wishlist |
 | `WISHLIST_DELETE_ERROR` | Failed to delete wishlist |

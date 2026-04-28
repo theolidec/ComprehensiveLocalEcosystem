@@ -397,6 +397,55 @@ curl -X POST http://localhost:3001/api/files/upload \
 
 ---
 
+## User Rights Endpoints
+
+### Base: `/api/user`
+
+These endpoints implement GDPR user rights: access, correction, deletion, and data export.
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/data` | Yes | Get all user data (access right) |
+| PUT | `/data` | Yes | Update name/email (correction right) |
+| DELETE | `/account` | Yes | Delete account and all data (deletion right) |
+| GET | `/export` | Yes | Export all data as JSON (portability right) |
+
+**Rate Limit**: 10 requests per hour per user
+
+**GET /api/user/data** - Access your personal data:
+```bash
+GET /api/user/data
+# Response: { user: { id, email, name, isActive, lastLogin, createdAt }, settings: {...}, activeSessions: [...] }
+```
+
+**PUT /api/user/data** - Correct inaccurate data:
+```bash
+PUT /api/user/data
+{
+  "name": "New Name",
+  "email": "newemail@example.com"
+}
+# Response: { message: 'User data updated successfully', user: {...} }
+```
+
+**DELETE /api/user/account** - Request deletion of your data:
+```bash
+DELETE /api/user/account
+{
+  "password": "your-current-password"
+}
+# Response: { message: 'Account deleted successfully' }
+# This permanently deletes: account, settings, calendar events, categories, passwords, wishlists, files, wikis, and social connections
+```
+
+**GET /api/user/export** - Export all your data:
+```bash
+GET /api/user/export
+# Response: Downloads JSON file with all user data including calendar, passwords, wishlists, files, and wikis
+```
+
+---
+
 ## System Endpoints
 
 ### Health Check
