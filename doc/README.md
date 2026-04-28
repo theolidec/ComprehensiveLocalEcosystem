@@ -150,6 +150,25 @@ If you find gaps in documentation:
 - **Rate Limiting**: Added `userDataLimiter` (10 req/hour)
 - **Documentation**: Updated settings.md and api-overview.md
 
+### Payment Cards Feature (v2.5.0)
+- **Backend**: Added complete payment card management system
+  - New model: `PaymentCard` with AES-256-GCM encryption for card details
+  - New controller: `paymentCardController.js` with CRUD operations
+  - New routes: `/api/payment-cards/*` endpoints
+  - Card type auto-detection (Visa, Mastercard, Amex, Discover)
+  - Default card selection and favorite support
+- **Frontend**: Added payment card UI to Password Manager
+  - New tab for Payment Cards with visual card display
+  - Visual card view with gradient backgrounds and magnetic strip
+  - List view for compact card details
+  - View mode toggle (visual vs list)
+  - Card type color coding
+  - Show/hide card details with masking
+  - Set default card functionality
+- **API Service**: New `paymentCardAPI.js` for frontend API calls
+- **Styles**: Added payment card CSS styles to App.css
+- **Documentation**: Updated passwords.md with payment card details
+
 ### Wiki System Updates (v2.3.1)
 - **WikiContext**: Added `permissions` state for role-based UI controls
 - **Routing**: Fixed `/wiki/:slug/new` route order to prevent path conflicts

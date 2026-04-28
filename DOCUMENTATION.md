@@ -706,6 +706,106 @@ Decrypt and view the actual password value.
 }
 ```
 
+### Payment Card Endpoints
+
+#### GET `/api/payment-cards`
+Get all payment cards for the authenticated user.
+
+**Authentication Required:** Yes
+
+**Query Parameters:**
+- `cardType` - Filter by card type (visa, mastercard, amex, discover, other)
+- `favorite` - Filter to favorites only (true/false)
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "cards": [
+    {
+      "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+      "cardName": "Personal Visa",
+      "cardholderName": "John Doe",
+      "cardType": "visa",
+      "lastFourDigits": "1234",
+      "billingAddress": "123 Main St, City, Country",
+      "isDefault": true,
+      "isFavorite": false,
+      "createdAt": "2024-01-15T10:30:00.000Z",
+      "updatedAt": "2024-01-15T10:30:00.000Z"
+    }
+  ]
+}
+```
+
+#### POST `/api/payment-cards`
+Create a new payment card.
+
+**Authentication Required:** Yes
+
+**Request Body:**
+```json
+{
+  "cardName": "Personal Visa",
+  "cardholderName": "John Doe",
+  "cardNumber": "4111111111111111",
+  "expiryDate": "12/25",
+  "cvv": "123",
+  "cardType": "visa",
+  "billingAddress": "123 Main St, City, Country",
+  "isDefault": false
+}
+```
+
+#### GET `/api/payment-cards/:id/decrypt`
+Decrypt and view the full card details.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "card": {
+    "cardNumber": "4111111111111111",
+    "expiryDate": "12/25",
+    "cvv": "123"
+  }
+}
+```
+
+#### POST `/api/payment-cards/:id/favorite`
+Toggle favorite status for a payment card.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "card": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "isFavorite": true
+  }
+}
+```
+
+#### POST `/api/payment-cards/:id/default`
+Set a payment card as the default card.
+
+**Authentication Required:** Yes
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "card": {
+    "id": "64f8a1b2c3d4e5f6a7b8c9d0",
+    "isDefault": true
+  }
+}
+```
+
 ### Wishlist Endpoints
 
 #### GET `/api/wishlist`

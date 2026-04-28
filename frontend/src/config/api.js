@@ -35,6 +35,9 @@ const API_ENDPOINTS = {
   PASSWORDS: '/api/passwords',
   PASSWORD_CATEGORIES: '/api/password-categories',
 
+  // Payment card endpoints
+  PAYMENT_CARDS: '/api/payment-cards',
+
   // Wishlist endpoints
   WISHLIST: {
     ITEMS: '/api/wishlist',
@@ -90,6 +93,7 @@ export const API_URLS = {
   SETTINGS: createApiUrl(API_ENDPOINTS.SETTINGS),
   PASSWORDS: createApiUrl(API_ENDPOINTS.PASSWORDS),
   PASSWORD_CATEGORIES: createApiUrl(API_ENDPOINTS.PASSWORD_CATEGORIES),
+  PAYMENT_CARDS: createApiUrl(API_ENDPOINTS.PAYMENT_CARDS),
   WISHLIST_ITEMS: createApiUrl(API_ENDPOINTS.WISHLIST.ITEMS),
   WISHLIST_STATS: createApiUrl(API_ENDPOINTS.WISHLIST.STATS),
   WISHLIST_ANALYTICS: createApiUrl(API_ENDPOINTS.WISHLIST.ANALYTICS),
