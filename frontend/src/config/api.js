@@ -67,6 +67,20 @@ const API_ENDPOINTS = {
     ACCOUNT: '/api/user/account',
     EXPORT: '/api/user/export',
   },
+
+  // Tracker endpoints
+  TRACKER: {
+    TASKS: '/api/tracker/tasks',
+    TASKS_TODAY: '/api/tracker/tasks/today',
+    QUESTIONS: '/api/tracker/questions',
+    RESPONSES: '/api/tracker/responses',
+    RESPONSES_TODAY: '/api/tracker/responses/today',
+    STATS: '/api/tracker/stats',
+    ANALYTICS: '/api/tracker/analytics',
+    HEATMAP: '/api/tracker/heatmap',
+    EXPORT: '/api/tracker/export',
+    IMPORT: '/api/tracker/import',
+  },
 };
 
 // Create full URLs for endpoints
@@ -108,4 +122,14 @@ export const API_URLS = {
   USER_DATA: createApiUrl(API_ENDPOINTS.USER.DATA),
   USER_ACCOUNT: createApiUrl(API_ENDPOINTS.USER.ACCOUNT),
   USER_EXPORT: createApiUrl(API_ENDPOINTS.USER.EXPORT),
+  TRACKER_TASKS: createApiUrl(API_ENDPOINTS.TRACKER.TASKS),
+  TRACKER_TASKS_TODAY: createApiUrl(API_ENDPOINTS.TRACKER.TASKS_TODAY),
+  TRACKER_QUESTIONS: createApiUrl(API_ENDPOINTS.TRACKER.QUESTIONS),
+  TRACKER_RESPONSES: createApiUrl(API_ENDPOINTS.TRACKER.RESPONSES),
+  TRACKER_RESPONSES_TODAY: createApiUrl(API_ENDPOINTS.TRACKER.RESPONSES_TODAY),
+  TRACKER_STATS: createApiUrl(API_ENDPOINTS.TRACKER.STATS),
+  TRACKER_ANALYTICS: createApiUrl(API_ENDPOINTS.TRACKER.ANALYTICS),
+  TRACKER_HEATMAP: createApiUrl(API_ENDPOINTS.TRACKER.HEATMAP),
+  TRACKER_EXPORT: createApiUrl(API_ENDPOINTS.TRACKER.EXPORT),
+  TRACKER_IMPORT: createApiUrl(API_ENDPOINTS.TRACKER.IMPORT),
 };

@@ -36,7 +36,9 @@ backend/
 │   ├── fileFolderController.js
 │   ├── passwordController.js
 │   ├── passwordCategoryController.js
+│   ├── paymentCardController.js
 │   ├── settingsController.js
+│   ├── userRightsController.js
 │   ├── wikiController.js
 │   └── wikiPageController.js
 ├── middleware/          # Express middleware
@@ -61,7 +63,11 @@ backend/
 │   ├── WishlistReservation.js
 │   ├── WishlistCategory.js
 │   ├── UserFollow.js
-│   └── PasswordCategory.js
+│   ├── PasswordCategory.js
+│   ├── PaymentCard.js
+│   ├── TrackerTask.js
+│   ├── TrackerQuestion.js
+│   └── TrackerResponse.js
 ├── routes/              # API route definitions
 │   ├── auth.js
 │   ├── calendar.js
@@ -71,6 +77,7 @@ backend/
 │   ├── follow.js
 │   ├── passwords.js
 │   ├── passwordCategories.js
+│   ├── paymentCards.js
 │   ├── settings.js
 │   ├── wikiPages.js
 │   ├── wikis.js
@@ -79,7 +86,8 @@ backend/
 │   ├── wishlistReservations.js  # Reservation operations
 │   ├── wishlistPublic.js    # Public token-based access
 │   ├── wishlistCategories.js
-│   └── wishlists.js
+│   ├── wishlists.js
+│   └── tracker.js
 ├── services/            # Business logic services
 │   ├── passwordService.js
 │   └── recurringEventService.js
@@ -296,10 +304,12 @@ app.use('/api/calendar', calendarRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/passwords', passwordRoutes);
+app.use('/api/payment-cards', paymentCardRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/follow', followRoutes);
 app.use('/api/files', filesRoutes);
 app.use('/api/wikis', wikiRoutes);
+app.use('/api/tracker', trackerRoutes);
 ```
 
 ## Services
@@ -594,6 +604,123 @@ npm start
 # Run tests
 npm test
 ```
+
+## Performance Optimizations
+
+The backend implements several database query optimizations to minimize latency and reduce database load.
+
+### Query Optimization Patterns
+
+#### 1. Batch Queries with Aggregation (Wishlists)
+**File**: `routes/wishlists.js`
+
+Instead of N+1 queries (1 query per wishlist), uses a single aggregation pipeline:
+
+```javascript
+// Before: N+1 queries
+wishlists.map(async (wl) => {
+  const itemCount = await WishlistItem.countDocuments({ wishlist: wl._id });
+});
+
+// After: 2 queries total
+const wishlistIds = wishlists.map(w => w._id);
+const counts = await WishlistItem.aggregate([
+  { $match: { wishlist: { $in: wishlistIds } } },
+  { $group: { _id: '$wishlist', count: { $sum: 1 } } }
+]);
+```
+
+#### 2. Parallel Queries with Promise.all
+**File**: `routes/wishlistItems.js`
+
+Analytics endpoint runs multiple aggregations in parallel instead of sequentially:
+
+```javascript
+const [breakdowns, itemsOverTime, monthlyTrends, reservationStats] = await Promise.all([
+  WishlistItem.aggregate([...]),  // $facet for status/priority/category
+  WishlistItem.aggregate([...]),  // items over time
+  WishlistItem.aggregate([...]),  // monthly trends
+  WishlistReservation.aggregate([...])  // reservation stats
+]);
+```
+
+#### 3. $facet for Multi-Result Aggregations
+Combines multiple aggregations that scan the same collection into a single pipeline:
+
+```javascript
+WishlistItem.aggregate([
+  { $match: { user: req.user._id } },
+  {
+    $facet: {
+      statusBreakdown: [{ $group: { _id: '$status', count: { $sum: 1 } } }],
+      priorityBreakdown: [{ $group: { _id: '$priority', count: { $sum: 1 } } }],
+      categoryBreakdown: [{ $group: { _id: '$category', count: { $sum: 1 } } }]
+    }
+  }
+]);
+```
+
+#### 4. Optimized Stats Aggregation (Tracker)
+**File**: `models/TrackerTask.js`
+
+Combines 6 sequential database calls into 2 parallel aggregations:
+
+```javascript
+// Before: 6 separate queries
+const totalTasks = await this.countDocuments({...});
+const completedTasks = await this.countDocuments({...});
+const overdueTasks = await this.countDocuments({...});
+const recurringTasks = await this.countDocuments({...});
+const byPriority = await this.aggregate([...]);
+const byCategory = await this.aggregate([...]);
+
+// After: 2 parallel aggregations
+const [counts, breakdowns] = await Promise.all([
+  this.aggregate([{ $group: { _id: null, totalTasks: {...}, ... }}]),
+  this.aggregate([{ $match: { status: 'active' } }, { $group: {...} }])
+]);
+```
+
+### Database Indexing Strategy
+
+Indexes are defined in model files for optimal query performance:
+
+| Model | Index | Purpose |
+|-------|-------|---------|
+| `User` | `email: 1` (unique) | Fast user lookup |
+| `User` | `createdAt: -1` | Sorting by creation date |
+| `Wishlist` | `user: 1, name: 1` (unique) | User's wishlists |
+| `Wishlist` | `user: 1, isDefault: 1` | Default wishlist lookup |
+| `WishlistItem` | `user: 1, category: 1` | Filtered item queries |
+| `WishlistItem` | `user: 1, status: 1` | Status filtering |
+| `WishlistItem` | `user: 1, wishlist: 1` | Wishlist items |
+| `TrackerTask` | `user: 1, status: 1` | Task filtering |
+| `TrackerTask` | `user: 1, dueDate: 1` | Overdue queries |
+| `TrackerTask` | `user: 1, recurrence: 1` | Recurring task queries |
+| `TrackerTask` | `user: 1, category: 1` | Category filtering |
+
+### Pagination and Limits
+
+All list endpoints implement pagination with configurable limits:
+
+```javascript
+const limitNum = Math.min(200, Math.max(1, parseInt(limit))); // Cap at 200
+const skip = (pageNum - 1) * limitNum;
+```
+
+### Rate Limiting
+
+Multiple rate limiters protect against abuse:
+
+| Limiter | Limit | Window | Purpose |
+|---------|-------|--------|---------|
+| `generalLimiter` | 1000 | 15 min | All API routes |
+| `authLimiter` | 20 | 15 min | Auth endpoints |
+| `passwordResetLimiter` | 3 | 1 hour | Password reset |
+| `tokenRefreshLimiter` | 50 | 15 min | Token refresh |
+| `userActionLimiter` | 50 | 1 hour | User actions |
+| `settingsLimiter` | 100 | 15 min | Settings changes |
+| `publicReservationLimiter` | 10 | 1 hour | Public reservations |
 
 ## Testing
 

@@ -1166,21 +1166,21 @@ backend/
 │   ├── WikiPermission.js    # Wiki permission model
 │   ├── WikiCategory.js      # Wiki category model
 │   └── WikiWatch.js         # Wiki watchlist model
-│   ├── routes/
-│   │   ├── auth.js              # Authentication routes
-│   │   ├── calendar.js          # Calendar API routes
-│   │   ├── categories.js        # Category routes
-│   │   ├── files.js             # File routes
-│   │   ├── fileFolders.js       # File folder routes
-│   │   ├── passwords.js         # Password routes
-│   │   ├── passwordCategories.js  # Password category routes
-│   │   ├── wishlist.js          # Wishlist routes
-│   │   ├── wishlistCategories.js    # Wishlist category routes
-│   │   ├── wishlists.js         # Wishlist management routes
-│   │   ├── follow.js            # User following routes
-│   │   ├── settings.js          # Settings routes
-│   │   ├── wikis.js             # Wiki routes
-│   │   └── wikiPages.js         # Wiki page routes
+├── routes/                  # API route definitions
+│   ├── auth.js              # Authentication routes
+│   ├── calendar.js          # Calendar API routes
+│   ├── categories.js        # Category routes
+│   ├── files.js             # File routes
+│   ├── fileFolders.js       # File folder routes
+│   ├── passwords.js         # Password routes
+│   ├── passwordCategories.js  # Password category routes
+│   ├── wishlist.js          # Wishlist routes
+│   ├── wishlistCategories.js    # Wishlist category routes
+│   ├── wishlists.js         # Wishlist management routes
+│   ├── follow.js            # User following routes
+│   ├── settings.js          # Settings routes
+│   ├── wikis.js             # Wiki routes
+│   └── wikiPages.js         # Wiki page routes
 ├── services/                # Business logic services
 │   ├── passwordService.js   # Password encryption service
 │   └── recurringEventService.js   # Recurring event expansion
@@ -2034,7 +2034,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 1.0.0
-**Last Updated**: 2026-04-26
+**Version**: 2.0.0
+**Last Updated**: 2026-05-03
 **Status**: Production Ready
 **Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events, Wiki System

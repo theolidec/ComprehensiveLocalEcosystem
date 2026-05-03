@@ -37,6 +37,7 @@ import WikiPageEditor from './components/Wiki/WikiPageEditor';
 import WikiPageHistory from './components/Wiki/WikiPageHistory';
 import WikiSettings from './components/Wiki/WikiSettings';
 import WikiRecentChanges from './components/Wiki/WikiRecentChanges';
+import DailyTracker from './components/Tracker/DailyTracker';
 import './App.css';
 
 const getInitialTheme = () => {
@@ -355,6 +356,20 @@ function AppContent() {
                 <Sidebar inline />
                 <div style={{ flex: 1 }}>
                   <UserFollowing />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/tracker" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <DailyTracker />
                 </div>
               </Row>
               <Footer />

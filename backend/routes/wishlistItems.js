@@ -49,32 +49,23 @@ router.get('/', authenticateToken, async (req, res) => {
     const limitNum = Math.min(200, Math.max(1, parseInt(limit)));
     const skip = (pageNum - 1) * limitNum;
 
+    const priorityOrder = { 'must-have': 0, 'high': 1, 'medium': 2, 'low': 3 };
+
     const [items, total] = await Promise.all([
-      WishlistItem.aggregate([
-        { $match: query },
-        {
-          $addFields: {
-            priorityOrder: { $arrayElemAt: [[0, 1, 2, 3], { $indexOfArray: [['must-have', 'high', 'medium', 'low'], '$priority'] }] }
-          }
-        },
-        { $sort: { priorityOrder: 1, createdAt: -1 } },
-        { $skip: skip },
-        { $limit: limitNum },
-        { $lookup: { from: 'wishlistreservations', localField: '_id', foreignField: 'wishlistItem', as: 'reservations' } },
-        { $project: { reservations: { reservedBy: 1, status: 1, reservedAt: 1, message: 1 } } }
-      ]),
+      WishlistItem.find(query)
+        .populate('reservations', 'reservedBy status reservedAt message')
+        .sort({ priority: 1, createdAt: -1 })
+        .skip(skip)
+        .limit(limitNum),
       WishlistItem.countDocuments(query)
     ]);
 
-    if (items.length > 0) {
-      const itemIds = items.map(i => i._id);
-      const populatedItems = await WishlistItem.find({ _id: { $in: itemIds } })
-        .populate('reservations', 'reservedBy status reservedAt message');
-      const sortedMap = new Map(populatedItems.map(i => [i._id.toString(), i]));
-      for (let i = 0; i < items.length; i++) {
-        items[i] = sortedMap.get(items[i]._id.toString());
-      }
-    }
+    items.sort((a, b) => {
+      const aOrder = priorityOrder[a.priority] ?? 4;
+      const bOrder = priorityOrder[b.priority] ?? 4;
+      if (aOrder !== bOrder) return aOrder - bOrder;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
 
     res.json({ 
       items,
@@ -360,80 +351,80 @@ router.post('/import/csv', authenticateToken, async (req, res) => {
 
 router.get('/analytics', authenticateToken, async (req, res) => {
   try {
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    
     const sixtyDaysAgo = new Date();
     sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
-
-    const itemsOverTime = await WishlistItem.aggregate([
-      { $match: { user: req.user._id, createdAt: { $gte: sixtyDaysAgo } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
-          count: { $sum: 1 },
-          totalValue: { $sum: { $ifNull: ['$price', 0] } }
-        }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-
-    const statusBreakdown = await WishlistItem.aggregate([
-      { $match: { user: req.user._id } },
-      { $group: { _id: '$status', count: { $sum: 1 }, totalValue: { $sum: { $ifNull: ['$price', 0] } } } }
-    ]);
-
-    const priorityBreakdown = await WishlistItem.aggregate([
-      { $match: { user: req.user._id } },
-      { $group: { _id: '$priority', count: { $sum: 1 } } }
-    ]);
-
-    const categoryBreakdown = await WishlistItem.aggregate([
-      { $match: { user: req.user._id } },
-      { $group: { _id: '$category', count: { $sum: 1 }, totalValue: { $sum: { $ifNull: ['$price', 0] } } } }
-    ]);
 
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
-    const monthlyTrends = await WishlistItem.aggregate([
-      { $match: { user: req.user._id, createdAt: { $gte: sixMonthsAgo } } },
-      {
-        $group: {
-          _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
-          itemsAdded: { $sum: 1 },
-          totalValue: { $sum: { $ifNull: ['$price', 0] } }
+    const [breakdowns, itemsOverTime, monthlyTrends, reservationStats] = await Promise.all([
+      WishlistItem.aggregate([
+        { $match: { user: req.user._id } },
+        {
+          $facet: {
+            statusBreakdown: [
+              { $group: { _id: '$status', count: { $sum: 1 }, totalValue: { $sum: { $ifNull: ['$price', 0] } } } }
+            ],
+            priorityBreakdown: [
+              { $group: { _id: '$priority', count: { $sum: 1 } } }
+            ],
+            categoryBreakdown: [
+              { $group: { _id: '$category', count: { $sum: 1 }, totalValue: { $sum: { $ifNull: ['$price', 0] } } } }
+            ]
+          }
         }
-      },
-      { $sort: { _id: 1 } }
-    ]);
-
-    const WishlistReservation = require('../models/WishlistReservation');
-    const reservationStats = await WishlistReservation.aggregate([
-      {
-        $lookup: {
-          from: 'wishlistitems',
-          localField: 'wishlistItem',
-          foreignField: '_id',
-          as: 'item'
-        }
-      },
-      { $unwind: '$item' },
-      { $match: { 'item.user': req.user._id } },
-      {
-        $group: {
-          _id: '$status',
-          count: { $sum: 1 }
-        }
-      }
+      ]),
+      WishlistItem.aggregate([
+        { $match: { user: req.user._id, createdAt: { $gte: sixtyDaysAgo } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+            count: { $sum: 1 },
+            totalValue: { $sum: { $ifNull: ['$price', 0] } }
+          }
+        },
+        { $sort: { _id: 1 } }
+      ]),
+      WishlistItem.aggregate([
+        { $match: { user: req.user._id, createdAt: { $gte: sixMonthsAgo } } },
+        {
+          $group: {
+            _id: { $dateToString: { format: '%Y-%m', date: '$createdAt' } },
+            itemsAdded: { $sum: 1 },
+            totalValue: { $sum: { $ifNull: ['$price', 0] } }
+          }
+        },
+        { $sort: { _id: 1 } }
+      ]),
+      (async () => {
+        const WishlistReservation = require('../models/WishlistReservation');
+        return WishlistReservation.aggregate([
+          {
+            $lookup: {
+              from: 'wishlistitems',
+              localField: 'wishlistItem',
+              foreignField: '_id',
+              as: 'item'
+            }
+          },
+          { $unwind: '$item' },
+          { $match: { 'item.user': req.user._id } },
+          {
+            $group: {
+              _id: '$status',
+              count: { $sum: 1 }
+            }
+          }
+        ]);
+      })()
     ]);
 
     res.json({
       analytics: {
         itemsOverTime,
-        statusBreakdown,
-        priorityBreakdown,
-        categoryBreakdown,
+        statusBreakdown: breakdowns[0].statusBreakdown,
+        priorityBreakdown: breakdowns[0].priorityBreakdown,
+        categoryBreakdown: breakdowns[0].categoryBreakdown,
         monthlyTrends,
         reservationStats
       }

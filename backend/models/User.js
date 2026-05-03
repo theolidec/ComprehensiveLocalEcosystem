@@ -42,6 +42,13 @@ const userSchema = new mongoose.Schema({
   passwordSalt: {
     type: String,
     select: false
+  },
+  resetPasswordToken: {
+    type: String,
+    select: false
+  },
+  resetPasswordExpires: {
+    type: Date
   }
 }, {
   timestamps: true,
@@ -142,6 +149,28 @@ userSchema.statics.incrementLoginAttempts = function(userId) {
     },
     { new: true }
   );
+};
+
+// Static method to generate password reset token
+userSchema.statics.generatePasswordResetToken = function(userId) {
+  const token = crypto.randomBytes(32).toString('hex');
+  const expires = Date.now() + 60 * 60 * 1000; // 1 hour
+  return this.findByIdAndUpdate(
+    userId,
+    {
+      resetPasswordToken: token,
+      resetPasswordExpires: new Date(expires)
+    },
+    { new: true }
+  );
+};
+
+// Static method to find by reset token
+userSchema.statics.findByResetToken = function(token) {
+  return this.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() }
+  }).select('+password');
 };
 
 module.exports = mongoose.model('User', userSchema);

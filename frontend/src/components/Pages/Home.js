@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book } from 'lucide-react';
+import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import calendarAPI from '../../services/calendarAPI';
 
@@ -128,6 +128,15 @@ function Home() {
       color: 'bg-amber-600',
       lightColor: 'bg-amber-100',
       textColor: 'text-amber-600'
+    },
+    {
+      icon: CheckSquare,
+      title: 'Daily Tracker',
+      description: 'Track habits & goals',
+      link: '/tracker',
+      color: 'bg-emerald-600',
+      lightColor: 'bg-emerald-100',
+      textColor: 'text-emerald-600'
     }
   ];
 

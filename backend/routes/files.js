@@ -4,8 +4,22 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const { body, param, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 const fileController = require('../controllers/fileController');
+const logger = require('../config/logger');
+
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    logger.warn('File validation errors:', errors.array());
+    return res.status(400).json({
+      errors: errors.array(),
+      code: 'VALIDATION_ERROR'
+    });
+  }
+  next();
+};
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads', 'files');
 
@@ -121,22 +135,67 @@ router.get('/trash', authenticateToken, fileController.getTrash);
 
 router.get('/shared/:token', fileController.getSharedFile);
 
-router.get('/:id', authenticateToken, fileController.getFile);
-router.get('/:id/download', authenticateToken, fileController.downloadFile);
-router.get('/:id/stream', authenticateToken, fileController.streamFile);
-router.get('/:id/dataurl', authenticateToken, fileController.getFileAsDataUrl);
+router.get('/:id', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.getFile);
 
-router.put('/:id', authenticateToken, fileController.updateFile);
-router.put('/:id/move', authenticateToken, fileController.moveFile);
-router.put('/:id/share', authenticateToken, fileController.shareFile);
+router.get('/:id/download', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.downloadFile);
 
-router.delete('/:id', authenticateToken, fileController.deleteFile);
-router.delete('/:id/permanent', authenticateToken, fileController.deleteFile);
-router.post('/:id/restore', authenticateToken, fileController.restoreFile);
+router.get('/:id/stream', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.streamFile);
+
+router.get('/:id/dataurl', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.getFileAsDataUrl);
+
+router.put('/:id', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID'),
+  body('description').optional().trim().isLength({ max: 1000 }),
+  body('tags').optional().isArray(),
+  body('isFavorite').optional().isBoolean()
+], handleValidationErrors, fileController.updateFile);
+
+router.put('/:id/move', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID'),
+  body('folderId').optional().isMongoId().withMessage('Invalid folder ID')
+], handleValidationErrors, fileController.moveFile);
+
+router.put('/:id/share', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID'),
+  body('isPublic').isBoolean().withMessage('isPublic must be a boolean')
+], handleValidationErrors, fileController.shareFile);
+
+router.delete('/:id', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.deleteFile);
+
+router.delete('/:id/permanent', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.permanentDeleteFile);
+
+router.post('/:id/restore', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.restoreFile);
+
 router.delete('/trash/empty', authenticateToken, fileController.emptyTrash);
 
-router.post('/create-text', authenticateToken, fileController.createTextFile);
-router.get('/:id/content', authenticateToken, fileController.getFileContent);
-router.put('/:id/content', authenticateToken, fileController.updateFileContent);
+router.post('/create-text', authenticateToken, [
+  body('name').trim().notEmpty().withMessage('File name is required').isLength({ max: 255 }),
+  body('content').optional().trim(),
+  body('folderId').optional().isMongoId().withMessage('Invalid folder ID'),
+  body('mimeType').optional().isString()
+], handleValidationErrors, fileController.createTextFile);
+
+router.get('/:id/content', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.getFileContent);
+
+router.put('/:id/content', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID'),
+  body('content').optional().trim()
+], handleValidationErrors, fileController.updateFileContent);
 
 module.exports = router;

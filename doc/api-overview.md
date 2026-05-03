@@ -23,6 +23,19 @@ Complete reference of all REST API endpoints in the Comprehensive Local Ecosyste
 | POST | `/forgot-password` | No | Request password reset email |
 | POST | `/reset-password/:token` | No | Reset password with token |
 
+**Password Reset Flow**:
+```bash
+# Request password reset
+POST /api/auth/forgot-password
+{ "email": "user@example.com" }
+# Response: { message: 'If an account exists with this email, a password reset link has been sent', code: 'RESET_EMAIL_SENT' }
+
+# Reset password (token from email/log)
+POST /api/auth/reset-password/:token
+{ "password": "newpassword123" }
+# Response: { message: 'Password reset successful. Please login with your new password.', code: 'PASSWORD_RESET_SUCCESS' }
+```
+
 **Request/Response Examples**:
 
 ```bash
@@ -151,6 +164,38 @@ GET /api/auth/me
 
 ---
 
+## Payment Cards Endpoints
+
+### Base: `/api/payment-cards`
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/` | Yes | List all payment cards |
+| POST | `/` | Yes | Add new payment card |
+| GET | `/:id` | Yes | Get card by ID |
+| PUT | `/:id` | Yes | Update card details |
+| DELETE | `/:id` | Yes | Delete payment card |
+| GET | `/:id/decrypt` | Yes | Decrypt and view card details |
+| POST | `/:id/favorite` | Yes | Toggle favorite status |
+| POST | `/:id/default` | Yes | Set as default card |
+
+**PaymentCard Object**:
+```json
+{
+  "cardName": "Personal Visa",
+  "cardholderName": "John Doe",
+  "cardType": "visa",
+  "lastFourDigits": "1234",
+  "billingAddress": "123 Main St, City, Country",
+  "isDefault": true,
+  "isFavorite": false
+}
+```
+
+**Note**: Card number, expiry date, and CVV are encrypted with AES-256-GCM and can only be retrieved via the decrypt endpoint.
+
+---
+
 ## Files Endpoints
 
 ### Base: `/api/files`
@@ -158,6 +203,7 @@ GET /api/auth/me
 | Method | Endpoint | Auth | Description |
 |--------|----------|------|-------------|
 | GET | `/` | Yes | List files with pagination |
+| GET | `/all` | Yes | List all files (flat list, max 1000) |
 | POST | `/upload` | Yes | Upload file (multipart/form-data) |
 | GET | `/stats` | Yes | Storage statistics |
 | GET | `/trash` | Yes | List deleted files |
@@ -392,6 +438,121 @@ curl -X POST http://localhost:3001/api/files/upload \
   "order": 0,
   "tags": ["guide"],
   "isHomePage": true
+}
+```
+
+---
+
+## Daily Tracker Endpoints
+
+### Base: `/api/tracker`
+
+#### Tasks
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/tasks` | Yes | List tasks with filtering and pagination |
+| GET | `/tasks/today` | Yes | Get today's tasks with completion status |
+| POST | `/tasks` | Yes | Create new task |
+| PUT | `/tasks/:id` | Yes | Update task |
+| DELETE | `/tasks/:id` | Yes | Delete task |
+
+**Query Parameters for GET /tasks**:
+- `status` - Filter by status (active, paused, completed, archived)
+- `recurrence` - Filter by recurrence type
+- `priority` - Filter by priority (low, medium, high, urgent)
+- `category` - Filter by category
+- `search` - Search in title/description
+- `sort` - Sort by (order, priority, dueDate, createdAt)
+- `page`, `limit` - Pagination
+
+#### Questions
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/questions` | Yes | List questions |
+| POST | `/questions` | Yes | Create question |
+| PUT | `/questions/:id` | Yes | Update question |
+| DELETE | `/questions/:id` | Yes | Delete question |
+
+#### Responses / Check-in
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/responses` | Yes | List responses with date filtering |
+| GET | `/responses/today` | Yes | Get today's response |
+| POST | `/responses` | Yes | Save/upsert daily response (upsert by date) |
+
+#### Statistics & Analytics
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/stats` | Yes | Overview statistics (streaks, completion rate, task counts) |
+| GET | `/analytics` | Yes | Detailed analytics (daily activity, mood trends, question stats) |
+| GET | `/heatmap` | Yes | Yearly activity heatmap data |
+
+**Query Parameters for GET /heatmap**:
+- `year` - Target year (default: current year)
+
+#### Data Management
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/export` | Yes | Export all tracker data as JSON |
+| POST | `/import` | Yes | Import tracker data from JSON |
+
+**Task Object**:
+```json
+{
+  "title": "Morning Meditation",
+  "description": "10 minutes mindfulness",
+  "category": "Health",
+  "priority": "high",
+  "recurrence": "daily",
+  "estimatedMinutes": 10,
+  "tags": ["mindfulness"]
+}
+```
+
+**Task Update Fields** (PUT /tasks/:id):
+- `title`, `description`, `category`, `priority`
+- `recurrence`, `customRecurrenceDays`, `weeklyDays`
+- `dueDate`, `startDate`, `endDate`
+- `estimatedMinutes`, `status`, `isCompleted`, `completedAt`, `order`, `tags`
+
+**Status Values**: `active`, `paused`, `completed`, `archived`
+**Priority Values**: `low`, `medium`, `high`, `urgent`
+**Recurrence Values**: `none`, `daily`, `weekly`, `biweekly`, `monthly`, `quarterly`, `yearly`, `custom`
+
+**Question Object**:
+```json
+{
+  "question": "Did I learn something today?",
+  "responseType": "yesno",
+  "category": "Learning",
+  "isRequired": true,
+  "icon": "book"
+}
+```
+
+**Yes/No/Maybe Question**:
+```json
+{
+  "question": "Will you attend the meeting?",
+  "responseType": "yesnomaybe",
+  "category": "Work",
+  "isRequired": true
+}
+```
+
+**Response Object**:
+```json
+{
+  "date": "2026-05-02",
+  "taskCompletions": [{ "task": "taskId", "completed": true }],
+  "questionResponses": [{ "question": "questionId", "value": true }],
+  "mood": 4,
+  "overallNotes": "Great day!"
 }
 ```
 

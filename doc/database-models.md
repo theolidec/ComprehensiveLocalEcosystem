@@ -30,6 +30,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 | Category | `Category.js` | Event categories | References User |
 | Password | `Password.js` | Stored passwords | References User |
 | PasswordCategory | `PasswordCategory.js` | Password groups | References User |
+| PaymentCard | `PaymentCard.js` | Stored payment cards | References User |
 | File | `File.js` | Uploaded files | References User, FileFolder |
 | FileFolder | `FileFolder.js` | File organization | References User, FileFolder (self) |
 | Settings | `Settings.js` | User preferences | References User (1:1) |
@@ -44,6 +45,9 @@ mongoose.connect(process.env.MONGODB_URI, {
 | WikiPermission | `WikiPermission.js` | Access control | References Wiki, User |
 | WikiCategory | `WikiCategory.js` | Page categories | References Wiki |
 | WikiWatch | `WikiWatch.js` | Page monitoring | References User, WikiPage |
+| TrackerTask | `TrackerTask.js` | Daily tracker tasks | References User |
+| TrackerQuestion | `TrackerQuestion.js` | Tracker questions | References User |
+| TrackerResponse | `TrackerResponse.js` | Daily check-in responses | References User |
 
 ---
 
@@ -248,6 +252,36 @@ mongoose.connect(process.env.MONGODB_URI, {
 - Shopping (Red, 🛒)
 - Entertainment (Purple, 🎮)
 - Other (Gray, 📁)
+
+---
+
+## PaymentCard Model
+
+**File**: `backend/models/PaymentCard.js`
+
+```javascript
+{
+  userId: ObjectId,          // Ref: 'User', required, indexed
+  cardName: String,          // Required, max 100 chars
+  cardholderName: String,    // Max 100 chars
+  encryptedCardNumber: String,  // Required, AES-256-GCM encrypted
+  encryptedExpiryDate: String,  // Required
+  encryptedCVV: String,      // Required
+  cardType: String,          // Enum: visa/mastercard/amex/discover/other
+  lastFourDigits: String,    // 4 digits
+  billingAddress: String,    // Max 500 chars
+  isDefault: Boolean,        // Default: false
+  isFavorite: Boolean,       // Default: false
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `userId: 1` - User's cards
+- `userId: 1, createdAt: -1` - Sorting
+- `userId: 1, isDefault: 1` - Default card lookup
+- `userId: 1, cardType: 1` - Card type filtering
 
 ---
 
@@ -634,6 +668,114 @@ mongoose.connect(process.env.MONGODB_URI, {
   createdAt: Date
 }
 ```
+
+---
+
+## TrackerTask Model
+
+**File**: `backend/models/TrackerTask.js`
+
+```javascript
+{
+  title: String,           // Required, max 100 chars
+  description: String,     // Max 500 chars
+  user: ObjectId,          // Ref: 'User', required, indexed
+  category: String,        // Max 50 chars
+  priority: String,        // Enum: low/medium/high/urgent
+  recurrence: String,      // Enum: none/daily/weekly/biweekly/monthly/quarterly/yearly/custom
+  customRecurrenceDays: Number,  // For custom recurrence
+  weeklyDays: [Number],    // 0-6 for weekly recurrence
+  dueDate: Date,
+  startDate: Date,
+  endDate: Date,
+  estimatedMinutes: Number,
+  status: String,          // Enum: active/paused/completed/archived
+  isCompleted: Boolean,
+  completedAt: Date,
+  order: Number,
+  tags: [String],
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `user: 1, status: 1` - Filter by status
+- `user: 1, dueDate: 1` - Due date sorting
+- `user: 1, recurrence: 1` - Recurrence filtering
+- `user: 1, category: 1` - Category filtering
+
+**Statics**:
+- `getStatsByUser(userId)` - Get task statistics
+
+---
+
+## TrackerQuestion Model
+
+**File**: `backend/models/TrackerQuestion.js`
+
+```javascript
+{
+  question: String,        // Required
+  user: ObjectId,          // Ref: 'User', required, indexed
+  responseType: String,    // Enum: yesno/yesnomaybe/scale/text/number
+  scaleMin: Number,        // For scale type
+  scaleMax: Number,
+  scaleLabels: {
+    minLabel: String,
+    maxLabel: String
+  },
+  category: String,
+  isActive: Boolean,       // Default: true
+  isRequired: Boolean,     // Default: false
+  order: Number,
+  icon: String,
+  color: String,
+  reminderTime: Number,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `user: 1, isActive: 1` - Active questions
+- `user: 1, category: 1` - Category filtering
+
+---
+
+## TrackerResponse Model
+
+**File**: `backend/models/TrackerResponse.js`
+
+```javascript
+{
+  user: ObjectId,          // Ref: 'User', required, indexed
+  date: Date,              // Required (unique per user)
+  taskCompletions: [{
+    task: ObjectId,        // Ref: 'TrackerTask'
+    completed: Boolean,
+    completedAt: Date
+  }],
+  questionResponses: [{
+    question: ObjectId,    // Ref: 'TrackerQuestion'
+    value: mongoose.Mixed // Boolean/Number/String based on question type
+  }],
+  mood: Number,            // 1-5
+  overallNotes: String,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `user: 1, date: 1` - Unique compound (one response per day)
+- `user: 1, taskCompletions.task: 1` - Task completion lookup
+- `user: 1, questionResponses.question: 1` - Question response lookup
+
+**Statics**:
+- `getStreakByUser(userId)` - Calculate current streak
+- `getCompletionRateByUser(userId, days)` - Calculate completion rate
+- `getAnalyticsByUser(userId)` - Get detailed analytics
 
 ---
 

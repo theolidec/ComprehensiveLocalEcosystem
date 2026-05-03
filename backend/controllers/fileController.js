@@ -254,29 +254,38 @@ const fileController = {
 
   deleteFile: async (req, res) => {
     try {
-      const { permanent } = req.query;
-      
       const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
       
       if (!file) {
         return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
       }
 
-      if (permanent === 'true') {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
-        }
-        await File.findByIdAndDelete(file._id);
-        logger.info(`File permanently deleted: ${file.originalName} by user ${req.user.email}`);
-        res.json({ message: 'File permanently deleted' });
-      } else {
-        await file.softDelete();
-        logger.info(`File moved to trash: ${file.originalName} by user ${req.user.email}`);
-        res.json(file);
-      }
+      await file.softDelete();
+      logger.info(`File moved to trash: ${file.originalName} by user ${req.user.email}`);
+      res.json(file);
     } catch (error) {
       logger.error('Delete file error:', error);
       res.status(500).json({ error: 'Failed to delete file', code: 'DELETE_ERROR' });
+    }
+  },
+
+  permanentDeleteFile: async (req, res) => {
+    try {
+      const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+      
+      if (!file) {
+        return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
+      }
+
+      if (fs.existsSync(file.path)) {
+        fs.unlinkSync(file.path);
+      }
+      await File.findByIdAndDelete(file._id);
+      logger.info(`File permanently deleted: ${file.originalName} by user ${req.user.email}`);
+      res.json({ message: 'File permanently deleted' });
+    } catch (error) {
+      logger.error('Permanent delete file error:', error);
+      res.status(500).json({ error: 'Failed to permanently delete file', code: 'DELETE_ERROR' });
     }
   },
 

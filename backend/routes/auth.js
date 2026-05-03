@@ -294,13 +294,104 @@ router.post('/logout-all', authenticateToken, async (req, res) => {
 
     logger.info(`User logged out from all devices: ${req.user.email}`);
 
-    res.json({ 
+    res.json({
       message: 'Logged out from all devices successfully'
     });
   } catch (error) {
     logger.error('Logout all error:', error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: 'Logout from all devices failed due to server error',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+// Forgot password - request password reset
+router.post('/forgot-password', authLimiter, [
+  body('email').isEmail().withMessage('Valid email required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      // Don't reveal whether email exists
+      return res.json({
+        message: 'If an account exists with this email, a password reset link has been sent',
+        code: 'RESET_EMAIL_SENT'
+      });
+    }
+
+    await User.generatePasswordResetToken(user._id);
+
+    // In production, send email with reset link
+    // For now, log the token (development only)
+    const resetUser = await User.findById(user._id).select('+resetPasswordToken');
+    logger.info(`Password reset token for ${email}: ${resetUser.resetPasswordToken}`);
+
+    // Note: In production, integrate with email service (SendGrid, Nodemailer, etc.)
+    // Example: await sendEmail(email, 'Password Reset', `Reset link: ${resetUrl}`);
+
+    res.json({
+      message: 'If an account exists with this email, a password reset link has been sent',
+      code: 'RESET_EMAIL_SENT'
+    });
+  } catch (error) {
+    logger.error('Forgot password error:', error);
+    res.status(500).json({
+      error: 'Password reset request failed',
+      code: 'SERVER_ERROR'
+    });
+  }
+});
+
+// Reset password with token
+router.post('/reset-password/:token', authLimiter, [
+  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        errors: errors.array(),
+        code: 'VALIDATION_ERROR'
+      });
+    }
+
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const user = await User.findByResetToken(token);
+    if (!user) {
+      return res.status(400).json({
+        error: 'Invalid or expired reset token',
+        code: 'INVALID_TOKEN'
+      });
+    }
+
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    logger.info(`Password reset successful for user: ${user.email}`);
+
+    res.json({
+      message: 'Password reset successful. Please login with your new password.',
+      code: 'PASSWORD_RESET_SUCCESS'
+    });
+  } catch (error) {
+    logger.error('Reset password error:', error);
+    res.status(500).json({
+      error: 'Password reset failed',
       code: 'SERVER_ERROR'
     });
   }

@@ -46,12 +46,17 @@ router.get('/', authenticateToken, async (req, res) => {
       wishlists = [defaultList];
     }
     
-    const wishlistsWithCounts = await Promise.all(
-      wishlists.map(async (wl) => {
-        const itemCount = await WishlistItem.countDocuments({ wishlist: wl._id, user: req.user._id });
-        return { ...wl.toObject(), itemCount };
-      })
-    );
+    const wishlistIds = wishlists.map(w => w._id);
+    const counts = await WishlistItem.aggregate([
+      { $match: { wishlist: { $in: wishlistIds }, user: req.user._id } },
+      { $group: { _id: '$wishlist', count: { $sum: 1 } } }
+    ]);
+    
+    const countMap = new Map(counts.map(c => [c._id.toString(), c.count]));
+    const wishlistsWithCounts = wishlists.map(wl => ({
+      ...wl.toObject(),
+      itemCount: countMap.get(wl._id.toString()) || 0
+    }));
     
     res.json({ wishlists: wishlistsWithCounts });
   } catch (error) {

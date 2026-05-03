@@ -35,6 +35,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`wiki.md`](wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
 | [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
 | [`geogebra-calculator.md`](geogebra-calculator.md) | Math graphing | Frontend component |
+| [`daily-tracker.md`](daily-tracker.md) | Daily tracker | `/api/tracker/*` |
 
 ### Security & Operations
 
@@ -92,6 +93,7 @@ Start here if you're integrating with the API:
 - [`passwords.md`](passwords.md) - Password vault
 - [`wishlist.md`](wishlist.md) - Gift registry
 - [`geogebra-calculator.md`](geogebra-calculator.md) - Math graphing
+- [`daily-tracker.md`](daily-tracker.md) - Habit & task tracker
 
 ### Organization
 - [`categories.md`](categories.md) - Event categories
@@ -131,8 +133,8 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: April 27, 2026  
-**Version**: 1.0.0
+**Last Updated**: May 3, 2026  
+**Version**: 2.0.0
 
 ## Recent Changes
 

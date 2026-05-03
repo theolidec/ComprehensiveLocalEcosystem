@@ -336,10 +336,10 @@ npm run build
 ### 2. Tag Release
 ```bash
 # Create annotated tag
-git tag -a v1.0.0 -m "Release version 1.0.0"
+git tag -a v2.0.0 -m "Release version 2.0.0"
 
 # Push tags to remote
-git push origin v1.0.0
+git push origin v2.0.0
 git push origin --tags
 ```
 

@@ -65,6 +65,16 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Object Management**: Add, edit, delete, and label mathematical objects
 - **Command Interface**: Text-based input for rapid object creation
 
+### Daily Tracker System
+- **Recurring Tasks**: Daily, weekly, monthly, custom recurrence with day selection
+- **Custom Daily Questions**: Yes/No, scale (1-5), text, and number response types
+- **Daily Check-in**: Progress bar, mood tracker, task checklist, question answers, daily notes
+- **Streak Tracking**: Current and longest activity streak calculations
+- **Completion Analytics**: 30-day completion rate, priority/category breakdowns
+- **Activity Heatmap**: GitHub-style yearly activity visualization
+- **Mood Trends**: Color-coded mood visualization over time
+- **Data Export/Import**: Full JSON export and import of tracker data
+
 ### Wiki System
 - **Wiki Spaces**: Create multiple wiki workspaces for different projects
 - **Hierarchical Pages**: Parent-child page relationships for organized structure
@@ -232,6 +242,7 @@ For detailed API documentation including request/response examples, see [DOCUMEN
 - Files: `/api/files/*` - File management and storage
 - Folders: `/api/file-folders/*` - Folder organization
 - Wiki: `/api/wikis/*` - Knowledge base system
+- Tracker: `/api/tracker/*` - Daily habit & task tracker
 - Settings: `/api/settings/*` - User preferences
 - Follow: `/api/follow/*` - Social features
 
@@ -247,6 +258,7 @@ For detailed application flow and usage instructions, see [DOCUMENTATION.md](DOC
 - **Files**: `/files` or `/drive` for file management
 - **Calculator**: `/calculator` for GeoGebra graphing
 - **Wiki**: `/wikis` for knowledge base system
+- **Tracker**: `/tracker` for daily habit & task tracking
 - **Settings**: `/settings` for user preferences
 
 ## Security
@@ -361,6 +373,9 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Wiki System with hierarchical pages and version control
 - Wiki access control with role-based permissions
 - Wiki full-text search and watchlist features
+- Daily Tracker with recurring tasks and custom check-in questions
+- Activity heatmap, streak tracking, and mood trends
+- Task completion analytics and question statistics
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -424,7 +439,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 1.0.0
-**Last Updated**: 2026-04-28
+**Version**: 2.0.0
+**Last Updated**: 2026-05-03
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
