@@ -107,6 +107,8 @@ components/
 └── Math/                    # Calculator
     ├── GeoGebraCalculator.js # Main calculator
     └── GeoGebraCalculator.css # Styles
+├── Tracker/                  # Daily Tracker
+    └── DailyTracker.js       # Habit & task tracker with 4 tabs (Today, Tasks, Questions, Statistics)
 ```
 
 ### Component Patterns

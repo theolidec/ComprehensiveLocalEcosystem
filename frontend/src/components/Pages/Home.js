@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare } from 'lucide-react';
+import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare, Flame, Target, CheckCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import calendarAPI from '../../services/calendarAPI';
+import trackerAPI from '../../services/trackerAPI';
 
 function Home() {
   const navigate = useNavigate();
@@ -10,6 +11,23 @@ function Home() {
   const [todayEvents, setTodayEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [trackerData, setTrackerData] = useState(null);
+  const [trackerLoading, setTrackerLoading] = useState(false);
+  const [currentMood, setCurrentMood] = useState(null);
+  const [moodSaved, setMoodSaved] = useState(false);
+
+  const isEndOfDay = currentTime.getHours() >= 17;
+
+  const handleSetMood = async (mood) => {
+    setCurrentMood(mood);
+    setMoodSaved(true);
+    setTimeout(() => setMoodSaved(false), 2000);
+    try {
+      await trackerAPI.saveResponse({ mood });
+    } catch (err) {
+      console.error('Error saving mood:', err);
+    }
+  };
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -52,6 +70,80 @@ function Home() {
     };
     fetchTodayEvents();
   }, [isAuthenticated]);
+
+  useEffect(() => {
+    const fetchTrackerData = async () => {
+      if (!isAuthenticated) return;
+      setTrackerLoading(true);
+      try {
+        const [todayTasks, todayResponse, questions, stats] = await Promise.all([
+          trackerAPI.getTodayTasks(),
+          trackerAPI.getTodayResponse(),
+          trackerAPI.getQuestions(),
+          trackerAPI.getStats()
+        ]);
+        setTrackerData({ 
+          tasks: todayTasks.tasks || [], 
+          response: todayResponse,
+          questions: questions?.filter(q => q.isActive) || [],
+          stats 
+        });
+        if (todayResponse?.mood) {
+          setCurrentMood(todayResponse.mood);
+        }
+      } catch (err) {
+        console.error('Error fetching tracker data:', err);
+      } finally {
+        setTrackerLoading(false);
+      }
+    };
+    fetchTrackerData();
+  }, [isAuthenticated]);
+
+  const handleToggleTask = async (taskId, completed) => {
+    try {
+      const now = completed ? new Date().toISOString() : null;
+      await trackerAPI.saveResponse({
+        taskCompletions: [{ task: taskId, completed, completedAt: now }]
+      });
+      setTrackerData(prev => ({
+        ...prev,
+        tasks: prev.tasks.map(t =>
+          t._id === taskId
+            ? { ...t, todayCompletion: { ...t.todayCompletion, completed, completedAt: now } }
+            : t
+        )
+      }));
+    } catch (err) {
+      console.error('Error toggling task:', err);
+    }
+  };
+
+  const handleAnswerQuestion = async (questionId, value) => {
+    try {
+      await trackerAPI.saveResponse({
+        questionResponses: [{ question: questionId, value }]
+      });
+      setTrackerData(prev => {
+        const existingResponses = prev.response?.questionResponses || [];
+        const existingIdx = existingResponses.findIndex(
+          r => r.question?._id === questionId || r.question?.toString() === questionId
+        );
+        const newResponses = [...existingResponses];
+        if (existingIdx >= 0) {
+          newResponses[existingIdx] = { ...newResponses[existingIdx], value };
+        } else {
+          newResponses.push({ question: questionId, value });
+        }
+        return {
+          ...prev,
+          response: { ...prev.response, questionResponses: newResponses }
+        };
+      });
+    } catch (err) {
+      console.error('Error answering question:', err);
+    }
+  };
 
   const getCategoryColor = (category) => {
     const colors = {
@@ -143,6 +235,288 @@ function Home() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Daily Tracker Card */}
+        {isAuthenticated && (
+          <div className="mb-12">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                  <CheckSquare className="h-5 w-5 text-emerald-600" />
+                  Daily Tracker
+                </h2>
+                <span className="text-sm text-gray-500 dark:text-gray-400" style={{ alignSelf: 'center', marginTop: '2px' }}>
+                  {formatDate(currentTime)}
+                </span>
+              </div>
+              <button
+                onClick={() => navigate('/tracker')}
+                className="text-sm text-emerald-600 dark:text-emerald-400 hover:text-emerald-800 dark:hover:text-emerald-300"
+              >
+                Open Tracker
+              </button>
+            </div>
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+              {trackerLoading ? (
+                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                  Loading tracker data...
+                </div>
+              ) : !trackerData?.tasks || trackerData.tasks.length === 0 ? (
+                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+                  <CheckSquare className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                  <p>No tasks for today</p>
+                  <button
+                    onClick={() => navigate('/tracker')}
+                    className="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:underline"
+                  >
+                    Add tasks in Tracker
+                  </button>
+                </div>
+              ) : (
+                <div className="p-6">
+                  {/* Progress Bar */}
+                  {(() => {
+                    const completed = trackerData.tasks.filter(t => t.todayCompletion?.completed).length;
+                    const total = trackerData.tasks.length;
+                    const percent = Math.round((completed / total) * 100);
+                    return (
+                      <div className="mb-6">
+                        <div className="flex justify-between text-sm mb-2">
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {completed}/{total} tasks completed
+                          </span>
+                          <span className="font-medium text-gray-900 dark:text-white">{percent}%</span>
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
+                          <div
+                            className="bg-gradient-to-r from-emerald-500 to-green-600 h-3 rounded-full transition-all duration-500"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Stats Row */}
+                  <div className="grid grid-cols-3 gap-4 mb-6">
+                    <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                      <Flame className="h-5 w-5 mx-auto text-orange-500 mb-1" />
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {trackerData.stats?.streak?.currentStreak || 0}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Day Streak</div>
+                    </div>
+                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                      <Target className="h-5 w-5 mx-auto text-blue-500 mb-1" />
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {trackerData.stats?.completionRate?.rate || 0}%
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">30-Day Rate</div>
+                    </div>
+                    <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                      <CheckCircle className="h-5 w-5 mx-auto text-purple-500 mb-1" />
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {trackerData.stats?.totalTasks || 0}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">Active Tasks</div>
+                    </div>
+                  </div>
+
+                  {/* Today's Tasks Preview */}
+                  <div className="space-y-2 mb-6">
+                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Today's Tasks</h4>
+                    {trackerData.tasks.slice(0, 4).map(task => (
+                      <div
+                        key={task._id}
+                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                      >
+                        <button
+                          onClick={() => handleToggleTask(task._id, !task.todayCompletion?.completed)}
+                          className="flex-shrink-0 focus:outline-none"
+                        >
+                          {task.todayCompletion?.completed ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : (
+                            <div className="h-4 w-4 border-2 border-gray-300 dark:border-gray-600 rounded-full hover:border-green-500 transition-colors" />
+                          )}
+                        </button>
+                        <span className={`text-sm truncate flex-1 cursor-pointer ${
+                          task.todayCompletion?.completed
+                            ? 'line-through text-gray-400 dark:text-gray-500'
+                            : 'text-gray-900 dark:text-white hover:text-emerald-600 dark:hover:text-emerald-400'
+                        }`}
+                        onClick={() => navigate('/tracker')}>
+                          {task.title}
+                        </span>
+                        {task.priority === 'urgent' && (
+                          <span className="text-xs bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 px-1.5 py-0.5 rounded">Urgent</span>
+                        )}
+                      </div>
+                    ))}
+                    {trackerData.tasks.length > 4 && (
+                      <button
+                        onClick={() => navigate('/tracker')}
+                        className="text-sm text-emerald-600 dark:text-emerald-400 hover:underline mt-2"
+                      >
+                        +{trackerData.tasks.length - 4} more tasks
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Today's Questions Preview */}
+                  {trackerData.questions.length > 0 && (
+                    <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <div className="flex items-center justify-between mb-3">
+                        <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Daily Check-in</h4>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {trackerData.response?.questionResponses?.length || 0}/{trackerData.questions.length} answered
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {trackerData.questions.slice(0, 4).map(q => {
+                          const answer = trackerData.response?.questionResponses?.find(
+                            a => a.question?._id === q._id || a.question?.toString() === q._id
+                          );
+                          const value = answer?.value;
+                          const isAnswered = value !== undefined;
+
+                          if (q.responseType === 'yesno' || q.responseType === 'yesnomaybe') {
+                            return (
+                              <div key={q._id} className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                                isAnswered 
+                                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800' 
+                                  : 'bg-gray-50 dark:bg-gray-700/30 border-gray-200 dark:border-gray-600'
+                              }`}>
+                                <span className="text-sm text-gray-800 dark:text-gray-200 max-w-[140px] truncate">{q.question}</span>
+                                <div className="flex gap-1">
+                                  <button
+                                    onClick={() => handleAnswerQuestion(q._id, true)}
+                                    className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                                      value === true
+                                        ? 'bg-green-600 text-white'
+                                        : 'bg-white dark:bg-gray-600 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-500 hover:bg-green-50 dark:hover:bg-green-900/30 hover:border-green-400'
+                                    }`}
+                                  >
+                                    Yes
+                                  </button>
+                                  <button
+                                    onClick={() => handleAnswerQuestion(q._id, false)}
+                                    className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                                      value === false
+                                        ? 'bg-red-600 text-white'
+                                        : 'bg-white dark:bg-gray-600 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-500 hover:bg-red-50 dark:hover:bg-red-900/30 hover:border-red-400'
+                                    }`}
+                                  >
+                                    No
+                                  </button>
+                                  {q.responseType === 'yesnomaybe' && (
+                                    <button
+                                      onClick={() => handleAnswerQuestion(q._id, 'maybe')}
+                                      className={`px-2 py-1 text-xs rounded font-medium transition-colors ${
+                                        value === 'maybe'
+                                          ? 'bg-yellow-500 text-white'
+                                          : 'bg-white dark:bg-gray-600 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-500 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 hover:border-yellow-400'
+                                      }`}
+                                    >
+                                      Maybe
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          if (q.responseType === 'scale') {
+                            return (
+                              <div key={q._id} className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${
+                                isAnswered 
+                                  ? 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800' 
+                                  : 'bg-gray-50 dark:bg-gray-700/30 border-gray-200 dark:border-gray-600'
+                              }`}>
+                                <span className="text-sm text-gray-800 dark:text-gray-200 max-w-[120px] truncate">{q.question}</span>
+                                <div className="flex gap-1">
+                                  {Array.from({ length: Math.min(q.scaleMax - q.scaleMin + 1, 5) }, (_, i) => i + q.scaleMin).map(val => (
+                                    <button
+                                      key={val}
+                                      onClick={() => handleAnswerQuestion(q._id, val)}
+                                      className={`w-7 h-7 text-xs rounded font-medium transition-colors ${
+                                        value === val
+                                          ? 'bg-purple-600 text-white'
+                                          : 'bg-white dark:bg-gray-600 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-500 hover:bg-purple-50 dark:hover:bg-purple-900/30'
+                                      }`}
+                                    >
+                                      {val}
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          return (
+                            <button
+                              key={q._id}
+                              onClick={() => navigate('/tracker')}
+                              className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/30 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                            >
+                              <span className="text-sm text-gray-800 dark:text-gray-200 max-w-[140px] truncate">{q.question}</span>
+                              <span className="text-xs text-gray-400">→</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {trackerData.questions.length > 4 && (
+                        <button
+                          onClick={() => navigate('/tracker')}
+                          className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline mt-2"
+                        >
+                          +{trackerData.questions.length - 4} more
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* End of Day Mood Selector */}
+        {isAuthenticated && isEndOfDay && (
+          <div className="mb-12">
+            <div className="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
+              <h2 className="text-lg font-semibold mb-1">How are you feeling today?</h2>
+              <p className="text-indigo-100 text-sm mb-4">Take a moment to reflect on your day</p>
+              <div className="flex items-center justify-center gap-4">
+                {[
+                  { level: 1, label: 'Awful', color: 'bg-red-500' },
+                  { level: 2, label: 'Bad', color: 'bg-orange-500' },
+                  { level: 3, label: 'Okay', color: 'bg-yellow-500' },
+                  { level: 4, label: 'Good', color: 'bg-lime-500' },
+                  { level: 5, label: 'Great', color: 'bg-green-500' }
+                ].map(({ level, label, color }) => (
+                  <button
+                    key={level}
+                    onClick={() => handleSetMood(level)}
+                    className={`flex flex-col items-center p-3 rounded-xl transition-all ${
+                      currentMood === level
+                        ? 'bg-white/30 ring-2 ring-white'
+                        : 'hover:bg-white/10'
+                    }`}
+                  >
+                    <div className={`w-12 h-12 ${color} rounded-full flex items-center justify-center text-2xl mb-1`}>
+                      {level === 1 ? '😫' : level === 2 ? '😔' : level === 3 ? '😐' : level === 4 ? '🙂' : '😄'}
+                    </div>
+                    <span className="text-xs font-medium">{label}</span>
+                  </button>
+                ))}
+              </div>
+              {moodSaved && (
+                <p className="text-center text-indigo-100 text-sm mt-3">Mood saved!</p>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Today's Events Card */}
         {isAuthenticated && (
           <div className="mb-12">

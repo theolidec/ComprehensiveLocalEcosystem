@@ -25,7 +25,7 @@ This document details the comprehensive security measures implemented throughout
 │  • Role-based access (Wiki permissions)                    │
 ├─────────────────────────────────────────────────────────────┤
 │                    DATA PROTECTION LAYER                      │
-│  • AES-256-GCM encryption (passwords)                        │
+│  • AES-256-GCM encryption (passwords, payment cards)        │
 │  • Per-user encryption salts                                 │
 │  • Secure file storage (hashed filenames)                   │
 ├─────────────────────────────────────────────────────────────┤
@@ -173,6 +173,25 @@ const deriveKey = (masterKey, userSalt) => {
 - Random IV per encryption
 - GCM mode provides authentication
 - Keys never stored
+
+### Payment Card Encryption
+
+Payment cards use the same AES-256-GCM encryption as passwords to protect sensitive card data.
+
+**Stored Data** (encrypted):
+- Card number (full)
+- Expiry date
+- CVV
+
+**Stored Data** (plaintext):
+- Card name, cardholder name, card type, last 4 digits, billing address
+- isDefault, isFavorite flags
+
+**Security Features**:
+- Same encryption key derivation as passwords
+- Unique IV per card
+- Card type auto-detection (Visa, Mastercard, Amex, Discover)
+- Decryption requires authentication
 
 ### File Storage Security
 
