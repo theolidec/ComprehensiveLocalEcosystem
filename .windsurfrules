@@ -1,4 +1,4 @@
-At the start of every response, write this "Yes sir!"
+At the start of every response, write this "Yes sir!" // This is only for validating that the AI is folowing the rules of this file. 
 Before making any changes, determine the scope of the changes and read the appropriate documentation files in the root directory and in /doc to understand the project structure. Always follow the existing project structure and coding conventions.
 Make the smallest change necessary to accomplish the task. Do not refactor, reorganize, or rename things unless necessary.
 After making changes, re-read every modified file and verify that the changes are correct and complete. Check for errors, inconsistencies, missing imports, broken references, and missing details.
