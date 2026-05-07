@@ -3,11 +3,17 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
 import { 
   X, RefreshCw, FileText, Download, File, Image, Video, FileCode,
   Save, Edit2, Eye, ArrowLeft, CheckCircle
 } from 'lucide-react';
+
 import fileStorageService from '../../services/fileService';
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://localhost:3443';
 const { fileService } = fileStorageService;
@@ -56,6 +62,7 @@ const DocumentViewer = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [fileInfo, setFileInfo] = useState(null);
+  const [numPages, setNumPages] = useState(null);
   
   // Text editing state
   const [isEditable, setIsEditable] = useState(false);
@@ -123,6 +130,11 @@ const DocumentViewer = () => {
   useEffect(() => {
     loadFile();
   }, [loadFile]);
+
+  // Reset PDF page count when file changes
+  useEffect(() => {
+    setNumPages(null);
+  }, [fileId]);
 
   // Track changes
   useEffect(() => {
@@ -443,11 +455,35 @@ const DocumentViewer = () => {
                 Your browser does not support video playback.
               </video>
             ) : fileInfo?.mimeType === 'application/pdf' ? (
-              <iframe
-                src={getPreviewUrl()}
-                className="w-full h-full rounded-lg border-0"
-                title={fileInfo.originalName}
-              />
+              <div
+                className="w-full h-full rounded-lg overflow-auto bg-gray-100 dark:bg-gray-800 p-4"
+                onClick={(e) => {
+                  const link = e.target.closest('a');
+                  if (link && link.href && !link.target) {
+                    e.preventDefault();
+                    window.open(link.href, '_blank');
+                  }
+                }}
+              >
+                <Document
+                  file={getPreviewUrl()}
+                  onLoadSuccess={({ numPages }) => setNumPages(numPages)}
+                  externalLinkTarget="_blank"
+                  options={{
+                    cMapUrl: 'https://unpkg.com/pdfjs-dist@3.11.174/cmaps/',
+                    cMapPacked: true,
+                  }}
+                >
+                  {Array.from(new Array(numPages), (el, index) => (
+                    <Page
+                      key={`page_${index + 1}`}
+                      pageNumber={index + 1}
+                      width={window.innerWidth * 0.6}
+                      className="mb-4"
+                    />
+                  ))}
+                </Document>
+              </div>
             ) : (
               <div className="text-center">
                 <FileIcon className="h-24 w-24 text-gray-400 mx-auto mb-4" />

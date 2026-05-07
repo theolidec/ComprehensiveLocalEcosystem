@@ -205,5 +205,5 @@ Frontend API service with methods for all tracker endpoints.
 
 ---
 
-**Last Updated**: May 3, 2026
+**Last Updated**: May 7, 2026
 **Version**: 2.0.0

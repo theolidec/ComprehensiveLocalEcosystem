@@ -133,7 +133,7 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 3, 2026  
+**Last Updated**: May 7, 2026  
 **Version**: 2.0.0
 
 ## Recent Changes

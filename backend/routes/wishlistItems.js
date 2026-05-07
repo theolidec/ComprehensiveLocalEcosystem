@@ -180,8 +180,6 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
     let y = tableTop + 20;
     doc.font('Helvetica').fontSize(8);
 
-    const itemsWithUrls = [];
-
     items.forEach((item, index) => {
       if (y > 680) {
         doc.addPage();
@@ -204,7 +202,6 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
 
       if (item.url) {
         doc.fillColor('#0066cc').text('Click here', columns.link.x, y, { width: columns.link.width, link: item.url });
-        itemsWithUrls.push({ title: item.title, url: item.url });
       } else {
         doc.fillColor('#ccc').text('-', columns.link.x, y, { width: columns.link.width });
       }
@@ -214,37 +211,39 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
       y += 16;
     });
 
-    if (itemsWithUrls.length > 0) {
-      y += 20;
-      doc.fontSize(12).font('Helvetica-Bold').fillColor('#000').text('Links', 50, y);
-      y += 15;
-      doc.font('Helvetica').fontSize(9);
+    y += 20;
+    doc.fontSize(12).font('Helvetica-Bold').fillColor('#000').text('Links', 50, y);
+    y += 15;
+    doc.font('Helvetica').fontSize(9);
 
-      itemsWithUrls.forEach((item, idx) => {
-        if (y > 700) {
-          doc.addPage();
-          y = 50;
-        }
-        doc.fillColor('#000');
-        const titleStr = `${idx + 1}. ${item.title}: `;
-        const titleWidth = doc.widthOfString(titleStr);
-        const urlWidth = 490 - titleWidth;
-        doc.text(titleStr, 50, y, { continued: true });
+    items.forEach((item, idx) => {
+      if (y > 700) {
+        doc.addPage();
+        y = 50;
+      }
+      doc.fillColor('#000');
+      const titleStr = `${idx + 1}. ${item.title}: `;
+      const titleWidth = doc.widthOfString(titleStr);
+      const urlWidth = 490 - titleWidth;
+      doc.text(titleStr, 50, y, { continued: true });
+      if (item.url) {
         doc.fillColor('#0066cc');
         const urlY = doc.text(item.url, { link: item.url, width: urlWidth });
         const linesWrapped = Math.ceil(doc.widthOfString(item.url) / urlWidth);
         doc.fillColor('#000');
         y += Math.max(14, linesWrapped * 12);
-      });
-    }
+      } else {
+        doc.fillColor('#999').text('--', { width: urlWidth });
+        doc.fillColor('#000');
+        y += 14;
+      }
+    });
 
-    const totalValue = items.reduce((sum, item) => sum + (item.price || 0), 0);
     y += 10;
     doc.moveTo(50, y).lineTo(530, y).stroke('#ccc');
     y += 10;
     doc.font('Helvetica-Bold').fontSize(10);
-    doc.text(`Total Items: ${items.length}`, 50, y, { width: 230 });
-    doc.text(`Total Value: $${totalValue.toFixed(2)}`, 300, y, { width: 230 });
+    doc.text(`Total Items: ${items.length}`, 50, y);
 
     doc.end();
     logger.info(`PDF export: ${items.length} items by ${req.user.email}`);
