@@ -25,6 +25,7 @@ A full-featured web application ecosystem combining robust authentication, dynam
 - **Category Manager**: Custom category creation and management
 - **Settings Page**: User preferences and account settings
 - **Import/Export**: JSON export and import functionality
+- **Home Page Integration**: Quick event creation and today's events on Home
 
 ### Password Manager
 - **AES-256-GCM Encryption**: Military-grade encryption for stored passwords
@@ -439,7 +440,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.0.0
-**Last Updated**: 2026-05-07
+**Version**: 2.1.0
+**Last Updated**: 2026-05-09
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

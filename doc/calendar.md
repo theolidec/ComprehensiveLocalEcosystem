@@ -173,3 +173,21 @@ Categories auto-assign colors:
 - **Settings Module**: Calendar preferences (default view, week start, timezone)
 - **Notification Module**: Event reminders (planned)
 - **Category Module**: Event categorization
+- **Home Page**: Quick event creation and today's events display
+
+### Home Page Integration
+The Home page provides quick access to calendar events:
+- **Today's Events Card**: Displays today's events with category color coding
+- **Quick Event Creation**: Inline form to add events directly from Home
+- **Next Event Preview**: Shows upcoming event when no events today
+- **Navigation**: Links to full calendar view (day/week/month)
+
+Event creation from Home supports:
+- Event title (required)
+- Time selection (default: 12:00)
+- Category selection (work, personal, health, family, social, other)
+
+---
+
+**Last Updated**: May 9, 2026
+**Version**: 2.1.0

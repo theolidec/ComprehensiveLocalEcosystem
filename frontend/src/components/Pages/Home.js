@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare, Flame, Target, CheckCircle } from 'lucide-react';
+import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare, Flame, Target, CheckCircle, Plus, X } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import calendarAPI from '../../services/calendarAPI';
 import trackerAPI from '../../services/trackerAPI';
@@ -10,11 +10,18 @@ function Home() {
   const { isAuthenticated } = useAuth();
   const [todayEvents, setTodayEvents] = useState([]);
   const [eventsLoading, setEventsLoading] = useState(false);
+  const [nextEvent, setNextEvent] = useState(null);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [trackerData, setTrackerData] = useState(null);
   const [trackerLoading, setTrackerLoading] = useState(false);
   const [currentMood, setCurrentMood] = useState(null);
   const [moodSaved, setMoodSaved] = useState(false);
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [newTask, setNewTask] = useState({ title: '', priority: 'medium', recurrence: 'none' });
+  const [creatingTask, setCreatingTask] = useState(false);
+  const [showEventForm, setShowEventForm] = useState(false);
+  const [newEvent, setNewEvent] = useState({ title: '', time: '', category: 'work' });
+  const [creatingEvent, setCreatingEvent] = useState(false);
 
   const isEndOfDay = currentTime.getHours() >= 17;
 
@@ -62,6 +69,38 @@ function Home() {
         const endOfDay = `${year}-${month}-${day}T23:59:59`;
         const events = await calendarAPI.getEvents({ startDate: startOfDay, endDate: endOfDay });
         setTodayEvents(events || []);
+        
+        if (!events || events.length === 0) {
+          const tomorrow = new Date(today);
+          tomorrow.setDate(tomorrow.getDate() + 1);
+          const nextYear = tomorrow.getFullYear();
+          const nextMonth = String(tomorrow.getMonth() + 1).padStart(2, '0');
+          const nextDay = String(tomorrow.getDate()).padStart(2, '0');
+          const nextStart = `${nextYear}-${nextMonth}-${nextDay}T00:00:00`;
+          const nextEnd = `${nextYear}-${nextMonth}-${nextDay}T23:59:59`;
+          const upcoming = await calendarAPI.getEvents({ startDate: nextStart, endDate: nextEnd, limit: 1 });
+          if (upcoming && upcoming.length > 0) {
+            setNextEvent({ event: upcoming[0], daysUntil: 1 });
+          } else {
+            let searchDate = new Date(tomorrow);
+            let foundEvent = null;
+            for (let i = 0; i < 30 && !foundEvent; i++) {
+              searchDate.setDate(searchDate.getDate() + 1);
+              const sYear = searchDate.getFullYear();
+              const sMonth = String(searchDate.getMonth() + 1).padStart(2, '0');
+              const sDay = String(searchDate.getDate()).padStart(2, '0');
+              const sStart = `${sYear}-${sMonth}-${sDay}T00:00:00`;
+              const sEnd = `${sYear}-${sMonth}-${sDay}T23:59:59`;
+              const futureEvents = await calendarAPI.getEvents({ startDate: sStart, endDate: sEnd, limit: 1 });
+              if (futureEvents && futureEvents.length > 0) {
+                foundEvent = { event: futureEvents[0], daysUntil: i + 2 };
+              }
+            }
+            setNextEvent(foundEvent);
+          }
+        } else {
+          setNextEvent(null);
+        }
       } catch (err) {
         console.error('Error fetching today events:', err);
       } finally {
@@ -99,6 +138,58 @@ function Home() {
     };
     fetchTrackerData();
   }, [isAuthenticated]);
+
+  const handleCreateTask = async (e) => {
+    e.preventDefault();
+    if (!newTask.title.trim()) return;
+    setCreatingTask(true);
+    try {
+      const taskData = {
+        title: newTask.title.trim(),
+        priority: newTask.priority,
+        recurrence: newTask.recurrence,
+        category: 'General'
+      };
+      await trackerAPI.createTask(taskData);
+      setNewTask({ title: '', priority: 'medium', recurrence: 'none' });
+      setShowTaskForm(false);
+      const todayTasks = await trackerAPI.getTodayTasks();
+      setTrackerData(prev => ({ ...prev, tasks: todayTasks.tasks || [] }));
+    } catch (err) {
+      console.error('Error creating task:', err);
+    } finally {
+      setCreatingTask(false);
+    }
+  };
+
+  const handleCreateEvent = async (e) => {
+    e.preventDefault();
+    if (!newEvent.title.trim()) return;
+    setCreatingEvent(true);
+    try {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const eventData = {
+        title: newEvent.title.trim(),
+        date: `${year}-${month}-${day}`,
+        time: newEvent.time || '12:00',
+        category: newEvent.category
+      };
+      await calendarAPI.createEvent(eventData);
+      setNewEvent({ title: '', time: '', category: 'work' });
+      setShowEventForm(false);
+      const startOfDay = `${year}-${month}-${day}T00:00:00`;
+      const endOfDay = `${year}-${month}-${day}T23:59:59`;
+      const events = await calendarAPI.getEvents({ startDate: startOfDay, endDate: endOfDay });
+      setTodayEvents(events || []);
+    } catch (err) {
+      console.error('Error creating event:', err);
+    } finally {
+      setCreatingEvent(false);
+    }
+  };
 
   const handleToggleTask = async (taskId, completed) => {
     try {
@@ -261,15 +352,72 @@ function Home() {
                   Loading tracker data...
                 </div>
               ) : !trackerData?.tasks || trackerData.tasks.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-                  <CheckSquare className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p>No tasks for today</p>
-                  <button
-                    onClick={() => navigate('/tracker')}
-                    className="mt-2 text-sm text-emerald-600 dark:text-emerald-400 hover:underline"
-                  >
-                    Add tasks in Tracker
-                  </button>
+                <div className="p-6">
+                  {showTaskForm ? (
+                    <form onSubmit={handleCreateTask} className="space-y-4">
+                      <div>
+                        <input
+                          type="text"
+                          value={newTask.title}
+                          onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                          placeholder="Task title..."
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                          autoFocus
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <select
+                          value={newTask.priority}
+                          onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <option value="low">Low</option>
+                          <option value="medium">Medium</option>
+                          <option value="urgent">Urgent</option>
+                        </select>
+                        <select
+                          value={newTask.recurrence}
+                          onChange={(e) => setNewTask({ ...newTask, recurrence: e.target.value })}
+                          className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                        >
+                          <option value="none">No repeat</option>
+                          <option value="daily">Daily</option>
+                          <option value="weekly">Weekly</option>
+                        </select>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          type="submit"
+                          disabled={creatingTask || !newTask.title.trim()}
+                          className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                        >
+                          {creatingTask ? 'Adding...' : 'Add Task'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setShowTaskForm(false);
+                            setNewTask({ title: '', priority: 'medium', recurrence: 'none' });
+                          }}
+                          className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <div className="text-center text-gray-500 dark:text-gray-400">
+                      <CheckSquare className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                      <p>No tasks for today</p>
+                      <button
+                        onClick={() => setShowTaskForm(true)}
+                        className="mt-2 inline-flex items-center gap-1 text-sm text-emerald-600 dark:text-emerald-400 hover:underline"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add a task
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="p-6">
@@ -321,9 +469,75 @@ function Home() {
                     </div>
                   </div>
 
+                  {/* Inline Task Form */}
+                  {showTaskForm && (
+                    <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600">
+                      <form onSubmit={handleCreateTask} className="space-y-3">
+                        <div>
+                          <input
+                            type="text"
+                            value={newTask.title}
+                            onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
+                            placeholder="Task title..."
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <select
+                            value={newTask.priority}
+                            onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                          >
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="urgent">Urgent</option>
+                          </select>
+                          <select
+                            value={newTask.recurrence}
+                            onChange={(e) => setNewTask({ ...newTask, recurrence: e.target.value })}
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-emerald-500"
+                          >
+                            <option value="none">No repeat</option>
+                            <option value="daily">Daily</option>
+                            <option value="weekly">Weekly</option>
+                          </select>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={creatingTask || !newTask.title.trim()}
+                            className="flex-1 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {creatingTask ? 'Adding...' : 'Add Task'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowTaskForm(false);
+                              setNewTask({ title: '', priority: 'medium', recurrence: 'none' });
+                            }}
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+
                   {/* Today's Tasks Preview */}
                   <div className="space-y-2 mb-6">
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Today's Tasks</h4>
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Today's Tasks</h4>
+                      <button
+                        onClick={() => setShowTaskForm(true)}
+                        className="text-xs text-emerald-600 dark:text-emerald-400 hover:underline flex items-center gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        Add Task
+                      </button>
+                    </div>
                     {trackerData.tasks.slice(0, 4).map(task => (
                       <div
                         key={task._id}
@@ -529,23 +743,122 @@ function Home() {
                   {formatTime(currentTime)} · {formatDate(currentTime)}
                 </span>
               </div>
-              <button
-                onClick={() => navigate('/calendar/day')}
-                className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
-              >
-                View Calendar
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowEventForm(true)}
+                  className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 flex items-center gap-1"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Event
+                </button>
+                <button
+                  onClick={() => navigate('/calendar/day')}
+                  className="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300"
+                >
+                  View Calendar
+                </button>
+              </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
               {eventsLoading ? (
                 <div className="p-6 text-center text-gray-500 dark:text-gray-400">
                   Loading events...
                 </div>
-              ) : todayEvents.length === 0 ? (
-                <div className="p-6 text-center text-gray-500 dark:text-gray-400">
-                  No events scheduled for today
+              ) : todayEvents.length === 0 && !showEventForm ? (
+                <div className="p-6">
+                  {nextEvent ? (
+                    <div className="text-center">
+                      <p className="text-gray-500 dark:text-gray-400 mb-2">
+                        No events scheduled for today
+                        <br />
+                        {nextEvent.daysUntil === 1 ? 'Your next event is tomorrow' : `Your next event is in ${nextEvent.daysUntil} days`}
+                      </p>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                        <Clock className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                        <span className="font-medium text-gray-900 dark:text-white">{nextEvent.event.title}</span>
+                      </div>
+                      <button
+                        onClick={() => setShowEventForm(true)}
+                        className="mt-3 block w-full text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        Add an event
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="text-center text-gray-500 dark:text-gray-400">
+                      <Calendar className="h-10 w-10 mx-auto mb-2 opacity-30" />
+                      <p>No events scheduled</p>
+                      <button
+                        onClick={() => setShowEventForm(true)}
+                        className="mt-2 inline-flex items-center gap-1 text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                      >
+                        <Plus className="h-4 w-4" />
+                        Add an event
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
+                <>
+                  {showEventForm && (
+                    <div className="p-4 bg-gray-50 dark:bg-gray-700/30 border-b border-gray-200 dark:border-gray-700">
+                      <form onSubmit={handleCreateEvent} className="space-y-3">
+                        <div>
+                          <input
+                            type="text"
+                            value={newEvent.title}
+                            onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
+                            placeholder="Event title..."
+                            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                            autoFocus
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <input
+                            type="time"
+                            value={newEvent.time}
+                            onChange={(e) => setNewEvent({ ...newEvent, time: e.target.value })}
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500"
+                          />
+                          <select
+                            value={newEvent.category}
+                            onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
+                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-indigo-500"
+                          >
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="health">Health</option>
+                            <option value="family">Family</option>
+                            <option value="social">Social</option>
+                            <option value="other">Other</option>
+                          </select>
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            type="submit"
+                            disabled={creatingEvent || !newEvent.title.trim()}
+                            className="flex-1 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            {creatingEvent ? 'Adding...' : 'Add Event'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowEventForm(false);
+                              setNewEvent({ title: '', time: '', category: 'work' });
+                            }}
+                            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {todayEvents.length > 0 && (
                 <div className="divide-y divide-gray-200 dark:divide-gray-700">
                   {todayEvents.map((event) => (
                     <div
