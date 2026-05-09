@@ -9,8 +9,13 @@ The Files module provides comprehensive file storage and management with folder 
 - **Trash System**: Soft delete with restore capability
 - **File Sharing**: Public sharing via token-based URLs
 - **Storage Stats**: Track storage usage and quotas
-- **Text File Editor**: Create and edit .txt and .md files
-- **File Preview**: In-browser preview for images, videos, documents
+- **Rich Document Editor**: TipTap-based WYSIWYG editor for HTML documents with headings (H1-H6), tables, text color, highlight, font family/size, alignment, lists, links, and server-side image upload
+- **Auto-Save**: Debounced auto-save (3s) for HTML documents
+- **Version History**: Automatic version snapshots for HTML documents with restore (max 50 versions per document)
+- **XSS Protection**: DOMPurify sanitization on all loaded HTML content
+- **Export & Print**: Download as HTML or plain text; print with proper formatting
+- **Text File Editor**: Create and edit .txt, .md, .html, .css, .js, .json, .xml files
+- **File Preview**: In-browser preview for images, videos, documents, rendered HTML
 - **Favorites**: Mark files as favorites for quick access
 - **Search**: Search files by name and description
 
@@ -66,6 +71,15 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 - `isDeleted`: Boolean (default: false)
 - `deletedAt`: Date (default: null)
 
+### DocumentVersion Schema
+- `fileId`: ObjectId (ref: 'File', required, indexed) - Associated file
+- `userId`: ObjectId (ref: 'User', required, indexed) - User who saved
+- `content`: String (required) - Full HTML content snapshot
+- `size`: Number (bytes) - Content size
+- `version`: Number (auto-incremented) - Version number
+- `timestamps`: createdAt, updatedAt
+- Max 50 versions per document (configurable via `MAX_DOCUMENT_VERSIONS` env var)
+
 ## API Endpoints
 
 ### Files (`/api/files`)
@@ -87,9 +101,13 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 | DELETE | `/:id/permanent` | Permanent delete |
 | POST | `/:id/restore` | Restore from trash |
 | DELETE | `/trash/empty` | Empty trash |
-| POST | `/create-text` | Create txt/md file |
+| POST | `/create-text` | Create txt/md/HTML file |
 | GET | `/:id/content` | Read text file |
-| PUT | `/:id/content` | Write text file |
+| PUT | `/:id/content` | Write text file (auto-versions HTML) |
+| POST | `/document-image` | Upload image for document |
+| GET | `/document-images/:filename` | Serve document image |
+| GET | `/:id/versions` | List document versions |
+| GET | `/:id/versions/:versionId` | Get version content |
 
 ### Folders (`/api/file-folders`)
 | Method | Endpoint | Description |
@@ -112,11 +130,14 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 
 ### Document Editor
 - **File**: `frontend/src/components/Pages/DocumentEditor.js`
-- Full-featured text/markdown editor
+- TipTap-based WYSIWYG rich text editor for HTML documents
+- **Extension**: `frontend/src/components/Editor/FontSize.js` - Custom TipTap font size extension
+- Features: Headings, tables, text color/highlight, font family/size, alignment, lists, links, images (server upload), auto-save, version history, print, HTML/TXT export
 
 ### Document Viewer
 - **File**: `frontend/src/components/Pages/DocumentViewer.js`
-- Read-only file viewer
+- Multi-format viewer with rendered HTML (sanitized via DOMPurify), markdown preview, and plain text editing
+- HTML files navigate to rich DocumentEditor on edit
 
 ### Service
 - **File**: `frontend/src/services/fileService.js`
@@ -133,6 +154,7 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 
 ### Configuration
 - Upload directory: `backend/uploads/files/`
+- Document images: `backend/uploads/files/document-images/`
 - Max file size: 500MB (configurable)
 - Default storage quota: 10GB per user
 - **Git Exclusion**: All uploaded files are excluded from version control via `.gitignore` patterns (`uploads/`, `backend/uploads/files/`, `backend/uploads/documents/`) to prevent sensitive user data from being committed to GitHub
@@ -162,6 +184,12 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 | `STATS_ERROR` | Statistics calculation failed |
 | `GET_CONTENT_ERROR` | Read file content failed |
 | `UPDATE_CONTENT_ERROR` | Write file content failed |
+| `IMAGE_UPLOAD_ERROR` | Document image upload failed |
+| `IMAGE_NOT_FOUND` | Document image not found |
+| `IMAGE_SERVE_ERROR` | Failed to serve document image |
+| `GET_VERSIONS_ERROR` | Failed to list document versions |
+| `VERSION_NOT_FOUND` | Document version not found |
+| `GET_VERSION_ERROR` | Failed to get document version |
 | `NO_NAME` | Missing file/folder name |
 | `INVALID_PARENT` | Invalid parent folder |
 | `GET_FOLDERS_ERROR` | Failed to fetch folders |

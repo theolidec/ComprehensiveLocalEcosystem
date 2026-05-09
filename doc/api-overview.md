@@ -205,22 +205,26 @@ GET /api/auth/me
 | GET | `/` | Yes | List files with pagination |
 | GET | `/all` | Yes | List all files (flat list, max 1000) |
 | POST | `/upload` | Yes | Upload file (multipart/form-data) |
+| POST | `/document-image` | Yes | Upload image for document embedding (multipart/form-data) |
+| GET | `/document-images/:filename` | No | Serve document image |
 | GET | `/stats` | Yes | Storage statistics |
 | GET | `/trash` | Yes | List deleted files |
 | DELETE | `/trash/empty` | Yes | Permanently delete all trash |
-| POST | `/create-text` | Yes | Create text/markdown file |
+| POST | `/create-text` | Yes | Create text/markdown/HTML file |
 | GET | `/:id` | Yes | File metadata |
 | GET | `/:id/download` | Yes | Download file |
 | GET | `/:id/stream` | Yes | Stream file content |
 | GET | `/:id/dataurl` | Yes | Get as base64 data URL |
 | GET | `/:id/content` | Yes | Read text file content |
 | PUT | `/:id` | Yes | Update metadata |
-| PUT | `/:id/content` | Yes | Update text file content |
+| PUT | `/:id/content` | Yes | Update text file content (auto-creates version for HTML) |
 | PUT | `/:id/move` | Yes | Move to folder |
 | PUT | `/:id/share` | Yes | Toggle public sharing |
 | DELETE | `/:id` | Yes | Soft delete (move to trash) |
 | DELETE | `/:id/permanent` | Yes | Permanently delete |
 | POST | `/:id/restore` | Yes | Restore from trash |
+| GET | `/:id/versions` | Yes | List document version history |
+| GET | `/:id/versions/:versionId` | Yes | Get specific version content |
 | GET | `/shared/:token` | No | Access shared file |
 
 ### Base: `/api/file-folders`

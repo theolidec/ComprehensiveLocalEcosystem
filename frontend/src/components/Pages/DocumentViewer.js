@@ -1,14 +1,15 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import DOMPurify from 'dompurify';
 import { Document, Page, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import { 
   X, RefreshCw, FileText, Download, File, Image, Video, FileCode,
-  Save, Edit2, Eye, ArrowLeft, CheckCircle
+  Save, Edit2, Eye, ArrowLeft, CheckCircle, Edit3
 } from 'lucide-react';
 
 import fileStorageService from '../../services/fileService';
@@ -166,6 +167,10 @@ const DocumentViewer = () => {
   };
 
   const handleEdit = () => {
+    if (fileInfo?.mimeType === 'text/html') {
+      navigate(`/files/document/edit/${fileId}`);
+      return;
+    }
     setIsEditing(true);
     setSaveSuccess(false);
   };
@@ -325,8 +330,8 @@ const DocumentViewer = () => {
                     : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
               >
-                <Edit2 className="h-4 w-4" />
-                <span className="text-sm">Edit</span>
+                {fileInfo?.mimeType === 'text/html' ? <Edit3 className="h-4 w-4" /> : <Edit2 className="h-4 w-4" />}
+                <span className="text-sm">{fileInfo?.mimeType === 'text/html' ? 'Rich Edit' : 'Edit'}</span>
               </button>
             </div>
           )}
@@ -414,7 +419,7 @@ const DocumentViewer = () => {
           // Text Editor View
           <div className="h-full flex flex-col">
             {isEditing ? (
-              // Edit Mode
+              // Edit Mode (plain text only — HTML uses DocumentEditor)
               <textarea
                 value={content}
                 onChange={handleContentChange}
@@ -425,7 +430,16 @@ const DocumentViewer = () => {
             ) : (
               // View Mode
               <div className="flex-1 overflow-auto p-6 bg-white dark:bg-gray-900">
-                {fileInfo?.mimeType === 'text/markdown' && !showRawMarkdown ? (
+                {fileInfo?.mimeType === 'text/html' ? (
+                  // Rendered HTML view (sanitized)
+                  <div 
+                    className="prose prose-sm dark:prose-invert max-w-none"
+                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content, {
+                      ADD_TAGS: ['table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'span', 'font'],
+                      ADD_ATTR: ['style', 'class', 'colspan', 'rowspan', 'color', 'bgcolor', 'face', 'size'],
+                    }) }}
+                  />
+                ) : fileInfo?.mimeType === 'text/markdown' && !showRawMarkdown ? (
                   // Markdown formatted view
                   <MarkdownPreview content={content} />
                 ) : (

@@ -38,7 +38,13 @@ This is a full-featured web application ecosystem combining robust authenticatio
 - **Settings Page**: User preferences and account settings
 - **File Manager**
   - **Complete File Management**: Upload, download, organize files with folder structure
-  - **Document Viewer**: Built-in text and markdown file editor with live preview
+  - **Rich Document Editor**: TipTap-based WYSIWYG editor (Google Docs-like) with headings, tables, text color, highlight, font family/size, alignment, lists, links, and images
+  - **Document Viewer**: Built-in text, HTML, and markdown file viewer with live preview; HTML files open in rich editor
+  - **Auto-Save**: Debounced auto-save (3s) for HTML documents with visual indicator
+  - **Version History**: Automatic version snapshots for HTML documents with restore capability (max 50 versions)
+  - **Image Upload**: Document images uploaded to server storage (not embedded as base64 data URLs)
+  - **XSS Protection**: DOMPurify sanitization on all loaded HTML content
+  - **Export & Print**: Download as HTML or plain text; print document with proper formatting
   - **File Organization**: Create folders, move files, favorite files
   - **File Types Supported**: Images, documents, spreadsheets, presentations, code files, archives, audio, video
   - **Trash System**: Soft delete with restore functionality
@@ -1121,7 +1127,7 @@ Get recent changes for a wiki.
 ### Data Protection
 - **Input Validation**: Comprehensive validation using express-validator
 - **SQL Injection Prevention**: Mongoose ODM provides protection
-- **XSS Protection**: HttpOnly cookies and Helmet security headers
+- **XSS Protection**: HttpOnly cookies, Helmet security headers, and DOMPurify sanitization for document content
 - **CSRF Protection**: SameSite cookie policy
 
 ## 🏗️ Architecture
@@ -1154,6 +1160,7 @@ backend/
 │   ├── Settings.js          # User settings model
 │   ├── File.js              # File model
 │   ├── FileFolder.js        # File folder model
+│   ├── DocumentVersion.js   # Document version history model
 │   ├── Wishlist.js          # Wishlist model
 │   ├── WishlistItem.js      # Wishlist item model
 │   ├── WishlistCategory.js  # Wishlist category model

@@ -51,6 +51,7 @@ backend/
 │   ├── Password.js
 │   ├── File.js
 │   ├── FileFolder.js
+│   ├── DocumentVersion.js   # Document version history
 │   ├── Settings.js
 │   ├── Wiki.js
 │   ├── WikiPage.js

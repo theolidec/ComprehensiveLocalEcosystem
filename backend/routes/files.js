@@ -128,6 +128,9 @@ const upload = multer({
 
 router.post('/upload', authenticateToken, upload.single('file'), fileController.uploadFile);
 
+router.post('/document-image', authenticateToken, upload.single('image'), fileController.uploadDocumentImage);
+router.get('/document-images/:filename', fileController.serveDocumentImage);
+
 router.get('/', authenticateToken, fileController.getFiles);
 router.get('/all', authenticateToken, fileController.getAllFiles);
 router.get('/stats', authenticateToken, fileController.getStorageStats);
@@ -184,8 +187,8 @@ router.delete('/trash/empty', authenticateToken, fileController.emptyTrash);
 
 router.post('/create-text', authenticateToken, [
   body('name').trim().notEmpty().withMessage('File name is required').isLength({ max: 255 }),
-  body('content').optional().trim(),
-  body('folderId').optional().isMongoId().withMessage('Invalid folder ID'),
+  body('content').optional().isString(),
+  body('folderId').optional({ values: 'falsy' }).isMongoId().withMessage('Invalid folder ID'),
   body('mimeType').optional().isString()
 ], handleValidationErrors, fileController.createTextFile);
 
@@ -195,7 +198,16 @@ router.get('/:id/content', authenticateToken, [
 
 router.put('/:id/content', authenticateToken, [
   param('id').isMongoId().withMessage('Invalid file ID'),
-  body('content').optional().trim()
+  body('content').optional().isString()
 ], handleValidationErrors, fileController.updateFileContent);
+
+router.get('/:id/versions', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID')
+], handleValidationErrors, fileController.getDocumentVersions);
+
+router.get('/:id/versions/:versionId', authenticateToken, [
+  param('id').isMongoId().withMessage('Invalid file ID'),
+  param('versionId').isMongoId().withMessage('Invalid version ID')
+], handleValidationErrors, fileController.getDocumentVersion);
 
 module.exports = router;

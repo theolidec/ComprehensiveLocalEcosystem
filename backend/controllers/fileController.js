@@ -1,5 +1,6 @@
 const File = require('../models/File');
 const FileFolder = require('../models/FileFolder');
+const DocumentVersion = require('../models/DocumentVersion');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
@@ -432,7 +433,17 @@ const fileController = {
       ensureUploadDir();
 
       const fileContent = content || '';
-      const fileExt = mimeType === 'text/markdown' ? '.md' : '.txt';
+      const extMap = {
+        'text/markdown': '.md',
+        'text/html': '.html',
+        'text/css': '.css',
+        'text/javascript': '.js',
+        'application/javascript': '.js',
+        'application/json': '.json',
+        'text/xml': '.xml',
+        'application/xml': '.xml'
+      };
+      const fileExt = extMap[mimeType] || '.txt';
       const originalName = name.endsWith(fileExt) ? name : `${name}${fileExt}`;
       const uniqueSuffix = crypto.randomBytes(16).toString('hex');
       const filename = `${uniqueSuffix}${fileExt}`;
@@ -483,6 +494,87 @@ const fileController = {
     }
   },
 
+  uploadDocumentImage: async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image uploaded', code: 'NO_FILE' });
+      }
+
+      const imageDir = path.join(UPLOAD_DIR, 'document-images');
+      if (!fs.existsSync(imageDir)) {
+        fs.mkdirSync(imageDir, { recursive: true });
+      }
+
+      const uniqueSuffix = crypto.randomBytes(16).toString('hex');
+      const ext = path.extname(req.file.originalname) || '.png';
+      const filename = `${uniqueSuffix}${ext}`;
+      const imagePath = path.join(imageDir, filename);
+
+      if (req.file.path && req.file.path !== imagePath) {
+        fs.renameSync(req.file.path, imagePath);
+      }
+
+      const url = `/api/files/document-images/${filename}`;
+      res.json({ url, filename });
+    } catch (error) {
+      logger.error('Document image upload error:', error);
+      if (req.file && req.file.path && fs.existsSync(req.file.path)) {
+        fs.unlinkSync(req.file.path);
+      }
+      res.status(500).json({ error: 'Failed to upload image', code: 'IMAGE_UPLOAD_ERROR' });
+    }
+  },
+
+  serveDocumentImage: async (req, res) => {
+    try {
+      const imagePath = path.join(UPLOAD_DIR, 'document-images', req.params.filename);
+      if (!fs.existsSync(imagePath)) {
+        return res.status(404).json({ error: 'Image not found', code: 'IMAGE_NOT_FOUND' });
+      }
+      res.sendFile(imagePath);
+    } catch (error) {
+      logger.error('Serve document image error:', error);
+      res.status(500).json({ error: 'Failed to serve image', code: 'IMAGE_SERVE_ERROR' });
+    }
+  },
+
+  getDocumentVersions: async (req, res) => {
+    try {
+      const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+      if (!file) {
+        return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
+      }
+
+      const versions = await DocumentVersion.find({ fileId: file._id })
+        .sort({ version: -1 })
+        .limit(50);
+
+      res.json({ versions });
+    } catch (error) {
+      logger.error('Get document versions error:', error);
+      res.status(500).json({ error: 'Failed to get versions', code: 'GET_VERSIONS_ERROR' });
+    }
+  },
+
+  getDocumentVersion: async (req, res) => {
+    try {
+      const file = await File.findOne({ _id: req.params.id, userId: req.user._id });
+      if (!file) {
+        return res.status(404).json({ error: 'File not found', code: 'FILE_NOT_FOUND' });
+      }
+
+      const version = await DocumentVersion.findOne({ _id: req.params.versionId, fileId: file._id });
+      if (!version) {
+        return res.status(404).json({ error: 'Version not found', code: 'VERSION_NOT_FOUND' });
+      }
+
+      res.json({ content: version.content, version: version.version, createdAt: version.createdAt });
+    } catch (error) {
+      logger.error('Get document version error:', error);
+      res.status(500).json({ error: 'Failed to get version', code: 'GET_VERSION_ERROR' });
+    }
+  },
+
   updateFileContent: async (req, res) => {
     try {
       const { content } = req.body;
@@ -501,6 +593,14 @@ const fileController = {
       
       file.size = Buffer.byteLength(content || '');
       await file.save();
+
+      if (file.mimeType === 'text/html') {
+        try {
+          await DocumentVersion.createVersion(file._id, req.user._id, content || '');
+        } catch (verErr) {
+          logger.warn('Failed to create document version:', verErr.message);
+        }
+      }
       
       logger.info(`File content updated: ${file.originalName} by user ${req.user.email}`);
       
