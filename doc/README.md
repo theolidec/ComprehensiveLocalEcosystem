@@ -46,9 +46,15 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 
 ### MIL-STD-498 Compliance
 
-| Document | Description | Status |
-|----------|-------------|--------|
-| [`MIL-STD-498/SRS.md`](MIL-STD-498/SRS.md) | Software Requirements Specification | Complete |
+| Document | Abbreviation | Description | Status |
+|----------|--------------|-------------|--------|
+| [`MIL-STD-498/MIL-STD-498.md`](MIL-STD-498/MIL-STD-498.md) | MIL-STD-498 | Overview and document relationships | Complete |
+| [`MIL-STD-498/SDP.md`](MIL-STD-498/SDP.md) | SDP | Software Development Plan | Complete |
+| [`MIL-STD-498/OCD.md`](MIL-STD-498/OCD.md) | OCD | Operational Concept Description | Complete |
+| [`MIL-STD-498/SRS.md`](MIL-STD-498/SRS.md) | SRS | Software Requirements Specification | Complete |
+| [`MIL-STD-498/SUM.md`](MIL-STD-498/SUM.md) | SUM | Software User Manual | Complete |
+
+> **Note:** The main project README (`../README.md`) includes a MIL-STD-498 compliance section with quick reference links to all documentation.
 
 ## Documentation by Role
 
@@ -139,8 +145,8 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 7, 2026  
-**Version**: 2.0.0
+**Last Updated**: May 10, 2026  
+**Version**: 2.1.0
 
 ## Recent Changes
 

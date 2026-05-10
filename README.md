@@ -1,6 +1,79 @@
 # Comprehensive Local Ecosystem
+
 ##### Written using Windsurf (https://windsurf.com/)
+
 A full-featured web application ecosystem combining robust authentication, dynamic calendar management, secure password storage, wishlist management with social features, and modern user interface design. Built with React (frontend) and Node.js/Express (backend) implementing industry best practices for security, scalability, and user experience.
+
+---
+
+## MIL-STD-498 Compliance
+
+This project follows **MIL-STD-498** (Military Standard: Software Development and Documentation) for software documentation and development practices.
+
+### Completed Documentation (DIDs)
+
+| Document | Abbreviation | Description |
+|----------|--------------|-------------|
+| [Software Development Plan](doc/MIL-STD-498/SDP.md) | SDP | Plan for performing software development |
+| [Operational Concept Description](doc/MIL-STD-498/OCD.md) | OCD | Operational concept for the system |
+| [Software Requirements Specification](doc/MIL-STD-498/SRS.md) | SRS | Requirements to be met by each CSCI |
+| [Software User Manual](doc/MIL-STD-498/SUM.md) | SUM | Instructions for hands-on users |
+
+### Document Hierarchy
+
+```
+OCD (Operational Concept)
+    │
+    ▼
+SSS/SRS (Requirements)
+    │
+    ▼
+SSDD/SDD/DBDD/IDD (Design)
+    │
+    ▼
+STP/STD (Test Planning)
+    │
+    ▼
+STR (Test Results)
+    │
+    ▼
+SUM/SIOM (User Manuals)
+```
+
+### Quick Reference
+
+- **Full MIL-STD-498 Documentation**: [doc/MIL-STD-498/MIL-STD-498.md](doc/MIL-STD-498/MIL-STD-498.md)
+- **Project SRS**: [doc/MIL-STD-498/SRS.md](doc/MIL-STD-498/SRS.md) - Detailed software requirements
+- **Project OCD**: [doc/MIL-STD-498/OCD.md](doc/MIL-STD-498/OCD.md) - Operational concept
+- **Project SDP**: [doc/MIL-STD-498/SDP.md](doc/MIL-STD-498/SDP.md) - Development plan
+- **Project SUM**: [doc/MIL-STD-498/SUM.md](doc/MIL-STD-498/SUM.md) - User manual
+
+---
+
+## Documentation Structure
+
+### For Everyone
+- **[README.md](README.md)** - This file: Project overview and quick start
+- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Comprehensive technical documentation
+
+### For Developers
+- **[doc/README.md](doc/README.md)** - Documentation index
+- **[doc/development.md](doc/development.md)** - Development setup and workflows
+- **[doc/backend-architecture.md](doc/backend-architecture.md)** - Backend structure and patterns
+- **[doc/frontend-architecture.md](doc/frontend-architecture.md)** - Frontend structure and patterns
+- **[doc/database-models.md](doc/database-models.md)** - All MongoDB schemas
+
+### For API Consumers
+- **[doc/api-overview.md](doc/api-overview.md)** - Complete API reference
+- **[doc/authentication.md](doc/authentication.md)** - Authentication flow
+
+### For Security Review
+- **[SECURITY.md](SECURITY.md)** - Security policy
+- **[doc/security.md](doc/security.md)** - Security implementation details
+
+### For Operations
+- **[doc/deployment.md](doc/deployment.md)** - Production deployment guide
+- **[GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md)** - CI/CD workflow
 
 ## Key Features
 
@@ -419,12 +492,28 @@ curl http://localhost:3001/health
 
 ## Additional Documentation
 
+### Technical & Development
 - **Technical Documentation:** [DOCUMENTATION.md](./DOCUMENTATION.md)
-- **GitHub Workflow:** [GITHUB_WORKFLOW.md](./GITHUB_WORKFLOW.md)
+- **Documentation Index:** [doc/README.md](./doc/README.md)
+- **Backend Architecture:** [doc/backend-architecture.md](./doc/backend-architecture.md)
+- **Frontend Architecture:** [doc/frontend-architecture.md](./doc/frontend-architecture.md)
+- **Database Models:** [doc/database-models.md](./doc/database-models.md)
+- **API Overview:** [doc/api-overview.md](./doc/api-overview.md)
+
+### MIL-STD-498 Documentation
+- **MIL-STD-498 Overview:** [doc/MIL-STD-498/MIL-STD-498.md](./doc/MIL-STD-498/MIL-STD-498.md)
+- **Software Requirements:** [doc/MIL-STD-498/SRS.md](./doc/MIL-STD-498/SRS.md)
+- **Operational Concept:** [doc/MIL-STD-498/OCD.md](./doc/MIL-STD-498/OCD.md)
+- **Development Plan:** [doc/MIL-STD-498/SDP.md](./doc/MIL-STD-498/SDP.md)
+- **User Manual:** [doc/MIL-STD-498/SUM.md](./doc/MIL-STD-498/SUM.md)
+
+### Security & Legal
 - **Security Policy:** [SECURITY.md](./SECURITY.md)
+- **Security Implementation:** [doc/security.md](./doc/security.md)
 - **Privacy Policy:** [PRIVACY.md](./PRIVACY.md)
 - **Terms of Service:** [TERMS.md](./TERMS.md)
 - **Cookie Policy:** [COOKIE_POLICY.md](./COOKIE_POLICY.md)
+- **GitHub Workflow:** [GITHUB_WORKFLOW.md](./GITHUB_WORKFLOW.md)
 
 ## Contributing
 
@@ -440,7 +529,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.1.0
-**Last Updated**: 2026-05-09
+**Version**: 2.2.0
+**Last Updated**: 2026-05-10
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
