@@ -149,10 +149,12 @@ const Settings = () => {
     });
     if (result.success) {
       showMessage('Privacy settings updated');
-      // Delete theme cookie if user disabled it
+      // Delete theme cookies if user disabled it
       if (!allowThemeCookie) {
         document.cookie = 'theme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax';
         document.cookie = 'theme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;domain=' + window.location.hostname;
+        document.cookie = 'geogebraTheme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax';
+        document.cookie = 'geogebraTheme=;path=/;expires=Thu, 01 Jan 1970 00:00:00 GMT;SameSite=Lax;domain=' + window.location.hostname;
         localStorage.removeItem('theme');
       } else {
         // Re-save current theme to cookie if enabling
@@ -505,9 +507,9 @@ const Settings = () => {
                   defaultChecked={settings.privacy?.allowThemeCookie ?? true}
                   value="true"
                 />
-                Save Theme to Cookie (for login page)
+                Save Theme to Cookie (for login page and GeoGebra calculator)
                 <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  Allows your theme preference to persist on the login page
+                  Allows your theme preference to persist on the login page and in the GeoGebra calculator
                 </small>
               </label>
             </div>

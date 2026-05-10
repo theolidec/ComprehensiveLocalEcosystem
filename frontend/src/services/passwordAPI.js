@@ -41,6 +41,7 @@ export const passwordAPI = {
       const response = await axios.post(API_URLS.PASSWORDS, {
         title: passwordData.title,
         username: passwordData.username,
+        email: passwordData.email,
         password: passwordData.password,
         website: passwordData.website,
         category: passwordData.category || 'other',
@@ -58,6 +59,7 @@ export const passwordAPI = {
       const response = await axios.put(`${API_URLS.PASSWORDS}/${id}`, {
         title: passwordData.title,
         username: passwordData.username,
+        email: passwordData.email,
         password: passwordData.password,
         website: passwordData.website,
         category: passwordData.category,
@@ -115,9 +117,37 @@ export const passwordAPI = {
     }
   },
 
+  exportPasswordsCSV: async () => {
+    try {
+      const response = await axios.get(`${API_URLS.PASSWORDS}/export/csv`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `passwords-export-${new Date().toISOString().split('T')[0]}.csv`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      return true;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
   importPasswords: async (data) => {
     try {
       const response = await axios.post(`${API_URLS.PASSWORDS}/import`, data);
+      return response.data;
+    } catch (error) {
+      handleApiError(error);
+    }
+  },
+
+  importPasswordsCSV: async (csvData) => {
+    try {
+      const response = await axios.post(`${API_URLS.PASSWORDS}/import/csv`, { csvData });
       return response.data;
     } catch (error) {
       handleApiError(error);

@@ -12,6 +12,7 @@ The Passwords module provides secure password and payment card management with A
 - **Search**: Search by title, website, or username
 - **Auto-lock**: Automatic vault locking after inactivity
 - **Import/Export**: JSON backup and restore
+- **CSV Export/Import**: Export and import passwords and payment cards to/from CSV format
 - **Copy to Clipboard**: One-click password copying
 - **Website Detection**: Auto-extract website from URL
 - **Payment Cards**: Securely store credit/debit card details
@@ -79,8 +80,10 @@ The Passwords module provides secure password and payment card management with A
 | DELETE | `/api/passwords/:id` | Delete password |
 | GET | `/api/passwords/:id/decrypt` | Decrypt and return |
 | POST | `/api/passwords/:id/favorite` | Toggle favorite |
-| GET | `/api/passwords/export` | Export all passwords |
-| POST | `/api/passwords/import` | Import passwords |
+| GET | `/api/passwords/export` | Export encrypted passwords (JSON) |
+| GET | `/api/passwords/export/csv` | Export passwords and cards to CSV |
+| POST | `/api/passwords/import` | Import passwords (JSON) |
+| POST | `/api/passwords/import/csv` | Import passwords and cards from CSV |
 | GET | `/api/password-categories` | List categories |
 | POST | `/api/password-categories` | Create category |
 | PUT | `/api/password-categories/:id` | Update category |
@@ -97,6 +100,70 @@ The Passwords module provides secure password and payment card management with A
 | GET | `/api/payment-cards/:id/decrypt` | Decrypt and return card details |
 | POST | `/api/payment-cards/:id/favorite` | Toggle favorite |
 | POST | `/api/payment-cards/:id/default` | Set as default card |
+
+### CSV Export Format
+
+The CSV export includes both passwords and payment cards with the following columns:
+
+| Column | Description |
+|--------|-------------|
+| `type` | Entry type: `login` for passwords, `card` for payment cards |
+| `name` | Title (for passwords) or card name (for cards) |
+| `url` | Website URL (passwords only) |
+| `email` | Email address (passwords only) |
+| `username` | Username (passwords) or cardholder name (cards) |
+| `password` | Decrypted password, or card details (number, expiry, CVV) |
+| `note` | Additional notes or billing address |
+| `totp` | 2FA/TOTP key (reserved for future use) |
+| `createTime` | ISO timestamp of creation |
+| `modifyTime` | ISO timestamp of last modification |
+| `category` | Category (password categories or card types) |
+
+**Notes:**
+- All encrypted values are decrypted during export using the user's encryption key
+- Card data is formatted as: `Card Number: [number], Expiry: [date], CVV: [cvv]`
+- Special characters in CSV values are properly escaped during export
+- Dates are exported in ISO 8601 format
+- During import, passwords are re-encrypted with the user's current encryption key
+- Card type is auto-detected from card number during import if not specified
+- The `type` column determines whether the row is imported as a login or card entry
+- **Column aliases supported**: Import recognizes common alternative column names from other password managers (Bitwarden, LastPass, 1Password, KeePass, etc.)
+- **Line endings**: Supports both Unix (LF) and Windows (CRLF) line endings
+- **Category mapping**: Automatically maps common category names to valid enum values (e.g., 'Personal' → 'social', 'Banking' → 'finance')
+- **Security**: No sensitive data (passwords, card numbers) are logged during import
+
+### Supported CSV Column Aliases
+
+The CSV import supports multiple column name variations (case-insensitive):
+
+| Standard Column | Supported Aliases |
+|-----------------|-------------------|
+| `type` | `type`, `itemtype`, `entrytype`, `kind` |
+| `name` | `name`, `title`, `entryname`, `sitename`, `servicename` |
+| `url` | `url`, `website`, `link`, `site`, `uri`, `webaddress` |
+| `email` | `email`, `mail`, `emailaddress`, `e-mail` |
+| `username` | `username`, `user`, `login`, `userid`, `loginname`, `account` |
+| `password` | `password`, `pass`, `passwd`, `pwd`, `secret`, `credential` |
+| `note` | `note`, `notes`, `comment`, `comments`, `description`, `memo` |
+| `totp` | `totp`, `2fa`, `twofactor`, `otp`, `authenticator`, `2fa_key` |
+| `createTime` | `createtime`, `created`, `createdat`, `datecreated`, `creationdate` |
+| `modifyTime` | `modifytime`, `modified`, `updatedat`, `datemodified`, `lastmodified`, `changed` |
+| `category` | `category`, `type`, `group`, `folder`, `vault`, `tags`, `collection` |
+
+This allows importing CSV files exported from other password managers without manual column renaming.
+
+### Category Mapping
+
+During import, category names are automatically mapped to the valid enum values:
+
+| Imported Value | Mapped To |
+|----------------|-----------|
+| `Personal`, `Family`, `Friends`, `Messaging`, `Email`, `Communication` | `social` |
+| `Banking`, `Financial`, `Payment`, `Money`, `Credit`, `Crypto`, `Investment` | `finance` |
+| `Business`, `Professional`, `Career`, `Job`, `Development`, `Tools` | `work` |
+| `E-commerce`, `Retail`, `Store`, `Amazon`, `Marketplace` | `shopping` |
+| `Media`, `Streaming`, `Gaming`, `Video`, `Music`, `Netflix`, `YouTube` | `entertainment` |
+| Any unrecognized value | `other` |
 
 ## Frontend Components
 
@@ -151,7 +218,9 @@ The Passwords module provides secure password and payment card management with A
   - `decryptPassword()` - Return plaintext
   - `toggleFavorite()` - Favorite flag
   - `exportPasswords()` - JSON backup
-  - `importPasswords()` - Restore from backup
+  - `exportPasswordsCSV()` - CSV export with decrypted passwords and cards
+  - `importPasswords()` - Restore from JSON backup
+  - `importPasswordsCSV()` - Import passwords and cards from CSV format
 
 ### Encryption Service
 - **File**: `backend/services/passwordService.js`

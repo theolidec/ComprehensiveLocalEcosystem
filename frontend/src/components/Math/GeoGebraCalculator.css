@@ -207,6 +207,13 @@
   border-radius: 3px;
   font-size: 12px;
   font-family: monospace;
+  background: var(--bg-primary, #fff);
+  color: var(--text-primary, #333);
+}
+
+.object-edit input:focus {
+  outline: none;
+  border-color: var(--accent-color, #4a90d9);
 }
 
 .object-edit button {

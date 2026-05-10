@@ -3520,6 +3520,23 @@
   background: var(--bg-tertiary);
 }
 
+/* Dark mode checkbox styles for batch bar and table */
+[data-theme="dark"] .batch-bar-inline .select-all input,
+[data-theme="dark"] .select-all input,
+[data-theme="dark"] .wishlist-table .col-select input,
+[data-theme="dark"] .card-checkbox input {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .batch-bar-inline .select-all input:hover,
+[data-theme="dark"] .select-all input:hover,
+[data-theme="dark"] .wishlist-table .col-select input:hover,
+[data-theme="dark"] .card-checkbox input:hover {
+  border-color: #764ba2;
+  background: var(--bg-tertiary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .wishlist-container {

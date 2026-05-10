@@ -7,7 +7,9 @@ router.use(authenticateToken);
 
 router.get('/', passwordController.getAllPasswords);
 router.get('/export', passwordController.exportPasswords);
+router.get('/export/csv', passwordController.exportPasswordsCSV);
 router.post('/import', passwordController.importPasswords);
+router.post('/import/csv', passwordController.importPasswordsCSV);
 router.get('/:id', passwordController.getPasswordById);
 router.post('/', passwordController.createPassword);
 router.put('/:id', passwordController.updatePassword);

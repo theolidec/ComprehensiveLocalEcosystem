@@ -372,6 +372,11 @@ Errors shown inline with red highlighting:
 - High contrast theme option
 - Adjustable font sizes
 
+## Recent Updates
+
+### May 2026
+- **Dark Theme Fix**: Fixed object edit input field to properly support dark theme styling (added `background` and `color` CSS variables to `.object-edit input`)
+
 ## Future Enhancements
 
 - [ ] Sliders for animated parameters

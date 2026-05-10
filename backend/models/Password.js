@@ -18,6 +18,11 @@ const passwordSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Username cannot exceed 100 characters']
   },
+  email: {
+    type: String,
+    trim: true,
+    maxlength: [100, 'Email cannot exceed 100 characters']
+  },
   encryptedPassword: {
     type: String,
     required: [true, 'Password is required']

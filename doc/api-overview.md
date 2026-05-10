@@ -137,8 +137,10 @@ GET /api/auth/me
 | PUT | `/:id` | Yes | Update password entry |
 | DELETE | `/:id` | Yes | Delete password |
 | POST | `/:id/favorite` | Yes | Toggle favorite status |
-| GET | `/export` | Yes | Export encrypted passwords |
-| POST | `/import` | Yes | Import passwords |
+| GET | `/export` | Yes | Export encrypted passwords (JSON) |
+| GET | `/export/csv` | Yes | Export decrypted passwords and cards to CSV |
+| POST | `/import` | Yes | Import passwords (JSON) |
+| POST | `/import/csv` | Yes | Import passwords and cards from CSV |
 
 ### Base: `/api/password-categories`
 
@@ -153,7 +155,8 @@ GET /api/auth/me
 ```json
 {
   "title": "Gmail",
-  "username": "user@gmail.com",
+  "username": "myusername",
+  "email": "user@gmail.com",
   "encryptedPassword": "...",
   "website": "https://gmail.com",
   "category": "social",

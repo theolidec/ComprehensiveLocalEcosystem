@@ -450,6 +450,32 @@ const theme = settings?.display?.theme || 'system';
 document.documentElement.classList.toggle('dark', theme === 'dark');
 ```
 
+#### Checkbox Dark Mode Styling
+
+All checkboxes throughout the application support dark mode through custom CSS styling. The implementation uses CSS custom properties (variables) for consistent theming:
+
+**Global Styles** (`src/index.css`):
+- All `input[type="checkbox"]` elements receive dark mode styling via `[data-theme="dark"]` selector
+- Checkboxes use `appearance: none` for custom styling with CSS variables
+- Background, border, and checked states adapt to dark theme colors
+
+**Component-Specific Styles**:
+- **Settings** (`src/components/Pages/Settings.css`): Custom checkbox styling for settings forms with `.form-group.checkbox-group` class
+- **Wishlist** (`src/components/Wishlist/Wishlist.css`): Custom styled checkboxes for batch selection, table view, and card checkboxes
+- **Password Manager** (`src/App.css`): Generator options checkboxes with purple accent color theming
+
+**CSS Variable Usage**:
+```css
+[data-theme="dark"] input[type="checkbox"] {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] input[type="checkbox"]:hover {
+  background: var(--bg-tertiary);
+}
+```
+
 ## State Management Flow
 
 ```

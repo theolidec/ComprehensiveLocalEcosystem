@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import GraphingEngine from '../../utils/GraphingEngine';
 import { Calculator, Trash2, ZoomIn, Grid3X3, Save, Plus, X, Edit2, Eye, EyeOff, MousePointer, ZoomOut, RotateCcw, Moon, Sun } from 'lucide-react';
+import { useSettings } from '../../contexts/SettingsContext';
 import './GeoGebraCalculator.css';
 
 const GeoGebraCalculator = () => {
   const canvasRef = useRef(null);
   const engineRef = useRef(null);
+  const { settings } = useSettings();
   const [objects, setObjects] = useState([]);
   const [editingObject, setEditingObject] = useState(null);
   const [editValue, setEditValue] = useState('');
@@ -17,7 +19,11 @@ const GeoGebraCalculator = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [panMode, setPanMode] = useState(true);
-  const [isDarkTheme, setIsDarkTheme] = useState(false);
+  const [isDarkTheme, setIsDarkTheme] = useState(() => {
+    // Load initial theme from cookie if available
+    const match = document.cookie.match(/geogebraTheme=([^;]+)/);
+    return match ? match[1] === 'dark' : false;
+  });
   const isDraggingRef = useRef(false);
   const dragStartRef = useRef({ x: 0, y: 0 });
   const nextLabelRef = useRef(65);
@@ -366,6 +372,10 @@ const GeoGebraCalculator = () => {
     if (engineRef.current) {
       engineRef.current.setDarkMode(newTheme);
       engineRef.current.draw();
+    }
+    // Save to cookie if user allows (using the same allowThemeCookie setting as login theme)
+    if (settings?.privacy?.allowThemeCookie !== false) {
+      document.cookie = `geogebraTheme=${newTheme ? 'dark' : 'light'};path=/;max-age=31536000;SameSite=Lax`;
     }
   };
 

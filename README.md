@@ -6,7 +6,7 @@ A full-featured web application ecosystem combining robust authentication, dynam
 
 ---
 
-## MIL-STD-498 Compliance
+## MIL-STD-498 Compliance (Not fully implemented yet)
 
 This project follows **MIL-STD-498** (Military Standard: Software Development and Documentation) for software documentation and development practices.
 

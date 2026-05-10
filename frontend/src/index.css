@@ -76,3 +76,46 @@ code {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
+
+/* Global Checkbox Dark Mode Styles */
+[data-theme="dark"] input[type="checkbox"] {
+  background-color: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+  accent-color: #3b82f6;
+}
+
+[data-theme="dark"] input[type="checkbox"]:not([class*="accent-"]) {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] input[type="checkbox"]:not([class*="accent-"]):hover {
+  border-color: #3b82f6;
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] input[type="checkbox"]:not([class*="accent-"]):checked {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] input[type="checkbox"]:not([class*="accent-"]):checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 0px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

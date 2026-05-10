@@ -186,6 +186,10 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
         y = 50;
       }
 
+      if (index % 2 === 1) {
+        doc.rect(50, y - 2, 490, 14).fill('#f3f4f6');
+      }
+
       const title = item.title.length > 25 ? item.title.substring(0, 22) + '...' : item.title;
       const description = item.description 
         ? (item.description.length > 30 ? item.description.substring(0, 27) + '...' : item.description)

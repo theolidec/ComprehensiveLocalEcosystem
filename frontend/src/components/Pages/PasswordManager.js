@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Search, X, Copy, Check, Lock, User, Globe, FileText, Shield, Sparkles, RefreshCw, Settings, Download, Upload, CreditCard, MapPin } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Star, StarOff, Search, X, Copy, Check, Lock, User, Globe, FileText, Shield, Sparkles, RefreshCw, Settings, Download, Upload, CreditCard, MapPin, Mail } from 'lucide-react';
 import passwordAPI from '../../services/passwordAPI';
 import { paymentCardAPI } from '../../services/paymentCardAPI';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -53,6 +53,7 @@ const generatePassword = (length = 16, options = {}) => {
 
 const PasswordManager = () => {
   const { registerPageActions, clearPageActions } = usePageActions();
+  const fileInputRef = useRef(null);
   const [passwords, setPasswords] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -75,8 +76,6 @@ const PasswordManager = () => {
   const [autoLockTimeout, setAutoLockTimeout] = useState(5);
   const [lastActivity, setLastActivity] = useState(Date.now());
   const [isLocked, setIsLocked] = useState(false);
-  const [showImportModal, setShowImportModal] = useState(false);
-  const [importData, setImportData] = useState(null);
   const [customCategories, setCustomCategories] = useState([]);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [newCategory, setNewCategory] = useState({ name: '', icon: '📁', color: '#6B7280' });
@@ -104,6 +103,7 @@ const PasswordManager = () => {
   const [formData, setFormData] = useState({
     title: '',
     username: '',
+    email: '',
     password: '',
     website: '',
     category: 'other',
@@ -149,6 +149,7 @@ const PasswordManager = () => {
           setFormData({
             title: '',
             username: '',
+            email: '',
             password: '',
             website: '',
             category: 'other',
@@ -168,7 +169,7 @@ const PasswordManager = () => {
       {
         icon: <Upload size={18} />,
         label: 'Import',
-        onClick: () => setShowImportModal(true),
+        onClick: () => fileInputRef.current?.click(),
         closeOnClick: false
       },
       {
@@ -488,47 +489,54 @@ const PasswordManager = () => {
 
   const handleExport = async () => {
     try {
-      await passwordAPI.exportPasswords();
+      await passwordAPI.exportPasswordsCSV();
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const handleImportFile = (e) => {
+  const handleImportFile = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    
+
+    const isCSV = file.name.toLowerCase().endsWith('.csv');
+    setLoading(true);
+
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
+      const content = event.target.result;
+
       try {
-        const data = JSON.parse(event.target.result);
-        if (data.passwords && Array.isArray(data.passwords)) {
-          setImportData(data);
+        let result;
+        if (isCSV) {
+          // CSV import
+          result = await passwordAPI.importPasswordsCSV(content);
         } else {
-          setError('Invalid backup file format');
+          // JSON import
+          const data = JSON.parse(content);
+          if (data.passwords && Array.isArray(data.passwords)) {
+            result = await passwordAPI.importPasswords({ passwords: data.passwords });
+          } else {
+            setError('Invalid backup file format');
+            setLoading(false);
+            return;
+          }
         }
+        setError('');
+        fetchPasswords();
+        if (activeTab === 'cards') {
+          fetchCards();
+        }
+        alert(result.message);
       } catch (err) {
-        setError('Failed to parse backup file');
+        setError(err.message || 'Import failed');
+      } finally {
+        setLoading(false);
+        // Reset the file input
+        e.target.value = '';
       }
     };
     reader.readAsText(file);
-  };
-
-  const handleImport = async () => {
-    if (!importData) return;
-    setLoading(true);
-    try {
-      const result = await passwordAPI.importPasswords({ passwords: importData.passwords });
-      setError('');
-      setShowImportModal(false);
-      setImportData(null);
-      fetchPasswords();
-      alert(result.message);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   const openModal = (password = null) => {
@@ -537,6 +545,7 @@ const PasswordManager = () => {
       setFormData({
         title: password.title,
         username: password.username || '',
+        email: password.email || '',
         password: '',
         website: password.website || '',
         category: password.category || 'other',
@@ -548,6 +557,7 @@ const PasswordManager = () => {
       setFormData({
         title: '',
         username: '',
+        email: '',
         password: '',
         website: '',
         category: 'other',
@@ -650,7 +660,7 @@ const PasswordManager = () => {
               <label className="pm-import-btn">
                 <Upload size={18} />
                 Import
-                <input type="file" accept=".json" onChange={handleImportFile} style={{ display: 'none' }} />
+                <input ref={fileInputRef} type="file" accept=".json,.csv" onChange={handleImportFile} style={{ display: 'none' }} />
               </label>
             </div>
           </>
@@ -861,6 +871,13 @@ const PasswordManager = () => {
                       <div className="pm-field">
                         <User size={14} className="pm-field-icon" />
                         <span className="pm-field-value">{password.username}</span>
+                      </div>
+                    )}
+
+                    {password.email && (
+                      <div className="pm-field">
+                        <Mail size={14} className="pm-field-icon" />
+                        <span className="pm-field-value">{password.email}</span>
                       </div>
                     )}
 
@@ -1158,7 +1175,21 @@ const PasswordManager = () => {
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     className="pm-input"
-                    placeholder="username or email"
+                    placeholder="username"
+                  />
+                </div>
+
+                <div className="pm-form-group">
+                  <label className="pm-label">
+                    <Mail size={14} />
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="pm-input"
+                    placeholder="email@example.com"
                   />
                 </div>
               </div>

@@ -70,35 +70,46 @@ The purpose of this manual is to provide end users with instructions for operati
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Header (Logo, User Menu)                               │
+│  Header (Logo, Apps Menu, User Menu)                    │
 ├──────────┬──────────────────────────────────────────────┤
 │          │                                              │
 │ Sidebar  │           Main Content Area                  │
-│          │                                              │
-│ - Home   │                                              │
-│ - Cal    │                                              │
-│ - Pass   │                                              │
-│ - Files  │                                              │
-│ - Wiki   │                                              │
-│ - Wish   │                                              │
-│ - Track  │                                              │
-│ - Set    │                                              │
+│ (Context │                                              │
+│  based)  │                                              │
 │          │                                              │
 └──────────┴──────────────────────────────────────────────┘
 ```
 
-### 4.2 Sidebar Navigation
+**Navigation Structure:**
+- **Main navigation** is accessed via the **Apps menu** (AL icon) in the Header
+- **Contextual sidebar** appears on specific pages with page-specific actions
+- **User menu** contains Settings, Passwords, and Logout
+
+### 4.2 Apps Menu Navigation
+
+The Apps menu (accessed via the AL icon in the Header) provides access to all modules:
 
 | Icon | Section | Description |
 |------|---------|-------------|
-| 🏠 | Home | Dashboard with overview |
-| 📅 | Calendar | Event management |
-| 🔑 | Passwords | Password manager |
-| 📁 | Files | File management |
-| 📚 | Wiki | Knowledge base |
-| 🎁 | Wishlist | Gift wishlists |
-| 📊 | Tracker | Daily habit tracking |
-| ⚙️ | Settings | User preferences |
+| 🏠 | Home | Dashboard with overview and quick actions |
+| 📅 | Calendar | Event management and scheduling |
+| 🔑 | Password Manager | Secure password storage |
+| 🎁 | Wishlist | Gift wishlists and reservations |
+| 📁 | Files | File storage and management |
+| 🧮 | Calculator | GeoGebra calculator tool |
+| 👥 | Following | Social connections and user following |
+| ✅ | Daily Tracker | Habit tracking and daily check-ins |
+| 📚 | Wiki | Knowledge base and documentation |
+
+### 4.3 User Menu
+
+The User menu (profile icon in the Header) contains account-related options:
+
+| Icon | Section | Description |
+|------|---------|-------------|
+| 🔑 | Passwords | Quick access to password manager |
+| ⚙️ | Settings | User preferences and account settings |
+| 🚪 | Logout | Sign out of the application |
 
 ---
 
@@ -106,11 +117,32 @@ The purpose of this manual is to provide end users with instructions for operati
 
 ### 5.1 Home Dashboard
 
-The Home page provides an overview of your data:
+The Home page provides a personalized overview of your data with the following sections:
 
-- **Quick Actions**: Create new events, passwords, files
-- **Today's Events**: Shows calendar events for today
-- **Recent Activity**: Recent items across all modules
+#### Daily Tracker Card
+A comprehensive daily overview at the top of the page:
+- **Progress Bar**: Visual indicator of completed vs total tasks
+- **Stats Row**: Day streak, 30-day completion rate, and active task count
+- **Today's Tasks**: Interactive checklist of daily tasks with priority indicators
+- **Daily Check-in**: Quick-response questions (Yes/No/Maybe, Scale ratings)
+- **Add Task**: Inline form to create new recurring or one-time tasks
+
+#### End of Day Mood Selector
+Appears after 5:00 PM for daily reflection:
+- 5-level mood scale (Awful to Great)
+- Saves mood to Daily Tracker history
+
+#### Today's Events
+Calendar overview for the current day:
+- Lists all scheduled events with time and location
+- Color-coded by category (Work, Personal, Health, etc.)
+- Quick-add button to create new events inline
+- Shows next upcoming event when no events today
+
+#### Quick Access Grid
+Navigation shortcuts to all application modules:
+- Calendar, Passwords, Wishlist, Files
+- Calculator, Following, Wikis, Daily Tracker
 
 ### 5.2 Calendar
 
@@ -125,9 +157,8 @@ The Home page provides an overview of your data:
    - **Time**: Set start time (optional)
    - **Location**: Add location (optional)
    - **Category**: Choose category (Work, Personal, etc.)
-   - **Color**: Select event color
    - **Reminder**: Set reminder time
-4. Click **"Save"**
+4. Click **"Add Event"**
 
 #### Recurring Events
 
@@ -139,9 +170,12 @@ To create a recurring event:
 
 #### Managing Categories
 
-1. Click **"Manage Categories"** in the sidebar
-2. Add new categories with name, color, and icon
-3. Edit or delete existing categories
+1. In the **Calendar** page, find the **Categories** section on the right side
+2. Click **"Manage"** next to the Categories heading
+3. In the modal dialog:
+   - Click **"+ Add Category"** to create new categories with name, color, and icon
+   - Click the **edit icon** on existing categories to modify them
+   - Click the **trash icon** to delete categories
 
 ### 5.3 Password Manager
 

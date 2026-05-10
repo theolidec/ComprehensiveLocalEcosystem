@@ -307,3 +307,40 @@
 [data-theme="dark"] .settings-loading {
   color: var(--text-muted);
 }
+
+/* Dark mode checkbox styles */
+[data-theme="dark"] .form-group.checkbox-group input[type="checkbox"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-primary);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+  accent-color: transparent;
+}
+
+[data-theme="dark"] .form-group.checkbox-group input[type="checkbox"]:hover {
+  border-color: #3b82f6;
+  background: var(--bg-tertiary);
+}
+
+[data-theme="dark"] .form-group.checkbox-group input[type="checkbox"]:checked {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  border-color: #3b82f6;
+}
+
+[data-theme="dark"] .form-group.checkbox-group input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
