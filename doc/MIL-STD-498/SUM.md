@@ -1,0 +1,430 @@
+# Software User Manual (SUM)
+## Comprehensive Local Ecosystem
+
+**Document Number**: SUM-001  
+**Revision**: 1.0  
+**Date**: May 10, 2026  
+**Standard**: MIL-STD-498  
+
+---
+
+## 1. Scope
+
+### 1.1 Identification
+
+This document is the Software User Manual (SUM) for the Comprehensive Local Ecosystem web application.
+
+### 1.2 Purpose
+
+The purpose of this manual is to provide end users with instructions for operating the Comprehensive Local Ecosystem application.
+
+---
+
+## 2. Referenced Documents
+
+| Document | Description |
+|----------|-------------|
+| SRS.md | Software Requirements Specification |
+| OCD.md | Operational Concept Description |
+
+---
+
+## 3. Getting Started
+
+### 3.1 System Requirements
+
+| Requirement | Minimum | Recommended |
+|-------------|---------|-------------|
+| Browser | Chrome 90+, Firefox 88+, Safari 14+, Edge 90+ | Latest version |
+| JavaScript | Enabled | Enabled |
+| Network | Internet connection | Broadband |
+| Display | 1024x768 | 1920x1080 |
+
+### 3.2 Accessing the Application
+
+1. Open your web browser
+2. Navigate to the application URL
+3. You will be directed to the login page
+
+### 3.3 Creating an Account
+
+1. Click **"Register"** on the login page
+2. Enter your email address
+3. Create a password (minimum 6 characters)
+4. Enter your display name
+5. Click **"Create Account"**
+6. You will be automatically logged in
+
+### 3.4 Logging In
+
+1. Enter your email address
+2. Enter your password
+3. Click **"Login"**
+4. You will be redirected to the Home dashboard
+
+---
+
+## 4. Application Navigation
+
+### 4.1 Layout Overview
+
+```
+┌─────────────────────────────────────────────────────────┐
+│  Header (Logo, User Menu)                               │
+├──────────┬──────────────────────────────────────────────┤
+│          │                                              │
+│ Sidebar  │           Main Content Area                  │
+│          │                                              │
+│ - Home   │                                              │
+│ - Cal    │                                              │
+│ - Pass   │                                              │
+│ - Files  │                                              │
+│ - Wiki   │                                              │
+│ - Wish   │                                              │
+│ - Track  │                                              │
+│ - Set    │                                              │
+│          │                                              │
+└──────────┴──────────────────────────────────────────────┘
+```
+
+### 4.2 Sidebar Navigation
+
+| Icon | Section | Description |
+|------|---------|-------------|
+| 🏠 | Home | Dashboard with overview |
+| 📅 | Calendar | Event management |
+| 🔑 | Passwords | Password manager |
+| 📁 | Files | File management |
+| 📚 | Wiki | Knowledge base |
+| 🎁 | Wishlist | Gift wishlists |
+| 📊 | Tracker | Daily habit tracking |
+| ⚙️ | Settings | User preferences |
+
+---
+
+## 5. Feature Instructions
+
+### 5.1 Home Dashboard
+
+The Home page provides an overview of your data:
+
+- **Quick Actions**: Create new events, passwords, files
+- **Today's Events**: Shows calendar events for today
+- **Recent Activity**: Recent items across all modules
+
+### 5.2 Calendar
+
+#### Creating an Event
+
+1. Navigate to **Calendar**
+2. Click on a date or click **"+ New Event"**
+3. Fill in event details:
+   - **Title**: Event name
+   - **Description**: Optional details
+   - **Date**: Select date
+   - **Time**: Set start time (optional)
+   - **Location**: Add location (optional)
+   - **Category**: Choose category (Work, Personal, etc.)
+   - **Color**: Select event color
+   - **Reminder**: Set reminder time
+4. Click **"Save"**
+
+#### Recurring Events
+
+To create a recurring event:
+1. Create a new event
+2. Enable **"Recurring"**
+3. Select pattern: Daily, Weekly, Monthly, or Yearly
+4. Set end date or number of occurrences (optional)
+
+#### Managing Categories
+
+1. Click **"Manage Categories"** in the sidebar
+2. Add new categories with name, color, and icon
+3. Edit or delete existing categories
+
+### 5.3 Password Manager
+
+#### Adding a Password
+
+1. Navigate to **Passwords**
+2. Click **"+ Add Password"**
+3. Fill in details:
+   - **Title**: Service name (e.g., "Gmail")
+   - **Username**: Your username or email
+   - **Password**: Enter password or use generator
+   - **Website**: URL of the service
+   - **Category**: Select category
+   - **Notes**: Additional notes
+4. Click **"Save"**
+
+#### Using the Password Generator
+
+1. In password form, click **"Generate"**
+2. Configure options:
+   - Length (default: 16)
+   - Include uppercase letters
+   - Include lowercase letters
+   - Include numbers
+   - Include symbols
+3. Click **"Generate"** to create password
+4. Click **"Use Password"** to fill the field
+
+#### Viewing a Password
+
+1. Find password in list
+2. Click **"Show"** icon
+3. Password is decrypted and displayed
+4. Click **"Copy"** to copy to clipboard
+
+#### Managing Payment Cards
+
+1. Navigate to **Passwords**
+2. Click **"Payment Cards"** tab
+3. Click **"+ Add Card"**
+4. Enter card details:
+   - Card name (e.g., "Personal Visa")
+   - Cardholder name
+   - Card number
+   - Expiry date
+   - CVV
+   - Billing address
+5. Click **"Save"**
+
+### 5.4 File Manager
+
+#### Uploading Files
+
+1. Navigate to **Files**
+2. Click **"Upload"** or drag files to the window
+3. Files are uploaded to your storage
+
+#### Creating Folders
+
+1. Click **"+ New Folder"**
+2. Enter folder name
+3. Click **"Create"**
+
+#### Organizing Files
+
+- **Move**: Select files → Click move icon → Choose destination
+- **Rename**: Right-click → Rename
+- **Delete**: Select → Click delete → Moves to trash
+- **Restore**: Go to Trash → Select → Restore
+
+#### Sharing Files
+
+1. Select file
+2. Click **"Share"** icon
+3. Copy the generated link
+4. Share link with others
+
+### 5.5 Wiki System
+
+#### Creating a Wiki
+
+1. Navigate to **Wiki**
+2. Click **"+ New Wiki"**
+3. Enter wiki name and description
+4. Choose visibility: Public or Private
+5. Click **"Create"**
+
+#### Adding Pages
+
+1. Open a wiki
+2. Click **"+ New Page"**
+3. Enter page title
+4. Write content using Markdown
+5. Click **"Save"**
+
+#### Wiki Features
+
+- **WikiLinks**: Use `[[Page Name]]` to link to other pages
+- **Categories**: Add categories to organize pages
+- **History**: View and restore previous versions
+- **Permissions**: Set access levels for users
+
+### 5.6 Wishlist System
+
+#### Creating a Wishlist
+
+1. Navigate to **Wishlist**
+2. Click **"+ New Wishlist"**
+3. Enter wishlist name (e.g., "Birthday 2026")
+4. Select category template (optional)
+5. Click **"Create"**
+
+#### Adding Items
+
+1. Open a wishlist
+2. Click **"+ Add Item"**
+3. Enter item details:
+   - Name
+   - Description
+   - Price (optional)
+   - URL (link to product)
+   - Priority (low, medium, high, must-have)
+   - Category
+4. Click **"Save"**
+
+#### Sharing a Wishlist
+
+1. Open wishlist
+2. Click **"Share"** button
+3. Copy public link
+4. Share with friends and family
+
+#### Managing Reservations
+
+When someone reserves an item:
+- Item shows as "Reserved"
+- Reserver's name is displayed
+- Other users see the reservation
+
+### 5.7 Daily Tracker
+
+#### Daily Check-in
+
+1. Navigate to **Tracker**
+2. Click **"Today"** tab
+3. Complete your daily check-in:
+   - Mark tasks as done
+   - Answer daily questions
+   - Add notes
+
+#### Creating Tasks
+
+1. Go to **Tasks** tab
+2. Click **"+ Add Task"**
+3. Enter task details:
+   - Task name
+   - Category
+   - Priority
+   - Due date
+   - Recurrence (optional)
+4. Click **"Save"**
+
+#### Viewing Statistics
+
+1. Go to **Statistics** tab
+2. View:
+   - Completion rates
+   - Streak information
+   - Activity heatmap
+   - Category breakdowns
+
+### 5.8 Settings
+
+#### Profile Settings
+
+1. Navigate to **Settings**
+2. Click **"Profile"** tab
+3. Update:
+   - Display name
+   - Email address
+   - Avatar image
+4. Click **"Save Changes"**
+
+#### Display Settings
+
+1. Navigate to **Settings**
+2. Click **"Display"** tab
+3. Configure:
+   - Theme: Light, Dark, or System
+   - Language (future feature)
+4. Changes apply immediately
+
+#### Privacy Settings
+
+1. Navigate to **Settings**
+2. Click **"Privacy"** tab
+3. Configure privacy preferences
+
+#### Managing Sessions
+
+1. Navigate to **Settings**
+2. Click **"Account"** tab
+3. View active sessions under "Active Sessions"
+4. Click **"Revoke"** to logout from a device
+
+#### GDPR / User Rights
+
+Under the **"Account"** tab:
+
+- **View My Data**: See all your stored data
+- **Download My Data**: Export all data as JSON
+- **Update Email**: Change your email address
+- **Delete Account**: Permanently delete your account and all data
+
+---
+
+## 6. Security Features
+
+### 6.1 Password Security
+
+- All passwords are encrypted with AES-256-GCM
+- Master key stored in server environment variables
+- Each user has unique encryption salt
+
+### 6.2 Session Management
+
+- Access tokens expire after 15 minutes
+- Refresh tokens last 7 days
+- View and revoke sessions from Settings
+
+### 6.3 Account Protection
+
+- Account locks after 5 failed login attempts
+- Lockout lasts for 2 hours
+- Use "Forgot Password" to reset
+
+---
+
+## 7. Troubleshooting
+
+### 7.1 Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| Can't login | Check credentials, verify account exists |
+| Password not working | Use "Forgot Password" to reset |
+| Files not uploading | Check file size (max 500MB) |
+| Calendar events not showing | Check date range filter |
+| Wiki pages not loading | Refresh the page |
+
+### 7.2 Getting Help
+
+- Check in-app error messages for details
+- Review documentation in Wiki module
+- Check browser console for technical errors
+
+---
+
+## 8. Appendix
+
+### A. Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| Ctrl+N | New event/item (context-dependent) |
+| Escape | Close modals/dialogs |
+
+### B. Acronyms
+
+| Acronym | Definition |
+|---------|------------|
+| AES | Advanced Encryption Standard |
+| GDPR | General Data Protection Ratio |
+| JWT | JSON Web Token |
+| MIL-STD | Military Standard |
+| SUM | Software User Manual |
+
+### C. Revision History
+
+| Revision | Date | Author | Description |
+|----------|------|--------|-------------|
+| 1.0 | May 10, 2026 | System | Initial SUM creation |
+
+---
+
+**END OF DOCUMENT**

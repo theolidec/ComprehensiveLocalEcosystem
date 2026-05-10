@@ -81,7 +81,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-CAL-008 | Event Import | Users shall be able to import events from JSON |
 | FR-CAL-009 | Event Statistics | System shall provide statistics on event counts by category |
 
-#### 3.1.3 Password Manager
+#### 3.1.3.1 Password Manager
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -94,7 +94,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-PWD-007 | Password Export | Users shall be able to export encrypted passwords |
 | FR-PWD-008 | Password Import | Users shall be able to import password data |
 
-#### 3.1.4 Payment Card Management
+##### 3.1.3.2 Payment Card Management
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -105,7 +105,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-PCD-005 | Default Card | Users shall be able to set a default payment card |
 | FR-PCD-006 | Card Favorites | Users shall be able to mark cards as favorites |
 
-#### 3.1.5 File Management
+#### 3.1.4 File Management
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -117,7 +117,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-FIL-006 | File Preview | System shall support preview for common file types |
 | FR-FIL-007 | File Deletion | Users shall be able to delete files and folders |
 
-#### 3.1.6 Wiki System
+#### 3.1.5 Wiki System
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -131,7 +131,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-WIK-008 | Backlinks | System shall display backlinks between wiki pages |
 | FR-WIK-009 | Wiki Search | Users shall be able to search within wikis |
 
-#### 3.1.7 Wishlist System
+#### 3.1.6 Wishlist System
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -142,7 +142,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-WSH-005 | Wishlist Analytics | System shall provide statistics on wishlist items and reservations |
 | FR-WSH-006 | Item Categories | Users shall be able to organize items into categories |
 
-#### 3.1.8 Daily Tracker
+#### 3.1.7 Daily Tracker
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -152,7 +152,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-TRK-004 | Statistics | System shall provide tracking statistics and analytics |
 | FR-TRK-005 | Task Categories | Users shall be able to organize tasks by category |
 
-#### 3.1.9 User Settings
+#### 3.1.8 User Settings
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -164,7 +164,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-SET-006 | Privacy Settings | Users shall be able to configure privacy preferences |
 | FR-SET-007 | Active Sessions | Users shall be able to view and revoke active sessions |
 
-#### 3.1.10 GDPR/User Rights
+#### 3.1.9 GDPR/User Rights
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -173,7 +173,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-GDPR-003 | Data Correction | Users shall be able to correct name and email |
 | FR-GDPR-004 | Account Deletion | Users shall be able to delete their account |
 
-#### 3.1.11 Social Features
+#### 3.1.10 Social Features
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
