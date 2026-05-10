@@ -44,6 +44,12 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`security.md`](security.md) | Security implementation | JWT, encryption, headers, CORS |
 | [`deployment.md`](deployment.md) | Deployment guide | Docker, Nginx, SSL |
 
+### MIL-STD-498 Compliance
+
+| Document | Description | Status |
+|----------|-------------|--------|
+| [`MIL-STD-498/SRS.md`](MIL-STD-498/SRS.md) | Software Requirements Specification | Complete |
+
 ## Documentation by Role
 
 ### For Developers
