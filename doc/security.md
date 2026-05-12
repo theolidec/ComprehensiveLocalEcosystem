@@ -75,6 +75,14 @@ This document details the comprehensive security measures implemented throughout
 }
 ```
 
+### Password Reset (current implementation)
+
+**Status: partially implemented.** `POST /api/auth/forgot-password` generates a reset token, stores its hash + expiry on the User document, and **logs** the token to `logs/combined.log` via Winston. Email delivery is **not yet wired up** — there is no SMTP integration in the codebase, although `SMTP_*` placeholders exist in `backend/.env.example`.
+
+**Operational implication**: in production, reset tokens are only retrievable by an operator with log access. Before exposing this feature to end users, integrate an email provider (e.g., Nodemailer, SendGrid) in `routes/auth.js` `/forgot-password` handler. The endpoint already returns the same neutral response regardless of whether an account exists, preventing email enumeration.
+
+`POST /api/auth/reset-password/:token` consumes the token (cleared on successful reset) and re-hashes the new password via the User model's `pre('save')` hook.
+
 ### Password Security
 
 **Hashing**:

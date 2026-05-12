@@ -54,6 +54,7 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 | User Actions | 50 actions | 1 hour |
 | Settings | 100 requests | 15 minutes |
 | Public Reservations | 10 requests | 1 hour |
+| GDPR Data Operations | 10 requests | 1 hour |
 
 ### Security Headers
 
@@ -163,6 +164,8 @@ The project uses the following security-focused dependencies:
 
 ## Changelog
 
+- **v2.5.0**: Added Payment Cards vault — credit/debit card numbers, expiry dates, and CVVs are encrypted with AES-256-GCM using the same per-user salt + master-key key-derivation pipeline as passwords. Only `lastFourDigits`, card name, cardholder name, type, and billing address are stored in plaintext.
+- **v2.4.0**: Added GDPR User Rights endpoints (`/api/user/data`, `/api/user/export`, `/api/user/account`) with a dedicated `userDataLimiter` (10 req/hour). Account deletion requires re-authentication via password and cascades through all user-owned collections.
 - **v2.3.0**: Updated rate limiting configuration, added recurring event support
 - **v2.2.0**: Added GeoGebra Calculator (client-side only, no server security impact)
 - **v2.1.0**: Added File Manager with secure file upload, storage, and sharing

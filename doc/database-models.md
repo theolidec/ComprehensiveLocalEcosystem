@@ -35,7 +35,7 @@ mongoose.connect(process.env.MONGODB_URI, {
 | FileFolder | `FileFolder.js` | File organization | References User, FileFolder (self) |
 | Settings | `Settings.js` | User preferences | References User (1:1) |
 | Wishlist | `Wishlist.js` | Wishlist containers | References User |
-| WishlistCategory | `WishlistCategory.js` | Wishlist groups | References Wishlist |
+| WishlistCategory | `WishlistCategory.js` | Per-user wishlist category labels | References User |
 | WishlistItem | `WishlistItem.js` | Wishlist entries | References User, Wishlist |
 | WishlistReservation | `WishlistReservation.js` | Item reservations | References User, WishlistItem |
 | UserFollow | `UserFollow.js` | Social following | References User (2x) |
@@ -390,9 +390,14 @@ mongoose.connect(process.env.MONGODB_URI, {
   privacy: {
     shareCalendar: Boolean,
     showBusyStatus: Boolean,
-    allowThemeCookie: Boolean
+    allowThemeCookie: Boolean    // Login page + GeoGebra theme cookies
   },
-  
+
+  wishlist: {
+    defaultItemsPerPage: Number, // 10-200, default: 20
+    saveItemsPerPageCookie: Boolean // Default: true
+  },
+
   createdAt: Date,
   updatedAt: Date
 }
@@ -429,14 +434,21 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 ```javascript
 {
-  name: String,            // Required
-  wishlist: ObjectId,      // Ref: 'Wishlist', required
-  color: String,
-  order: Number,
+  name: String,            // Required, trim, max 50 chars
+  color: String,           // Required, hex, default: '#8b5cf6'
+  icon: String,            // Default: 'gift'
+  user: ObjectId,          // Ref: 'User', required (categories are per-user, not per-wishlist)
+  isDefault: Boolean,      // Default: false
   createdAt: Date,
   updatedAt: Date
 }
 ```
+
+**Indexes**:
+- `{ user: 1, name: 1 }` (unique compound) - one category name per user
+
+**Statics**:
+- `createDefaultCategories(userId)` - Creates `Birthday` and `Christmas` defaults; ignores duplicate-key errors via `insertMany({ ordered: false })`
 
 ---
 
@@ -849,15 +861,20 @@ User
 ├── Categories (1:N)
 ├── Passwords (1:N)
 ├── PasswordCategories (1:N)
+├── PaymentCards (1:N)
 ├── Files (1:N)
 ├── FileFolders (1:N)
+├── DocumentVersions (1:N, via File)
 ├── Settings (1:1)
 ├── Wishlists (1:N)
-│   └── WishlistCategories (1:N)
-├── WishlistItems (1:N)
+├── WishlistCategories (1:N)              # Per-user labels, not nested under Wishlist
+├── WishlistItems (1:N, may reference Wishlist)
 │   └── WishlistReservations (1:N)
 ├── Following (UserFollow 1:N, as follower)
 ├── Followers (UserFollow 1:N, as following)
+├── TrackerTasks (1:N)
+├── TrackerQuestions (1:N)
+├── TrackerResponses (1:N, unique per [user, date])
 └── Wikis (1:N, as owner)
     ├── WikiPages (1:N)
     │   └── WikiVersions (1:N)

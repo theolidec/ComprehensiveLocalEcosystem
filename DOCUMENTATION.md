@@ -1535,10 +1535,15 @@ The Comprehensive Local Ecosystem consists of two main components:
 - Refresh tokens: 7 days, database-tracked with rotation
 - Device tracking: User agent and IP logging
 
-**Rate Limiting:**
-- General API: 100 requests/15min per IP
-- Authentication: 5 attempts/15min per IP
-- Token refresh: 10 attempts/15min per IP
+**Rate Limiting** (see `backend/config/rateLimiter.js`):
+- General API: 1000 requests/15min per IP
+- Authentication: 20 attempts/15min per IP
+- Token refresh: 50 attempts/15min per IP
+- Password reset: 3 attempts/hour per IP
+- User actions: 50 actions/hour per authenticated user (in-memory)
+- Settings: 100 requests/15min per IP
+- Public reservations: 10 requests/hour per IP
+- GDPR data ops: 10 requests/hour per user
 
 **Data Protection:**
 - Input validation with express-validator
@@ -1647,29 +1652,51 @@ server.js
 #### User Model
 ```javascript
 {
-  email: String (unique, required),
-  password: String (hashed, required),
-  name: String (required),
+  email: String (unique, required, lowercase, validated),
+  password: String (hashed with bcrypt 12 rounds, select: false),
+  name: String (required, trim, max 50),
   isActive: Boolean (default: true),
   lastLogin: Date,
   loginAttempts: Number (default: 0),
-  lockUntil: Date,
-  avatar: String,  // URL to avatar image
+  lockUntil: Date,                            // 2-hour lock after 5 failed attempts
+  passwordSalt: String (32-byte hex, select: false),  // per-user salt for AES key derivation
+  resetPasswordToken: String (select: false),
+  resetPasswordExpires: Date,
   timestamps: true
 }
 ```
 
-#### PasswordEntry Model
+> Avatar URLs are stored in `Settings.profile.avatar`, not on the User document.
+
+#### Password Model (Mongoose model name: `Password`)
 ```javascript
 {
-  title: String (required),
-  username: String,
-  encryptedPassword: String (required),
-  website: String,
-  notes: String,
-  category: ObjectId (ref: PasswordCategory),
+  userId: ObjectId (ref: User, required, indexed),
+  title: String (required, trim, max 100),
+  username: String (trim, max 100),
+  encryptedPassword: String (required),       // AES-256-GCM
+  website: String (trim, max 200),
+  category: String (enum: social/finance/work/shopping/entertainment/other, default: 'other'),
+  notes: String (trim, max 1000),
   isFavorite: Boolean (default: false),
-  user: ObjectId (ref: User, required),
+  timestamps: true
+}
+```
+
+#### PaymentCard Model
+```javascript
+{
+  userId: ObjectId (ref: User, required, indexed),
+  cardName: String (required, trim, max 100),
+  cardholderName: String (trim, max 100),
+  encryptedCardNumber: String (required),     // AES-256-GCM
+  encryptedExpiryDate: String (required),
+  encryptedCVV: String (required),
+  cardType: String (enum: visa/mastercard/amex/discover/other, default: 'other'),
+  lastFourDigits: String (4 digits),
+  billingAddress: String (trim, max 500),
+  isDefault: Boolean (default: false),
+  isFavorite: Boolean (default: false),
   timestamps: true
 }
 ```
@@ -1677,28 +1704,46 @@ server.js
 #### PasswordCategory Model
 ```javascript
 {
-  name: String (required),
-  color: String,
-  icon: String,
-  user: ObjectId (ref: User, required),
+  userId: ObjectId (ref: User, required, indexed),
+  name: String (required, trim, max 50),
+  icon: String (emoji, default: '📁'),
+  color: String (hex, default: '#6B7280'),
+  isDefault: Boolean (default: false),
   timestamps: true
 }
 ```
 
+#### Wishlist Model (container)
+```javascript
+{
+  name: String (required, trim, max 50),
+  description: String (trim, max 200),
+  user: ObjectId (ref: User, required),
+  isDefault: Boolean (default: false),
+  template: String (enum: birthday/christmas/wedding/baby_shower/housewarming/null, default: null),
+  coverImage: String,
+  color: String (hex, default: '#8b5cf6'),
+  timestamps: true
+}
+```
+
+Unique compound index on `[user, name]`. Statics: `createDefaultWishlist(userId)`, `createFromTemplate(userId, type, customName)`, `getTemplates()`.
+
 #### WishlistItem Model
 ```javascript
 {
-  title: String (required),
-  description: String,
-  url: String,
-  price: Number,
-  currency: String (enum: ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NOK', 'SEK', 'DKK']),
-  priority: String (enum: ['low', 'medium', 'high', 'must-have']),
-  category: String (required),
-  imageUrl: String,
+  title: String (required, trim, max 100),
+  description: String (trim, max 500),
+  url: String (valid URL),
+  price: Number (min: 0),
+  currency: String (enum: ['USD','EUR','GBP','CAD','AUD','NOK','SEK','DKK'], default: 'USD'),
+  priority: String (enum: ['low','medium','high','must-have'], default: 'medium'),
+  wishlist: ObjectId (ref: Wishlist, default: null),
+  category: String (default: 'Birthday'),
+  imageUrl: String (trim),
   isPublic: Boolean (default: false),
   shareToken: String (unique, sparse),
-  status: String (enum: ['active', 'purchased', 'archived']),
+  status: String (enum: ['active','purchased','archived'], default: 'active'),
   reservations: [ObjectId (ref: WishlistReservation)],
   user: ObjectId (ref: User, required),
   timestamps: true
@@ -1708,13 +1753,12 @@ server.js
 #### WishlistReservation Model
 ```javascript
 {
-  wishlistItem: ObjectId (ref: WishlistItem, required),
-  reservedBy: {
-    name: String (required),
-    email: String
-  },
+  item: ObjectId (ref: WishlistItem, required),
+  reservedBy: ObjectId (ref: User, required),
+  wishlist: ObjectId (ref: Wishlist, required),
   message: String,
-  status: String (enum: ['reserved', 'purchased'], default: 'reserved'),
+  status: String (enum: ['reserved','purchased','cancelled'], default: 'reserved'),
+  isAnonymous: Boolean (default: false),
   reservedAt: Date (default: now),
   timestamps: true
 }
@@ -1723,23 +1767,27 @@ server.js
 #### WishlistCategory Model
 ```javascript
 {
-  name: String (required),
-  color: String,
-  icon: String,
-  user: ObjectId (ref: User, required),
+  name: String (required, trim, max 50),
+  color: String (required, hex, default: '#8b5cf6'),
+  icon: String (default: 'gift'),
+  user: ObjectId (ref: User, required),    // owner; categories are per-user, not per-wishlist
+  isDefault: Boolean (default: false),
   timestamps: true
 }
 ```
+
+Unique compound index on `[user, name]`. Default categories: `Birthday`, `Christmas` (created on demand).
 
 #### UserFollow Model
 ```javascript
 {
   follower: ObjectId (ref: User, required),
   following: ObjectId (ref: User, required),
-  followedAt: Date (default: now),
   timestamps: true
 }
 ```
+
+Unique compound index on `[follower, following]`. Statics: `follow()`, `unfollow()`, `getFollowers()`, `getFollowing()`.
 
 #### RefreshToken Model
 ```javascript
@@ -1756,43 +1804,57 @@ server.js
 }
 ```
 
-#### CalendarEvent Model
+#### Event Model (Mongoose model name: `Event`)
 ```javascript
 {
-  title: String (required),
-  description: String,
+  title: String (required, max 100),
+  description: String (max 500),
   date: Date (required),
   time: String,
-  location: String,
-  category: String (enum: ['Work', 'Personal', 'Social', 'Health', 'Education', 'Travel']),
-  attendees: [String],
-  reminder: String,
-  color: String,
+  location: String (max 200),
+  category: String (default: 'work'),         // free-form string, not enum
+  color: String,                              // hex
+  attendees: [String],                        // emails
+  reminder: Number,                           // minutes (0/5/15/30/60/1440)
+  isRecurring: Boolean,
+  recurringPattern: String,                   // daily/weekly/monthly/yearly
+  recurringEndDate: Date,
+  recurringOccurrences: Number,               // 1-365
+  timezone: String,
+  isAllDay: Boolean,
+  duration: Number,                           // minutes 0-1440
+  isCompleted: Boolean,
   user: ObjectId (ref: User, required),
   timestamps: true
 }
 ```
 
-#### Category Model
+Recurring events are expanded on-the-fly via `backend/services/recurringEventService.js`.
+
+#### Category Model (event categories)
 ```javascript
 {
-  name: String (required),
-  color: String (required),
+  name: String (required, trim, max 50),
+  color: String (required, hex, default: '#3B82F6'),
+  icon: String (required, default: '📅'),
   user: ObjectId (ref: User, required),
+  isDefault: Boolean (default: false),
   timestamps: true
 }
 ```
+
+Unique compound index on `[user, name]`. Six defaults are auto-created at registration via `Category.createDefaultCategories(userId)` (Work, Personal, Social, Health, Education, Travel).
 
 #### File Model
 ```javascript
 {
-  userId: ObjectId (ref: User, required),
+  userId: ObjectId (ref: User, required, indexed),
   filename: String (required),
   originalName: String (required),
   mimeType: String (required),
   size: Number (required),
   path: String (required),
-  folderId: ObjectId (ref: FileFolder),
+  folderId: ObjectId (ref: FileFolder, default: null),
   isPublic: Boolean (default: false),
   shareToken: String (unique, sparse),
   description: String (maxlength: 500),
@@ -1807,32 +1869,92 @@ server.js
 #### FileFolder Model
 ```javascript
 {
-  userId: ObjectId (ref: User, required),
-  name: String (required),
-  parentId: ObjectId (ref: FileFolder),
+  userId: ObjectId (ref: User, required, indexed),
+  name: String (required, trim),
+  parentId: ObjectId (ref: FileFolder, default: null),
+  color: String (hex, default: '#6b7280'),
   isDeleted: Boolean (default: false),
   deletedAt: Date,
   timestamps: true
 }
 ```
 
+#### DocumentVersion Model
+```javascript
+{
+  fileId: ObjectId (ref: File, required, indexed),
+  userId: ObjectId (ref: User, required, indexed),
+  content: String (required),                  // Full HTML snapshot
+  size: Number,
+  version: Number,                              // auto-incremented per file
+  timestamps: true
+}
+```
+
+Up to 50 versions retained per HTML document (configurable via `MAX_DOCUMENT_VERSIONS`).
+
 #### Settings Model
 ```javascript
 {
-  user: ObjectId (ref: User, required),
-  theme: String (enum: ['light', 'dark'], default: 'light'),
-  language: String (default: 'en'),
-  notifications: {
-    email: Boolean,
-    push: Boolean
+  userId: ObjectId (ref: User, required, unique),
+  profile: {
+    name: String (max 50, default: ''),
+    bio: String (max 500, default: ''),
+    avatar: String (URL, default: '')
   },
-  preferences: {
-    defaultView: String (enum: ['month', 'week', 'day']),
-    weekStart: String (enum: ['sunday', 'monday'])
+  calendar: {
+    defaultView: String (enum: month/week/day/agenda, default: 'month'),
+    weekStartsOn: Number (0-6, default: 0),
+    timezone: String (default: 'UTC'),
+    showWeekNumbers: Boolean (default: false),
+    defaultEventDuration: Number (15-480 min, default: 60),
+    workingHours: { start: '09:00', end: '17:00' }
+  },
+  notifications: {
+    emailReminders: Boolean (default: true),
+    reminderTime: Number (0-10080 min, default: 15),
+    eventUpdates: Boolean (default: true),
+    weeklyDigest: Boolean (default: false)
+  },
+  display: {
+    theme: String (enum: light/dark/system, default: 'system'),
+    language: String (default: 'en'),
+    compactMode: Boolean (default: false),
+    showCompletedEvents: Boolean (default: true)
+  },
+  privacy: {
+    shareCalendar: Boolean (default: false),
+    showBusyStatus: Boolean (default: true),
+    allowThemeCookie: Boolean (default: true)    // login page + GeoGebra theme cookies
+  },
+  wishlist: {
+    defaultItemsPerPage: Number (10-200, default: 20),
+    saveItemsPerPageCookie: Boolean (default: true)
   },
   timestamps: true
 }
 ```
+
+Static: `Settings.getOrCreateForUser(userId)`.
+
+#### Wiki Models (Wiki, WikiPage, WikiVersion, WikiPermission, WikiCategory, WikiWatch)
+
+See [`doc/database-models.md`](doc/database-models.md) and [`doc/wiki.md`](doc/wiki.md) for full schema details. Summary:
+
+- **Wiki**: `{ name, slug, description, owner, visibility, icon, color, allowPublicRead, allowPublicEdit }`
+- **WikiPage**: hierarchical pages with `parent`, `slug`, markdown `content`, `excerpt`, `categories[]`, `tags[]`, `viewCount`, `lastEditedBy`, `lastEditedAt`, optional `redirectTo`/`isRedirect`, `infobox`. Methods: `generateSlug()`, `getPageTree()`, `extractHeadings()`, `extractLinks()`. Async permission checks: `wiki.canView(user)`, `wiki.canEdit(user)`.
+- **WikiVersion**: full snapshot per edit (`page`, `wiki`, `title`, `content`, `version`, `editSummary`, `editedBy`).
+- **WikiPermission**: `{ wiki, user, role: admin/editor/viewer, grantedBy }`.
+- **WikiCategory**: per-wiki `{ wiki, name, slug, description, color }`.
+- **WikiWatch**: per-user page watches `{ user, page, wiki }`.
+
+#### Tracker Models (TrackerTask, TrackerQuestion, TrackerResponse)
+
+See [`doc/daily-tracker.md`](doc/daily-tracker.md) for full schema details. Summary:
+
+- **TrackerTask**: `{ title, description, user, category, priority: low/medium/high/urgent, recurrence: none/daily/weekly/biweekly/monthly/quarterly/yearly/custom, customRecurrenceDays, weeklyDays[], dueDate, startDate, endDate, estimatedMinutes, status: active/paused/completed/archived, isCompleted, completedAt, order, tags[] }`. Static: `getStatsByUser(userId)`.
+- **TrackerQuestion**: `{ question, user, responseType: yesno/yesnomaybe/scale/text/number, scaleMin, scaleMax, scaleLabels: { minLabel, maxLabel }, category, isActive, isRequired, order, icon, color, reminderTime }`.
+- **TrackerResponse**: `{ user, date, taskCompletions: [{task, completed, completedAt}], questionResponses: [{question, value: Mixed}], mood: 1-5, overallNotes }`. Unique compound index on `[user, date]`. Statics: `getStreakByUser()`, `getCompletionRateByUser(days)`, `getAnalyticsByUser()`.
 
 ## 🚀 Deployment
 
@@ -2046,7 +2168,7 @@ For technical support or questions:
 
 ---
 
-**Version**: 2.0.0
-**Last Updated**: 2026-05-10
+**Version**: 2.5.0
+**Last Updated**: 2026-05-12
 **Status**: Production Ready
-**Features**: Authentication, Calendar Management, Password Manager, Wishlist System, Social Features, User Settings, File Manager, Document Viewer, GeoGebra Calculator, Recurring Events, Wiki System
+**Features**: Authentication, Calendar Management, Password Manager, Payment Cards Vault, Wishlist System, Social Features, User Settings, GDPR User Rights, File Manager, Document Editor (TipTap) + Document Viewer, GeoGebra Calculator, Recurring Events, Wiki System, Daily Tracker

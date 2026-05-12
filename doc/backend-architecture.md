@@ -9,27 +9,34 @@ The backend is built on **Node.js** with **Express.js**, using **MongoDB** with 
 | Component | Technology | Version |
 |-----------|------------|---------|
 | Runtime | Node.js | 18+ |
-| Framework | Express.js | 4.x |
-| Database | MongoDB | 5.0+ |
-| ODM | Mongoose | 7.x |
-| Authentication | JWT (jsonwebtoken) | 9.x |
-| Validation | express-validator | 7.x |
-| Rate Limiting | express-rate-limit | 6.x |
-| Security | Helmet | 7.x |
-| Logging | Winston | 3.x |
-| Password Hashing | bcryptjs | 2.x |
-| File Uploads | Multer | 1.x |
-| CORS | cors | 2.x |
+| Framework | Express.js | 4.18.x |
+| Database | MongoDB | 6.x (Docker `mongo:6`) |
+| ODM | Mongoose | 8.6.x |
+| Authentication | JWT (jsonwebtoken) | 9.0.x |
+| Validation | express-validator | 7.3.x |
+| Rate Limiting | express-rate-limit | 7.1.x |
+| Security | Helmet | 7.1.x |
+| Logging | Winston | 3.15.x |
+| HTTP Logging | Morgan | 1.10.x |
+| Password Hashing | bcryptjs | 3.0.x |
+| File Uploads | Multer | 2.1.x |
+| CORS | cors | 2.8.x |
+| Cookies | cookie-parser | 1.4.x |
+| PDF Generation | pdfkit | 0.18.x (used by `routes/wishlistItems.js` for PDF export) |
+| Time Zones | moment-timezone | 0.6.x (used by `services/recurringEventService.js`) |
+| Env Loading | dotenv | 16.3.x |
+
+**Reserved / not yet wired up**: `socket.io`, `socket.io-client`, `node-cron` are present in `package.json` but not currently referenced in source. They are placeholders for future realtime / scheduled-job features (e.g., calling `RefreshToken.cleanupExpiredTokens()`).
 
 ## Project Structure
 
 ```
 backend/
 ├── config/              # Configuration files
-│   ├── database.js      # MongoDB connection
+│   ├── database.js      # MongoDB connection + legacy index cleanup
 │   ├── logger.js        # Winston logging setup
-│   └── rateLimiter.js   # Rate limiting rules
-├── controllers/         # Request handlers (business logic)
+│   └── rateLimiter.js   # Rate limiting rules (8 limiters)
+├── controllers/         # Request handlers (business logic) — 11 files
 │   ├── calendarController.js
 │   ├── categoryController.js
 │   ├── fileController.js
@@ -69,7 +76,7 @@ backend/
 │   ├── TrackerTask.js
 │   ├── TrackerQuestion.js
 │   └── TrackerResponse.js
-├── routes/              # API route definitions
+├── routes/              # API route definitions — 20 files
 │   ├── auth.js
 │   ├── calendar.js
 │   ├── categories.js
@@ -80,12 +87,13 @@ backend/
 │   ├── passwordCategories.js
 │   ├── paymentCards.js
 │   ├── settings.js
+│   ├── userRights.js
 │   ├── wikiPages.js
 │   ├── wikis.js
-│   ├── wishlist.js          # Main router (imports sub-routes)
-│   ├── wishlistItems.js     # Item CRUD, stats, analytics
+│   ├── wishlist.js              # Main router (imports sub-routes)
+│   ├── wishlistItems.js         # Item CRUD, stats, analytics, PDF export
 │   ├── wishlistReservations.js  # Reservation operations
-│   ├── wishlistPublic.js    # Public token-based access
+│   ├── wishlistPublic.js        # Public token-based access (with caching)
 │   ├── wishlistCategories.js
 │   ├── wishlists.js
 │   └── tracker.js
@@ -148,12 +156,15 @@ app.use(errorHandler);       // Global errors
 
 ### Rate Limiter (`config/rateLimiter.js`)
 
-Five limiter configurations:
+Eight limiter configurations:
 1. **generalLimiter**: 1000 requests / 15 minutes (all routes)
 2. **authLimiter**: 20 requests / 15 minutes (auth endpoints)
 3. **passwordResetLimiter**: 3 requests / hour (password reset)
 4. **tokenRefreshLimiter**: 50 requests / 15 minutes (token refresh)
-5. **createUserRateLimiter**: User-based limiting (in-memory)
+5. **userActionLimiter**: 50 actions / hour (in-memory, user-keyed via `createUserRateLimiter`)
+6. **settingsLimiter**: 100 requests / 15 minutes (settings endpoints)
+7. **publicReservationLimiter**: 10 requests / hour (public wishlist reservations)
+8. **userDataLimiter**: 10 requests / hour (GDPR data access/export/delete)
 
 ## Controllers
 
@@ -299,19 +310,29 @@ module.exports = router;
 
 ### Route Registration (server.js)
 
+All 17 API namespaces mounted under `/api/*`:
+
 ```javascript
 app.use('/api/auth', authRoutes);
 app.use('/api/calendar', calendarRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/passwords', passwordRoutes);
+app.use('/api/password-categories', passwordCategoryRoutes);
 app.use('/api/payment-cards', paymentCardRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/wishlist-categories', wishlistCategoryRoutes);
+app.use('/api/wishlists', wishlistsRoutes);
 app.use('/api/follow', followRoutes);
 app.use('/api/files', filesRoutes);
+app.use('/api/file-folders', fileFoldersRoutes);
 app.use('/api/wikis', wikiRoutes);
+app.use('/api/wikis/:slug/pages', wikiPageRoutes);  // Nested mount; :slug forwarded
+app.use('/api/user', userRightsRoutes);              // GDPR endpoints
 app.use('/api/tracker', trackerRoutes);
 ```
+
+**Note**: `wikiPageRoutes` is mounted under `/api/wikis/:slug/pages`, so the wiki slug is available via `req.params.slug` inside the page router (Express forwards parent params).
 
 ## Services
 

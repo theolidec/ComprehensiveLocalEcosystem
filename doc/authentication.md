@@ -14,7 +14,7 @@ The authentication system provides secure JWT-based authentication with refresh 
 - **Password Security**: bcrypt hashing with 12 salt rounds
 - **Session Management**: Individual and bulk logout capabilities
 - **Device Tracking**: Monitor login sessions across devices
-- **Password Reset**: Email-based password reset functionality
+- **Password Reset**: Token-based password reset (⚠ email delivery not yet integrated — see [Password Reset Status](#password-reset-status))
 
 ## Architecture
 
@@ -363,6 +363,21 @@ FRONTEND_URL=http://localhost:3000
 - **Password Module**: Per-user salt for encryption
 - **Rate Limiter**: Auth-specific rate limiting rules
 - **Frontend Router**: ProtectedRoute wrapper for auth-required routes
+
+## Password Reset Status
+
+The password reset flow is implemented at the route layer but **email delivery is not yet wired up**.
+
+| Step | Status |
+|------|--------|
+| `POST /api/auth/forgot-password` accepts email and generates token | ✅ Implemented |
+| Token stored on User as `resetPasswordToken` + `resetPasswordExpires` (1 hour) | ✅ Implemented |
+| Token logged to `logs/combined.log` via Winston | ✅ Implemented (development convenience) |
+| Email containing the reset link sent to the user | ❌ **TODO** — no SMTP integration in `routes/auth.js` |
+| `POST /api/auth/reset-password/:token` validates token and resets password | ✅ Implemented |
+| Token cleared on successful reset | ✅ Implemented |
+
+**To wire up email delivery**, add a mailer (e.g., Nodemailer with SMTP env vars already present in `backend/.env.example`) and call it from `routes/auth.js` immediately after `User.generatePasswordResetToken(user._id)`. The endpoint already returns a neutral response (`"If an account exists..."`) so enabling email will not introduce account-enumeration regressions.
 
 ## File Locations
 

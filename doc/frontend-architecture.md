@@ -8,13 +8,20 @@ The frontend is built with **React 19.2.4** using modern hooks and functional co
 
 | Component | Technology | Version |
 |-----------|------------|---------|
-| Framework | React | 19.2.4 |
-| Build Tool | Create React App | 5.x |
-| Styling | Tailwind CSS | 3.x |
-| Icons | Lucide React | 0.x |
-| HTTP Client | Axios | 1.x |
-| Routing | React Router DOM | 6.x |
+| Framework | React | 19.2.x |
+| Build Tool | Create React App (`react-scripts`) | 5.0.x |
+| Styling | Tailwind CSS | 3.4.x |
+| Tailwind Plugins | `@tailwindcss/typography` | 0.5.x |
+| Icons | Lucide React | 0.577.x |
+| HTTP Client | Axios | 1.13.x |
+| Routing | React Router DOM | 7.13.x |
 | State | Context API + useReducer | Built-in |
+| Rich Text Editor | TipTap (`@tiptap/react`, `@tiptap/starter-kit` + extensions: color, font-family, highlight, image, link, placeholder, table, table-cell, table-header, table-row, text-align, text-style, underline, `@tiptap/pm`) | 3.23.x |
+| HTML Sanitization | DOMPurify | 3.4.x |
+| Markdown | `react-markdown` + `remark-gfm` | 10.1.x / 4.0.x |
+| PDF Viewer | `pdfjs-dist`, `react-pdf` | 5.7.x / 10.4.x |
+| TypeScript | typescript | 5.3.x |
+| Realtime (reserved) | `socket.io-client` | 4.8.x (present but not yet wired up) |
 
 ## Project Structure
 
@@ -56,59 +63,66 @@ Components are organized by feature/domain:
 
 ```
 components/
-├── Auth/                    # Authentication
-│   ├── AuthPage.js          # Login/register container
-│   ├── Login.js             # Login form
-│   ├── Register.js          # Registration form
-│   └── ProtectedRoute.js    # Auth guard
-├── Layout/                  # Layout components
-│   ├── Header.js            # Navigation header
-│   ├── Footer.js            # Page footer
-│   ├── Sidebar.js           # Navigation sidebar
-│   ├── Row.js               # Flexbox layout helper
-│   └── Toast.js             # Notification toast
-├── Pages/                   # Main pages
-│   ├── Home.js              # Dashboard
-│   ├── Calendar.js          # Full calendar (~1700 lines)
-│   ├── Settings.js          # User settings
-│   ├── PasswordManager.js   # Password vault
-│   ├── FileManager.js       # File explorer
-│   ├── DocumentViewer.js    # File preview
-│   ├── DocumentEditor.js    # Text editor
-│   ├── UserFollowing.js     # Social/follow page
-│   ├── LandingPage.js       # Marketing page container
-│   ├── Hero.js              # Landing page hero section
-│   ├── ProductGrid.js       # Product showcase grid
-│   ├── Features.js          # Features display section
-│   ├── Privacy.js           # Privacy policy
-│   ├── Terms.js             # Terms of service
-│   ├── Cookies.js           # Cookie policy
-│   ├── CookiePopup.js       # Cookie consent
-│   ├── LinkNotFound.js      # 404 page
-│   ├── CalendarHeader.js    # Calendar navigation
-│   ├── CalendarSidebar.js   # Calendar filters
-│   ├── EventForm.js         # Event editor
-│   ├── EventDetails.js      # Event display
-│   └── CategoryManager.js   # Event category management
-├── Wiki/                    # Wiki system
-│   ├── WikiList.js          # Wiki directory
-│   ├── WikiView.js          # Wiki home
-│   ├── WikiPageView.js      # Page viewer
-│   ├── WikiPageEditor.js    # Page editor
-│   ├── WikiPageHistory.js   # Version history
-│   ├── WikiSettings.js      # Wiki config
-│   └── WikiRecentChanges.js # Activity feed
-├── Wishlist/                # Wishlist system
-│   ├── Wishlist.js          # Main wishlist
-│   ├── WishlistItemModal.js # Item editor
-│   ├── ReservationModal.js  # Reservation UI
-│   ├── WishlistShareModal.js # Sharing dialog
-│   └── PublicWishlistItem.js # Public view
-└── Math/                    # Calculator
-    ├── GeoGebraCalculator.js # Main calculator
-    └── GeoGebraCalculator.css # Styles
-├── Tracker/                  # Daily Tracker
-    └── DailyTracker.js       # Habit & task tracker with 4 tabs (Today, Tasks, Questions, Statistics)
+├── Auth/                       # Authentication
+│   ├── AuthPage.js              # Login/register container
+│   ├── Login.js                 # Login form
+│   ├── Register.js              # Registration form
+│   └── ProtectedRoute.js        # Auth guard
+├── Layout/                     # Layout components
+│   ├── Header.js                # Navigation header
+│   ├── Footer.js                # Page footer
+│   ├── Sidebar.js + Sidebar.css # Navigation sidebar
+│   ├── Row.js                   # Flexbox layout helper
+│   └── Toast.js                 # Notification toast
+├── Pages/                      # Main pages
+│   ├── Home.js                  # Dashboard (~46KB)
+│   ├── Calendar.js              # Full calendar (~72KB)
+│   ├── Settings.js + Settings.css   # User settings (~36KB)
+│   ├── PasswordManager.js       # Password + payment cards vault (~58KB)
+│   ├── FileManager.js           # File explorer (~41KB)
+│   ├── DocumentViewer.js        # File preview / lightweight editor (~21KB)
+│   ├── DocumentEditor.js        # TipTap rich-text editor (~43KB)
+│   ├── DocumentEditor_old.js    # Pre-TipTap legacy editor (kept for reference; not routed)
+│   ├── UserFollowing.js + .css  # Social/follow page
+│   ├── LandingPage.js           # Marketing page container
+│   ├── Hero.js                  # Landing page hero section
+│   ├── ProductGrid.js           # Product showcase grid
+│   ├── Features.js              # Features display section
+│   ├── Privacy.js               # Privacy policy
+│   ├── Terms.js                 # Terms of service
+│   ├── Cookies.js               # Cookie policy
+│   ├── CookiePopup.js + .css    # Cookie consent
+│   ├── LinkNotFound.js + .css   # 404 page
+│   └── CategoryManager.js       # Event category management
+├── (root)                      # Loose calendar pieces shared across views
+│   ├── CalendarHeader.js        # Calendar navigation
+│   ├── CalendarSidebar.js       # Calendar filters
+│   ├── EventForm.js             # Event editor
+│   └── EventDetails.js          # Event display
+├── Wiki/                       # Wiki system
+│   ├── WikiList.js              # Wiki directory
+│   ├── WikiView.js              # Wiki home
+│   ├── WikiPageView.js          # Page viewer
+│   ├── WikiPageEditor.js        # Page editor
+│   ├── WikiPageHistory.js       # Version history
+│   ├── WikiSettings.js          # Wiki config
+│   └── WikiRecentChanges.js     # Activity feed
+├── Wishlist/                   # Wishlist system
+│   ├── Wishlist.js + Wishlist.css   # Main wishlist (~39KB JS / ~65KB CSS)
+│   ├── WishlistItemModal.js     # Item editor
+│   ├── ReservationModal.js      # Reservation UI
+│   ├── WishlistShareModal.js    # Sharing dialog
+│   └── PublicWishlistItem.js    # Public view
+├── Math/                       # Calculator
+│   ├── GeoGebraCalculator.js    # Main calculator
+│   └── GeoGebraCalculator.css   # Styles
+├── Tracker/                    # Daily Tracker
+│   └── DailyTracker.js          # Habit & task tracker (~66KB) with 4 tabs (Today, Tasks, Questions, Statistics)
+├── Editor/                     # Custom TipTap extensions
+│   └── FontSize.js              # Font-size mark for DocumentEditor
+└── FileManager/                # File-manager sub-widgets
+    ├── FileTree.js              # Folder tree sidebar
+    └── FileTree.css
 ```
 
 ### Component Patterns
@@ -331,23 +345,28 @@ export const createData = async (data) => {
 };
 ```
 
-### Service Files
+### Service Files (`frontend/src/services/`)
 
-| Service | File | Purpose |
-|---------|------|---------|
-| calendarAPI.js | Calendar operations | Events, recurring events |
-| categoryAPI.js | Category CRUD | Event categories |
-| fileService.js | File operations | Upload, download, folders |
-| passwordAPI.js | Password manager | Passwords, categories |
-| settingsAPI.js | User settings | Profile, preferences |
-| wishlistAPI.js | Wishlist | Items, reservations |
-| wishlistCategoryAPI.js | Categories | Wishlist categories |
+| File | Purpose |
+|------|---------|
+| `calendarAPI.js` | Calendar event CRUD, upcoming, stats, import/export |
+| `categoryAPI.js` | Calendar event category CRUD |
+| `fileService.js` | File upload/download, folders, sharing, document content |
+| `passwordAPI.js` | Password vault (passwords + categories), CSV/JSON import/export |
+| `paymentCardAPI.js` | Payment card CRUD + decrypt + favorite/default |
+| `settingsAPI.js` | User settings, sessions, avatar |
+| `userRightsAPI.js` | GDPR endpoints (`/api/user/*`): access, update, delete, export |
+| `wishlistAPI.js` | Wishlists, items, reservations, public links |
+| `wishlistCategoryAPI.js` | Wishlist category CRUD |
+| `trackerAPI.js` | Daily tracker (tasks, questions, responses, stats, heatmap, export/import) |
+
+> Wiki API calls are made directly from `WikiContext` rather than via a dedicated `wikiAPI.js` service.
 
 ## Routing
 
 **File**: `src/App.js`
 
-React Router DOM v6 configuration:
+React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
 
 ```javascript
 <Routes>

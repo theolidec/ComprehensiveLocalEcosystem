@@ -145,10 +145,20 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 10, 2026  
-**Version**: 2.1.0
+**Last Updated**: May 12, 2026  
+**Version**: 2.5.0
 
 ## Recent Changes
+
+### Documentation Audit (2026-05-12)
+A full doc-vs-code audit was performed and the following inconsistencies were corrected:
+- **`README.md`**: Version 2.2.0 → 2.5.0; Last Updated → 2026-05-12.
+- **`DOCUMENTATION.md`**: Corrected `Settings`, `User`, `Event`, `Category`, `FileFolder`, `WishlistItem`, `WishlistReservation`, `WishlistCategory`, `UserFollow`, `Password`, `PasswordCategory` schemas to match actual Mongoose definitions; added missing `PaymentCard`, `Wishlist`, `DocumentVersion`, Wiki* and Tracker* model summaries; corrected rate-limit numbers (general 1000, auth 20, refresh 50, password reset 3, settings 100, public reservation 10, GDPR 10); bumped version to 2.5.0.
+- **`doc/backend-architecture.md`**: Updated dependency versions (Mongoose 7→8.6, bcryptjs 2→3, multer 1→2.1, express-rate-limit 6→7); listed all 17 route mounts in `server.js`; expanded rate limiter list from 5 to 8; documented `pdfkit` and `moment-timezone` actual usage, and noted `socket.io`/`socket.io-client`/`node-cron` as reserved/unused dependencies.
+- **`doc/frontend-architecture.md`**: React Router 6 → 7; added TipTap suite, DOMPurify, react-markdown, remark-gfm, pdfjs-dist, react-pdf to the stack; documented `socket.io-client` as reserved; expanded component tree to include `Tracker/`, `Editor/`, `FileManager/` subfolders and `DocumentEditor_old.js`; replaced services table with current 10-file list.
+- **`doc/database-models.md`**: Fixed `WishlistCategory` schema (it is per-user, not per-wishlist; correct fields are `name`, `color`, `icon`, `user`, `isDefault`); added `wishlist.saveItemsPerPageCookie` to Settings.
+- **`SECURITY.md`**: Added v2.4.0 (GDPR User Rights) and v2.5.0 (Payment Cards) to changelog.
+- **`doc/security.md`**: Documented that `/api/auth/forgot-password` currently only **logs** the reset token; email delivery is a TODO.
 
 ### User Rights / GDPR Implementation (v2.4.0)
 - **Backend**: Added `/api/user/*` endpoints for GDPR compliance
