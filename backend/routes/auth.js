@@ -1,4 +1,5 @@
 const express = require('express');
+const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const RefreshToken = require('../models/RefreshToken');
@@ -9,37 +10,44 @@ const logger = require('../config/logger');
 
 const router = express.Router();
 
-// Helper function to set secure cookies
+// Helper function to set secure cookies.
+// `secure` defaults to true (HTTPS-only). For local dev over plain HTTP, set
+// ALLOW_INSECURE_COOKIES=true. This is fail-closed: a misconfigured production
+// deploy that forgets NODE_ENV=production no longer silently drops the Secure flag.
+const cookieSecure = process.env.ALLOW_INSECURE_COOKIES !== 'true';
+
 const setAuthCookies = (res, accessToken, refreshToken) => {
   // Set access token cookie (short-lived)
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    secure: cookieSecure,
     sameSite: 'strict',
     maxAge: 15 * 60 * 1000, // 15 minutes
     path: '/'
   });
 
-  // Set refresh token cookie (longer-lived)
+  // Set refresh token cookie (longer-lived). Path is scoped so the long-lived
+  // cookie isn't sent with every API request.
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+    secure: cookieSecure,
     sameSite: 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    path: '/'
+    path: '/api/auth'
   });
 };
 
-// Helper function to clear auth cookies
+// Helper function to clear auth cookies. Paths must match the values used in setAuthCookies
+// or browsers will keep the cookie because clearCookie's path didn't match.
 const clearAuthCookies = (res) => {
   res.clearCookie('accessToken', { path: '/' });
-  res.clearCookie('refreshToken', { path: '/' });
+  res.clearCookie('refreshToken', { path: '/api/auth' });
 };
 
 // Register new user
 router.post('/register', authLimiter, [
   body('email').isEmail().withMessage('Valid email required'),
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters'),
+  body('password').isLength({ min: 12, max: 128 }).withMessage('Password must be 12-128 characters'),
   body('name').trim().notEmpty().withMessage('Name is required')
 ], async (req, res) => {
   try {
@@ -52,7 +60,8 @@ router.post('/register', authLimiter, [
       });
     }
 
-    const { email, password, name } = req.body;
+    const { password, name } = req.body;
+    const email = typeof req.body.email === 'string' ? req.body.email.toLowerCase().trim() : '';
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
@@ -202,10 +211,10 @@ router.post('/login', authLimiter, [
 // Refresh access token
 router.post('/refresh', tokenRefreshLimiter, verifyRefreshToken, async (req, res) => {
   try {
-    const { user, refreshTokenDoc } = req;
+    const { user, refreshToken } = req;
 
-    // Revoke old refresh token
-    await RefreshToken.revokeToken(refreshTokenDoc.token);
+    // Revoke old refresh token (pass the raw JWT; the model hashes for lookup).
+    await RefreshToken.revokeToken(refreshToken);
 
     // Generate new tokens
     const newAccessToken = user.generateAccessToken();
@@ -320,30 +329,38 @@ router.post('/forgot-password', authLimiter, [
     }
 
     const { email } = req.body;
+    const normalizedEmail = typeof email === 'string' ? email.toLowerCase().trim() : '';
 
-    const user = await User.findOne({ email });
-    if (!user) {
-      // Don't reveal whether email exists
-      return res.json({
-        message: 'If an account exists with this email, a password reset link has been sent',
-        code: 'RESET_EMAIL_SENT'
-      });
-    }
-
-    await User.generatePasswordResetToken(user._id);
-
-    // In production, send email with reset link
-    // For now, log the token (development only)
-    const resetUser = await User.findById(user._id).select('+resetPasswordToken');
-    logger.info(`Password reset token for ${email}: ${resetUser.resetPasswordToken}`);
-
-    // Note: In production, integrate with email service (SendGrid, Nodemailer, etc.)
-    // Example: await sendEmail(email, 'Password Reset', `Reset link: ${resetUrl}`);
-
-    res.json({
+    const user = normalizedEmail ? await User.findOne({ email: normalizedEmail }) : null;
+    const responseBody = {
       message: 'If an account exists with this email, a password reset link has been sent',
       code: 'RESET_EMAIL_SENT'
-    });
+    };
+
+    if (!user) {
+      // Perform dummy work to roughly equalise response timing with the
+      // real-user branch (random-bytes + sha256 + a no-op update). This
+      // makes account-existence enumeration via response time noticeably
+      // harder without changing the response shape.
+      const dummyToken = crypto.randomBytes(32).toString('hex');
+      crypto.createHash('sha256').update(dummyToken).digest('hex');
+      await User.findOne({ _id: null }).lean();
+      return res.json(responseBody);
+    }
+
+    const plainToken = await User.generatePasswordResetToken(user._id);
+
+    // TODO: integrate an email provider (SMTP_* placeholders exist in backend/.env.example)
+    //       and send the token to user.email. Until then, in non-production environments
+    //       only, expose the token in the response so developers can complete the flow.
+    //       Production MUST never log or return the plain reset token.
+    if (process.env.NODE_ENV !== 'production') {
+      responseBody.devResetToken = plainToken;
+    } else {
+      logger.warn(`Password reset requested for ${email} but no email provider is configured; reset link cannot be delivered.`);
+    }
+
+    res.json(responseBody);
   } catch (error) {
     logger.error('Forgot password error:', error);
     res.status(500).json({
@@ -355,7 +372,7 @@ router.post('/forgot-password', authLimiter, [
 
 // Reset password with token
 router.post('/reset-password/:token', authLimiter, [
-  body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters')
+  body('password').isLength({ min: 12, max: 128 }).withMessage('Password must be 12-128 characters')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);

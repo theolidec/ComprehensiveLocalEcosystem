@@ -129,7 +129,9 @@ const upload = multer({
 router.post('/upload', authenticateToken, upload.single('file'), fileController.uploadFile);
 
 router.post('/document-image', authenticateToken, upload.single('image'), fileController.uploadDocumentImage);
-router.get('/document-images/:filename', fileController.serveDocumentImage);
+router.get('/document-images/:filename', authenticateToken, [
+  param('filename').matches(/^[a-f0-9]{32}\.[a-zA-Z0-9]{1,8}$/).withMessage('Invalid filename')
+], handleValidationErrors, fileController.serveDocumentImage);
 
 router.get('/', authenticateToken, fileController.getFiles);
 router.get('/all', authenticateToken, fileController.getAllFiles);

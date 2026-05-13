@@ -54,6 +54,20 @@ router.post('/categories', authenticateToken, [
   await wikiPageController.createCategory(req, res);
 });
 
+// Literal-path routes must be declared BEFORE the `/:pageSlug` catch-all,
+// otherwise Express will treat them as a page slug lookup.
+router.get('/watchlist', authenticateToken, async (req, res) => {
+  await wikiPageController.getWatchlist(req, res);
+});
+
+router.get('/recent-changes', optionalAuth, async (req, res) => {
+  await wikiPageController.getRecentChanges(req, res);
+});
+
+router.get('/all', optionalAuth, async (req, res) => {
+  await wikiPageController.getAllPages(req, res);
+});
+
 router.get('/:pageSlug', optionalAuth, async (req, res) => {
   await wikiPageController.getPage(req, res);
 });
@@ -136,18 +150,6 @@ router.post('/:pageSlug/watch', authenticateToken, async (req, res) => {
 
 router.delete('/:pageSlug/watch', authenticateToken, async (req, res) => {
   await wikiPageController.removeFromWatchlist(req, res);
-});
-
-router.get('/watchlist', authenticateToken, async (req, res) => {
-  await wikiPageController.getWatchlist(req, res);
-});
-
-router.get('/recent-changes', optionalAuth, async (req, res) => {
-  await wikiPageController.getRecentChanges(req, res);
-});
-
-router.get('/all', optionalAuth, async (req, res) => {
-  await wikiPageController.getAllPages(req, res);
 });
 
 module.exports = router;

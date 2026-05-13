@@ -5,6 +5,7 @@ const Event = require('../models/Event');
 const Category = require('../models/Category');
 const Password = require('../models/Password');
 const PasswordCategory = require('../models/PasswordCategory');
+const PaymentCard = require('../models/PaymentCard');
 const Wishlist = require('../models/Wishlist');
 const WishlistCategory = require('../models/WishlistCategory');
 const WishlistItem = require('../models/WishlistItem');
@@ -12,12 +13,16 @@ const WishlistReservation = require('../models/WishlistReservation');
 const UserFollow = require('../models/UserFollow');
 const File = require('../models/File');
 const FileFolder = require('../models/FileFolder');
+const DocumentVersion = require('../models/DocumentVersion');
 const Wiki = require('../models/Wiki');
 const WikiPage = require('../models/WikiPage');
 const WikiCategory = require('../models/WikiCategory');
 const WikiPermission = require('../models/WikiPermission');
 const WikiVersion = require('../models/WikiVersion');
 const WikiWatch = require('../models/WikiWatch');
+const TrackerTask = require('../models/TrackerTask');
+const TrackerQuestion = require('../models/TrackerQuestion');
+const TrackerResponse = require('../models/TrackerResponse');
 const logger = require('../config/logger');
 
 const getUserData = async (req, res) => {
@@ -29,7 +34,7 @@ const getUserData = async (req, res) => {
       return res.status(404).json({ error: 'User not found', code: 'USER_NOT_FOUND' });
     }
 
-    const settings = await Settings.findOne({ user: userId });
+    const settings = await Settings.findOne({ userId });
     const refreshTokens = await RefreshToken.find({ user: userId, isRevoked: false })
       .select('deviceInfo createdAt expiresAt');
 
@@ -131,20 +136,38 @@ const deleteAccount = async (req, res) => {
 
     logger.info(`Starting account deletion for user: ${user.email}`);
 
+    // Delete reservations on this user's wishlist items before deleting the items themselves.
+    const userWishlistItemIds = await WishlistItem.find({ user: userId }).distinct('_id');
+    if (userWishlistItemIds.length > 0) {
+      await WishlistReservation.deleteMany({ wishlistItem: { $in: userWishlistItemIds } });
+    }
+
+    // Delete document versions for this user's files (file cleanup will follow).
+    const userFileIds = await File.find({ userId }).distinct('_id');
+    if (userFileIds.length > 0) {
+      await DocumentVersion.deleteMany({ fileId: { $in: userFileIds } });
+    }
+
     await Promise.all([
       RefreshToken.deleteMany({ user: userId }),
-      Settings.deleteOne({ user: userId }),
+      Settings.deleteOne({ userId }),
       Event.deleteMany({ user: userId }),
       Category.deleteMany({ user: userId }),
-      Password.deleteMany({ user: userId }),
-      PasswordCategory.deleteMany({ user: userId }),
+      Password.deleteMany({ userId }),
+      PasswordCategory.deleteMany({ userId }),
+      PaymentCard.deleteMany({ userId }),
       Wishlist.deleteMany({ user: userId }),
       WishlistCategory.deleteMany({ user: userId }),
       WishlistItem.deleteMany({ user: userId }),
-      WishlistReservation.deleteMany({ $or: [{ reservedBy: userId }, { owner: userId }] }),
       UserFollow.deleteMany({ $or: [{ follower: userId }, { following: userId }] }),
-      File.deleteMany({ user: userId }),
-      FileFolder.deleteMany({ user: userId })
+      File.deleteMany({ userId }),
+      FileFolder.deleteMany({ userId }),
+      TrackerTask.deleteMany({ user: userId }),
+      TrackerQuestion.deleteMany({ user: userId }),
+      TrackerResponse.deleteMany({ user: userId }),
+      // Memberships in other users' wikis and watch entries owned by this user
+      WikiPermission.deleteMany({ user: userId }),
+      WikiWatch.deleteMany({ user: userId })
     ]);
 
     const userWikis = await Wiki.find({ owner: userId });
@@ -185,6 +208,7 @@ const exportUserData = async (req, res) => {
       categories,
       passwords,
       passwordCategories,
+      paymentCards,
       wishlists,
       wishlistCategories,
       wishlistItems,
@@ -192,21 +216,28 @@ const exportUserData = async (req, res) => {
       followers,
       files,
       folders,
-      wikis
+      wikis,
+      trackerTasks,
+      trackerQuestions,
+      trackerResponses
     ] = await Promise.all([
-      Settings.findOne({ user: userId }),
+      Settings.findOne({ userId }),
       Event.find({ user: userId }).sort({ date: -1 }),
       Category.find({ user: userId }),
-      Password.find({ user: userId }),
-      PasswordCategory.find({ user: userId }),
+      Password.find({ userId }),
+      PasswordCategory.find({ userId }),
+      PaymentCard.find({ userId }),
       Wishlist.find({ user: userId }),
       WishlistCategory.find({ user: userId }),
       WishlistItem.find({ user: userId }),
       UserFollow.find({ follower: userId }).populate('following', 'name email'),
       UserFollow.find({ following: userId }).populate('follower', 'name email'),
-      File.find({ user: userId }),
-      FileFolder.find({ user: userId }),
-      Wiki.find({ owner: userId })
+      File.find({ userId }),
+      FileFolder.find({ userId }),
+      Wiki.find({ owner: userId }),
+      TrackerTask.find({ user: userId }),
+      TrackerQuestion.find({ user: userId }),
+      TrackerResponse.find({ user: userId })
     ]);
 
     const exportData = {
@@ -249,14 +280,31 @@ const exportUserData = async (req, res) => {
           id: p._id,
           title: p.title,
           username: p.username,
-          url: p.url,
+          email: p.email,
+          website: p.website,
+          encryptedPassword: p.encryptedPassword,
           category: p.category,
           notes: p.notes,
-          favorite: p.favorite,
+          isFavorite: p.isFavorite,
           createdAt: p.createdAt,
           updatedAt: p.updatedAt
         }))
       },
+      paymentCards: paymentCards.map(c => ({
+        id: c._id,
+        cardName: c.cardName,
+        cardholderName: c.cardholderName,
+        encryptedCardNumber: c.encryptedCardNumber,
+        encryptedExpiryDate: c.encryptedExpiryDate,
+        encryptedCVV: c.encryptedCVV,
+        cardType: c.cardType,
+        lastFourDigits: c.lastFourDigits,
+        billingAddress: c.billingAddress,
+        isDefault: c.isDefault,
+        isFavorite: c.isFavorite,
+        createdAt: c.createdAt,
+        updatedAt: c.updatedAt
+      })),
       wishlists: {
         categories: wishlistCategories.map(c => ({
           id: c._id,
@@ -268,25 +316,33 @@ const exportUserData = async (req, res) => {
           id: w._id,
           name: w.name,
           description: w.description,
-          isPublic: w.isPublic,
+          template: w.template,
+          color: w.color,
+          isDefault: w.isDefault,
           createdAt: w.createdAt,
           updatedAt: w.updatedAt
         })),
         items: wishlistItems.map(i => ({
           id: i._id,
           wishlist: i.wishlist,
-          name: i.name,
+          title: i.title,
           description: i.description,
           price: i.price,
+          currency: i.currency,
           url: i.url,
           imageUrl: i.imageUrl,
           category: i.category,
           priority: i.priority,
-          reserved: i.reserved,
-          purchased: i.purchased,
+          status: i.status,
+          isPublic: i.isPublic,
           createdAt: i.createdAt,
           updatedAt: i.updatedAt
         }))
+      },
+      tracker: {
+        tasks: trackerTasks,
+        questions: trackerQuestions,
+        responses: trackerResponses
       },
       social: {
         following: following.map(f => ({
@@ -312,16 +368,20 @@ const exportUserData = async (req, res) => {
         folders: folders.map(f => ({
           id: f._id,
           name: f.name,
-          parentFolder: f.parentFolder,
+          parentId: f.parentId,
+          color: f.color,
           createdAt: f.createdAt,
           updatedAt: f.updatedAt
         })),
         files: files.map(f => ({
           id: f._id,
-          name: f.name,
+          originalName: f.originalName,
           mimeType: f.mimeType,
           size: f.size,
-          folder: f.folder,
+          folderId: f.folderId,
+          description: f.description,
+          tags: f.tags,
+          isFavorite: f.isFavorite,
           createdAt: f.createdAt,
           updatedAt: f.updatedAt
         }))

@@ -3,6 +3,9 @@ const PaymentCard = require('../models/PaymentCard');
 const User = require('../models/User');
 const passwordEncryption = require('../services/passwordService');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
+
+const MAX_IMPORT_ITEMS = 1000;
 
 const getUserSalt = async (userId) => {
   const user = await User.findById(userId).select('+passwordSalt');
@@ -26,11 +29,12 @@ const getAllPasswords = async (req, res, next) => {
     if (category) filter.category = category;
     if (favorite === 'true') filter.isFavorite = true;
     if (search) {
+      const safeSearch = escapeRegex(search);
       filter.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { website: { $regex: search, $options: 'i' } },
-        { username: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { website: { $regex: safeSearch, $options: 'i' } },
+        { username: { $regex: safeSearch, $options: 'i' } },
+        { email: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 
@@ -318,6 +322,13 @@ const importPasswords = async (req, res, next) => {
       return res.status(400).json({ error: 'Invalid import data' });
     }
 
+    if (passwords.length > MAX_IMPORT_ITEMS) {
+      return res.status(413).json({
+        error: `Import exceeds maximum of ${MAX_IMPORT_ITEMS} items`,
+        code: 'IMPORT_TOO_LARGE'
+      });
+    }
+
     if (!password) {
       return res.status(400).json({ error: 'Encryption password is required' });
     }
@@ -378,6 +389,13 @@ const importPasswordsCSV = async (req, res, next) => {
 
     if (lines.length < 2) {
       return res.status(400).json({ error: 'CSV must have at least a header row and one data row' });
+    }
+
+    if (lines.length - 1 > MAX_IMPORT_ITEMS) {
+      return res.status(413).json({
+        error: `CSV exceeds maximum of ${MAX_IMPORT_ITEMS} data rows`,
+        code: 'CSV_TOO_LARGE'
+      });
     }
 
     // Parse header

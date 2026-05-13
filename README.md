@@ -529,7 +529,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.5.0
-**Last Updated**: 2026-05-12
+**Version**: 2.6.0
+**Last Updated**: 2026-05-13
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

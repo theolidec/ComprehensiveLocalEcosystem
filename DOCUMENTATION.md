@@ -631,9 +631,7 @@ System health check.
 ```json
 {
   "status": "OK",
-  "timestamp": "2024-01-15T10:30:00.000Z",
-  "uptime": 3600.5,
-  "environment": "development"
+  "timestamp": "2024-01-15T10:30:00.000Z"
 }
 ```
 

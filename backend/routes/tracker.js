@@ -6,6 +6,7 @@ const TrackerQuestion = require('../models/TrackerQuestion');
 const TrackerResponse = require('../models/TrackerResponse');
 const { authenticateToken } = require('../middleware/auth');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
 
@@ -43,9 +44,10 @@ router.get('/tasks', authenticateToken, async (req, res) => {
       query.category = category;
     }
     if (search) {
+      const safeSearch = escapeRegex(search);
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 

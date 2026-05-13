@@ -2,8 +2,12 @@ const express = require('express');
 const { body, param, validationResult } = require('express-validator');
 const WishlistItem = require('../models/WishlistItem');
 const { authenticateToken } = require('../middleware/auth');
+const { userActionLimiter } = require('../config/rateLimiter');
 const logger = require('../config/logger');
 const PDFDocument = require('pdfkit');
+const { escapeRegex } = require('../utils/regex');
+
+const MAX_CSV_IMPORT_ROWS = 1000;
 
 const router = express.Router();
 
@@ -39,9 +43,10 @@ router.get('/', authenticateToken, async (req, res) => {
       query.priority = priority;
     }
     if (search) {
+      const safeSearch = escapeRegex(search);
       query.$or = [
-        { title: { $regex: search, $options: 'i' } },
-        { description: { $regex: search, $options: 'i' } }
+        { title: { $regex: safeSearch, $options: 'i' } },
+        { description: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 
@@ -117,9 +122,10 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
         query.priority = priority;
       }
       if (search) {
+        const safeSearch = escapeRegex(search);
         query.$or = [
-          { title: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } }
+          { title: { $regex: safeSearch, $options: 'i' } },
+          { description: { $regex: safeSearch, $options: 'i' } }
         ];
       }
     }
@@ -260,7 +266,7 @@ router.get('/export/pdf', authenticateToken, async (req, res) => {
   }
 });
 
-router.post('/import/csv', authenticateToken, async (req, res) => {
+router.post('/import/csv', authenticateToken, userActionLimiter, async (req, res) => {
   try {
     const { csv } = req.body;
     if (!csv || typeof csv !== 'string') {
@@ -270,6 +276,14 @@ router.post('/import/csv', authenticateToken, async (req, res) => {
     const lines = csv.trim().split('\n');
     if (lines.length < 2) {
       return res.status(400).json({ error: 'CSV must have header and at least one data row', code: 'VALIDATION_ERROR' });
+    }
+
+    // Cap import size to prevent storage exhaustion via large CSVs.
+    if (lines.length - 1 > MAX_CSV_IMPORT_ROWS) {
+      return res.status(413).json({
+        error: `CSV exceeds maximum of ${MAX_CSV_IMPORT_ROWS} data rows`,
+        code: 'CSV_TOO_LARGE'
+      });
     }
 
     const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));

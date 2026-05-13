@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 const RecurringEventService = require('../services/recurringEventService');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const extractOriginalEventId = (id) => {
   if (!id) return id;
@@ -117,12 +118,13 @@ const getEvents = async (req, res) => {
     }
 
     if (search) {
+      const safeSearch = escapeRegex(search);
       // If we already have $or for date filtering, we need to use $and
       const searchQuery = {
         $or: [
-          { title: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } },
-          { location: { $regex: search, $options: 'i' } }
+          { title: { $regex: safeSearch, $options: 'i' } },
+          { description: { $regex: safeSearch, $options: 'i' } },
+          { location: { $regex: safeSearch, $options: 'i' } }
         ]
       };
 

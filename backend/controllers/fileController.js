@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads', 'files');
 
@@ -71,14 +72,15 @@ const fileController = {
       }
       
       if (search) {
+        const safeSearch = escapeRegex(search);
         query.$or = [
-          { originalName: { $regex: search, $options: 'i' } },
-          { description: { $regex: search, $options: 'i' } }
+          { originalName: { $regex: safeSearch, $options: 'i' } },
+          { description: { $regex: safeSearch, $options: 'i' } }
         ];
       }
       
       if (type) {
-        query.mimeType = { $regex: `^${type}` };
+        query.mimeType = { $regex: `^${escapeRegex(type)}` };
       }
       
       if (favorite === 'true') {
@@ -170,7 +172,14 @@ const fileController = {
 
       res.setHeader('Content-Type', file.mimeType);
       res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-      
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      // SVG can contain <script> that executes on top-level navigation. Sandbox the
+      // response so embedded scripts cannot run, run in their own origin, or trigger
+      // navigation/form submission.
+      if (file.mimeType === 'image/svg+xml') {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+      }
+
       const stream = fs.createReadStream(file.path);
       stream.pipe(res);
     } catch (error) {
@@ -382,7 +391,11 @@ const fileController = {
 
       res.setHeader('Content-Type', file.mimeType);
       res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-      
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      if (file.mimeType === 'image/svg+xml') {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+      }
+
       const stream = fs.createReadStream(file.path);
       stream.pipe(res);
     } catch (error) {
@@ -527,9 +540,25 @@ const fileController = {
 
   serveDocumentImage: async (req, res) => {
     try {
-      const imagePath = path.join(UPLOAD_DIR, 'document-images', req.params.filename);
+      const filename = req.params.filename;
+      if (!/^[a-f0-9]{32}\.[a-zA-Z0-9]{1,8}$/.test(filename)) {
+        return res.status(400).json({ error: 'Invalid filename', code: 'INVALID_FILENAME' });
+      }
+      const imageDir = path.resolve(UPLOAD_DIR, 'document-images');
+      const imagePath = path.resolve(imageDir, filename);
+      if (!imagePath.startsWith(imageDir + path.sep)) {
+        logger.warn(`Document image path traversal attempt by user ${req.user?.email}: ${filename}`);
+        return res.status(400).json({ error: 'Invalid filename', code: 'INVALID_FILENAME' });
+      }
       if (!fs.existsSync(imagePath)) {
         return res.status(404).json({ error: 'Image not found', code: 'IMAGE_NOT_FOUND' });
+      }
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+      // SVGs can carry <script>; sandbox so they cannot execute on top-level
+      // navigation. The extension regex (validated above) only allows up to 8 chars,
+      // matching `svg` or `SVG` etc.
+      if (path.extname(filename).toLowerCase() === '.svg') {
+        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
       }
       res.sendFile(imagePath);
     } catch (error) {

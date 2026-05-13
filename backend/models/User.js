@@ -16,7 +16,7 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters long'],
+    minlength: [12, 'Password must be at least 12 characters long'],
     select: false // Don't include password in queries by default
   },
   name: {
@@ -89,16 +89,15 @@ userSchema.methods.comparePassword = async function(candidatePassword) {
   }
 };
 
-// Instance method to generate access token
+// Instance method to generate access token. Payload contains only userId — the auth
+// middleware re-fetches the user on every request anyway, so embedding email leaks
+// information unnecessarily (JWTs are base64-decodable by anyone holding them).
 userSchema.methods.generateAccessToken = function() {
   return jwt.sign(
-    { 
-      userId: this._id,
-      email: this.email 
-    },
+    { userId: this._id },
     process.env.JWT_SECRET,
-    { 
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m' 
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m'
     }
   );
 };
@@ -121,9 +120,12 @@ userSchema.virtual('isLocked').get(function() {
   return !!(this.lockUntil && this.lockUntil > Date.now());
 });
 
-// Static method to find user by email with password
+// Static method to find user by email with password. Email is lowercased to match
+// what's stored (the email path uses `lowercase: true` on save). Without this, a
+// login with `User@Example.com` would not match a stored `user@example.com`.
 userSchema.statics.findByEmailWithPassword = function(email) {
-  return this.findOne({ email }).select('+password');
+  if (typeof email !== 'string') return Promise.resolve(null);
+  return this.findOne({ email: email.toLowerCase().trim() }).select('+password');
 };
 
 // Static method to find by ID and update last login
@@ -140,35 +142,53 @@ userSchema.statics.updateLastLogin = function(userId) {
 };
 
 // Static method to increment login attempts
-userSchema.statics.incrementLoginAttempts = function(userId) {
-  return this.findByIdAndUpdate(
+// After 5 consecutive failed attempts the account is locked for 2 hours.
+userSchema.statics.incrementLoginAttempts = async function(userId) {
+  const user = await this.findByIdAndUpdate(
     userId,
-    { 
-      $inc: { loginAttempts: 1 },
-      $set: { lockUntil: this.loginAttempts + 1 >= 5 ? Date.now() + 2 * 60 * 60 * 1000 : undefined } // Lock for 2 hours after 5 attempts
-    },
+    { $inc: { loginAttempts: 1 } },
     { new: true }
   );
+
+  if (user && user.loginAttempts >= 5) {
+    const alreadyLocked = user.lockUntil && user.lockUntil > new Date();
+    if (!alreadyLocked) {
+      const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
+      await this.findByIdAndUpdate(userId, { $set: { lockUntil } });
+      user.lockUntil = lockUntil;
+      logger.warn(`Account locked due to ${user.loginAttempts} failed login attempts: ${user.email}`);
+    }
+  }
+
+  return user;
 };
 
-// Static method to generate password reset token
-userSchema.statics.generatePasswordResetToken = function(userId) {
+// Hash a reset token using SHA-256. The plain token is sent to the user (e.g. via email);
+// only the hash is persisted, so a database compromise cannot grant password resets.
+userSchema.statics.hashResetToken = function(token) {
+  return crypto.createHash('sha256').update(token).digest('hex');
+};
+
+// Static method to generate password reset token. Returns the plain token to the caller.
+userSchema.statics.generatePasswordResetToken = async function(userId) {
   const token = crypto.randomBytes(32).toString('hex');
+  const tokenHash = this.hashResetToken(token);
   const expires = Date.now() + 60 * 60 * 1000; // 1 hour
-  return this.findByIdAndUpdate(
+  await this.findByIdAndUpdate(
     userId,
     {
-      resetPasswordToken: token,
+      resetPasswordToken: tokenHash,
       resetPasswordExpires: new Date(expires)
-    },
-    { new: true }
+    }
   );
+  return token;
 };
 
-// Static method to find by reset token
+// Static method to find by reset token (caller passes the plain token).
 userSchema.statics.findByResetToken = function(token) {
+  const tokenHash = this.hashResetToken(token);
   return this.findOne({
-    resetPasswordToken: token,
+    resetPasswordToken: tokenHash,
     resetPasswordExpires: { $gt: Date.now() }
   }).select('+password');
 };

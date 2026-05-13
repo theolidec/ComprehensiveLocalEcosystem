@@ -94,29 +94,26 @@ wikiSchema.methods.canView = async function(user) {
 };
 
 wikiSchema.methods.canEdit = async function(user) {
-  logger.info('canEdit called:', { 
-    wikiId: this._id, 
-    userId: user?._id, 
-    owner: this.owner,
-    ownerId: this.owner._id ? this.owner._id.toString() : this.owner.toString(),
-    userIdStr: user?._id?.toString(),
-    allowPublicEdit: this.allowPublicEdit 
+  logger.debug('canEdit called:', {
+    wikiId: this._id,
+    userId: user?._id,
+    allowPublicEdit: this.allowPublicEdit
   });
-  
+
   if (!user) {
     return this.allowPublicEdit;
   }
-  
+
   const ownerId = this.owner._id ? this.owner._id.toString() : this.owner.toString();
   const userIdStr = user._id.toString();
-  logger.info('canEdit comparison:', { ownerId, userIdStr, match: ownerId === userIdStr });
-  
+  logger.debug('canEdit comparison:', { ownerId, userIdStr, match: ownerId === userIdStr });
+
   if (ownerId === userIdStr) return true;
   if (this.allowPublicEdit) return true;
-  
+
   const WikiPermission = mongoose.model('WikiPermission');
   const permission = await WikiPermission.findOne({ wiki: this._id, user: user._id });
-  logger.info('canEdit permission check:', { permission: permission?.role });
+  logger.debug('canEdit permission check:', { permission: permission?.role });
   return permission && (permission.role === 'editor' || permission.role === 'admin');
 };
 

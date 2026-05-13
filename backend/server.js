@@ -6,9 +6,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
+const cron = require('node-cron');
 const connectDB = require('./config/database');
 const logger = require('./config/logger');
 const { generalLimiter } = require('./config/rateLimiter');
+const RefreshToken = require('./models/RefreshToken');
 const authRoutes = require('./routes/auth');
 const calendarRoutes = require('./routes/calendar');
 const categoryRoutes = require('./routes/categories');
@@ -42,27 +44,54 @@ logger.info(`CWD: ${process.cwd()}`);
 // Connect to database
 connectDB();
 
-// Trust proxy for rate limiting and IP detection
-app.set('trust proxy', 1);
+// Resolve the allowed CORS origin. In production, FRONTEND_URL MUST be set explicitly —
+// falling back to localhost would let any locally-running attacker app hit the API with
+// credentials. In development, fall back to localhost:3000 for convenience.
+const FRONTEND_URL = process.env.FRONTEND_URL;
+if (process.env.NODE_ENV === 'production' && !FRONTEND_URL) {
+  logger.error('FATAL: FRONTEND_URL must be set when NODE_ENV=production');
+  process.exit(1);
+}
+const CORS_ORIGIN = FRONTEND_URL || 'http://localhost:3000';
+
+// Trust proxy for rate limiting and IP detection. Trusting too aggressively (e.g. `true` or
+// `1` behind multiple hops) lets attackers spoof X-Forwarded-For from anywhere upstream of
+// the first proxy. Default to internal-only ranges, override via TRUST_PROXY when the
+// deployment topology is known (e.g. number of hops or a comma-separated IP/CIDR list).
+const TRUST_PROXY = process.env.TRUST_PROXY || 'loopback, linklocal, uniquelocal';
+const trustProxyValue = /^\d+$/.test(TRUST_PROXY) ? Number(TRUST_PROXY) : TRUST_PROXY;
+app.set('trust proxy', trustProxyValue);
 
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
+      // Tailwind compiled CSS uses inline styles for some utilities; nonce/hash
+      // migration is preferred but requires UI work.
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
+      // imgSrc must allow https: so externally-hosted product images (e.g. wishlist
+      // imageUrl, wiki content) render. data: is needed for inline base64 thumbnails.
       imgSrc: ["'self'", "data:", "https:"],
+      // Disallow embedding the app in any iframe (clickjacking defense).
+      frameAncestors: ["'none'"],
+      // Forms can only submit to same-origin endpoints.
+      formAction: ["'self'"],
+      // Lock the document base URI to same-origin to defeat <base> tag injections.
+      baseUri: ["'self'"],
+      // Block <object>/<embed>/<applet> entirely.
+      objectSrc: ["'none'"],
     },
   },
 }));
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: CORS_ORIGIN,
   credentials: true, // Allow cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  allowedHeaders: ['Content-Type'],
 }));
 
 // Logging middleware
@@ -82,13 +111,12 @@ app.use(cookieParser());
 // Rate limiting middleware
 app.use(generalLimiter);
 
-// Health check endpoint
+// Health check endpoint. Public and unauthenticated, so reveal only liveness — not
+// uptime or environment, which can help an attacker fingerprint deploys.
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV || 'development'
+    timestamp: new Date().toISOString()
   });
 });
 
@@ -150,6 +178,17 @@ app.use((error, req, res, next) => {
   });
 });
 
+// Schedule a daily cleanup of expired/revoked refresh tokens. The TTL index on
+// expiresAt removes naturally-expired rows, but rows with isRevoked: true and a
+// future expiresAt would otherwise persist until expiry. Run at 03:15 server time.
+cron.schedule('15 3 * * *', async () => {
+  try {
+    await RefreshToken.cleanupExpiredTokens();
+  } catch (error) {
+    logger.error('Scheduled refresh-token cleanup failed:', error);
+  }
+});
+
 // Graceful shutdown
 process.on('SIGTERM', () => {
   logger.info('SIGTERM received, shutting down gracefully');
@@ -176,7 +215,7 @@ if (USE_HTTPS && SSL_CERT_PATH && SSL_KEY_PATH) {
     server.listen(HTTPS_PORT, () => {
       logger.info(`HTTPS Server is running on port ${HTTPS_PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+      logger.info(`CORS origin: ${CORS_ORIGIN}`);
     });
   } catch (error) {
     logger.error('Failed to start HTTPS server:', error.message);
@@ -185,13 +224,13 @@ if (USE_HTTPS && SSL_CERT_PATH && SSL_KEY_PATH) {
     app.listen(PORT, () => {
       logger.info(`HTTP Server is running on port ${PORT}`);
       logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-      logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+      logger.info(`CORS origin: ${CORS_ORIGIN}`);
     });
   }
 } else {
   app.listen(PORT, () => {
     logger.info(`Server is running on port ${PORT}`);
     logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
-    logger.info(`CORS origin: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
+    logger.info(`CORS origin: ${CORS_ORIGIN}`);
   });
 }

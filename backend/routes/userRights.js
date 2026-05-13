@@ -21,7 +21,7 @@ const validateRequest = (req, res, next) => {
 
 router.use(authenticateToken);
 
-router.get('/data', userRightsController.getUserData);
+router.get('/data', userDataLimiter, userRightsController.getUserData);
 
 router.put('/data', userDataLimiter, [
   body('name').optional().trim().isLength({ min: 1, max: 50 }),
@@ -32,6 +32,6 @@ router.delete('/account', userDataLimiter, [
   body('password').notEmpty().withMessage('Password is required')
 ], validateRequest, userRightsController.deleteAccount);
 
-router.get('/export', userRightsController.exportUserData);
+router.get('/export', userDataLimiter, userRightsController.exportUserData);
 
 module.exports = router;

@@ -26,7 +26,11 @@ The backend is built on **Node.js** with **Express.js**, using **MongoDB** with 
 | Time Zones | moment-timezone | 0.6.x (used by `services/recurringEventService.js`) |
 | Env Loading | dotenv | 16.3.x |
 
-**Reserved / not yet wired up**: `socket.io`, `socket.io-client`, `node-cron` are present in `package.json` but not currently referenced in source. They are placeholders for future realtime / scheduled-job features (e.g., calling `RefreshToken.cleanupExpiredTokens()`).
+**Reserved / not yet wired up**: `socket.io`, `socket.io-client` are present in `package.json` but not currently referenced in source.
+
+**Active utilities**:
+- `node-cron` — daily 03:15 cleanup of expired/revoked refresh tokens (`server.js`)
+- `backend/utils/regex.js` — `escapeRegex()` helper applied to all user-supplied search inputs before `$regex`/`new RegExp()` (ReDoS defense)
 
 ## Project Structure
 
@@ -100,6 +104,8 @@ backend/
 ├── services/            # Business logic services
 │   ├── passwordService.js
 │   └── recurringEventService.js
+├── utils/               # Shared utilities
+│   └── regex.js         # escapeRegex() for ReDoS-safe MongoDB queries
 ├── uploads/             # File storage directory
 ├── logs/                # Log files
 ├── .env                 # Environment variables

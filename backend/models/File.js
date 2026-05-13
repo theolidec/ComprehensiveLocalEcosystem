@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const fileSchema = new mongoose.Schema({
   userId: {
@@ -99,13 +100,14 @@ fileSchema.statics.getTrash = function(userId) {
 };
 
 fileSchema.statics.searchFiles = function(userId, searchTerm) {
+  const safeTerm = escapeRegex(searchTerm);
   return this.find({
     userId,
     isDeleted: false,
     $or: [
-      { originalName: { $regex: searchTerm, $options: 'i' } },
-      { description: { $regex: searchTerm, $options: 'i' } },
-      { tags: { $in: [new RegExp(searchTerm, 'i')] } }
+      { originalName: { $regex: safeTerm, $options: 'i' } },
+      { description: { $regex: safeTerm, $options: 'i' } },
+      { tags: { $in: [new RegExp(safeTerm, 'i')] } }
     ]
   }).sort({ createdAt: -1 });
 };

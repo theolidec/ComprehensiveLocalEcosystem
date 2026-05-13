@@ -4,7 +4,7 @@ Complete reference of all REST API endpoints in the Comprehensive Local Ecosyste
 
 **Base URL**: `http://localhost:3001/api`
 
-**Authentication**: Most endpoints require JWT authentication via HttpOnly cookies or `Authorization: Bearer <token>` header.
+**Authentication**: Most endpoints require JWT authentication via HttpOnly cookies. `Authorization: Bearer` is not accepted.
 
 ---
 

@@ -4,6 +4,7 @@ const WikiVersion = require('../models/WikiVersion');
 const WikiCategory = require('../models/WikiCategory');
 const WikiPermission = require('../models/WikiPermission');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const createPage = async (req, res) => {
   try {
@@ -20,7 +21,7 @@ const createPage = async (req, res) => {
     }
     
     const canEdit = await wiki.canEdit(req.user);
-    logger.info(`createPage canEdit: wiki=${wikiSlug}, user=${req.user._id}, canEdit=${canEdit}, owner=${wiki.owner._id}`);
+    logger.debug(`createPage canEdit: wiki=${wikiSlug}, user=${req.user._id}, canEdit=${canEdit}, owner=${wiki.owner._id}`);
     if (!canEdit) {
       return res.status(403).json({
         error: 'You do not have permission to create pages',
@@ -29,7 +30,7 @@ const createPage = async (req, res) => {
     }
     
     const pageSlug = await WikiPage.generateSlug(wiki._id, title);
-    logger.info(`Generated slug: ${pageSlug} for title: ${title}`);
+    logger.debug(`Generated slug: ${pageSlug} for title: ${title}`);
     
     const page = new WikiPage({
       wiki: wiki._id,
@@ -129,7 +130,7 @@ const getPages = async (req, res) => {
 const getPage = async (req, res) => {
   try {
     const { slug: wikiSlug, pageSlug } = req.params;
-    logger.info(`getPage called: wikiSlug=${wikiSlug}, pageSlug=${pageSlug}, userId=${req.user?._id}`);
+    logger.debug(`getPage called: wikiSlug=${wikiSlug}, pageSlug=${pageSlug}, userId=${req.user?._id}`);
     
     const wiki = await Wiki.findOne({ slug: wikiSlug });
     
@@ -142,7 +143,7 @@ const getPage = async (req, res) => {
     }
     
     const canView = await wiki.canView(req.user);
-    logger.info(`canView result for wiki ${wikiSlug}: ${canView}, owner=${wiki.owner._id}, user=${req.user?._id}`);
+    logger.debug(`canView result for wiki ${wikiSlug}: ${canView}, owner=${wiki.owner._id}, user=${req.user?._id}`);
     if (!canView) {
       return res.status(403).json({
         error: 'You do not have permission to view this wiki',
@@ -154,7 +155,7 @@ const getPage = async (req, res) => {
       .populate('categories', 'name slug color')
       .populate('lastEditedBy', 'name');
     
-    logger.info(`Page lookup: wikiId=${wiki._id}, pageSlug=${pageSlug}, found=${!!page}`);
+    logger.debug(`Page lookup: wikiId=${wiki._id}, pageSlug=${pageSlug}, found=${!!page}`);
     if (!page) {
       return res.status(404).json({
         error: 'Page not found',
@@ -367,9 +368,11 @@ const getPageHistory = async (req, res) => {
     }
     
     const total = await WikiVersion.countDocuments({ page: pageDoc._id });
-    
+
+    // Only expose the editor's name, never their email — this endpoint is reachable
+    // by unauthenticated viewers on public wikis.
     const versions = await WikiVersion.find({ page: pageDoc._id })
-      .populate('editedBy', 'name email')
+      .populate('editedBy', 'name')
       .sort({ version: -1 })
       .skip(skip)
       .limit(limit);
@@ -423,8 +426,8 @@ const getVersion = async (req, res) => {
     }
     
     const version = await WikiVersion.findById(versionId)
-      .populate('editedBy', 'name email');
-    
+      .populate('editedBy', 'name');
+
     if (!version || version.page.toString() !== page._id.toString()) {
       return res.status(404).json({
         error: 'Version not found',
@@ -601,11 +604,12 @@ const getBacklinks = async (req, res) => {
     
     const backlinks = [];
     const pageTitleLower = page.title.toLowerCase();
-    
+    const safePageTitle = escapeRegex(pageTitleLower);
+
     for (const p of allPages) {
       if (p._id.toString() === page._id.toString()) continue;
-      
-      const linkRegex = new RegExp(`\\[\\[${pageTitleLower}(\\]|\\|)`, 'i');
+
+      const linkRegex = new RegExp(`\\[\\[${safePageTitle}(\\]|\\|)`, 'i');
       if (linkRegex.test(p.content)) {
         backlinks.push({
           id: p._id,

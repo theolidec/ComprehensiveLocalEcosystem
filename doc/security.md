@@ -43,15 +43,18 @@ This document details the comprehensive security measures implemented throughout
 **Access Tokens**:
 - **Expiration**: 15 minutes
 - **Storage**: HttpOnly cookie
-- **Payload**: `{ userId, email }`
+- **Payload**: `{ userId }` only (email was removed in v2.6.0; the auth middleware re-fetches the user on every request anyway)
 - **Secret**: `JWT_SECRET` environment variable
+- **Transport**: cookies only — `Authorization: Bearer` is not accepted
 
 **Refresh Tokens**:
 - **Expiration**: 7 days
 - **Storage**: HttpOnly cookie + database
-- **Database**: Hashed token with device info
+- **Database**: SHA-256 hash of the JWT (the raw JWT is **never** persisted) plus `deviceInfo`
+- **Cookie Path**: `/api/auth` (cookie is not sent with non-auth API requests)
 - **Rotation**: New token issued on each refresh
-- **Revocation**: Can be revoked per-token or all-user
+- **Revocation**: Can be revoked per-token (verify/revoke hash the input first) or all-user
+- **Cleanup**: Daily cron at 03:15 prunes expired/revoked rows
 
 **Token Flow**:
 ```
@@ -65,23 +68,43 @@ This document details the comprehensive security measures implemented throughout
 
 ### Cookie Security
 
+Access cookie:
 ```javascript
 {
   httpOnly: true,        // No JavaScript access (XSS protection)
-  secure: true,          // HTTPS only in production
+  secure: true,          // HTTPS-only by default; opt-out via ALLOW_INSECURE_COOKIES=true
   sameSite: 'strict',    // CSRF protection
   maxAge: 15 * 60 * 1000, // 15 minutes for access
   path: '/'              // Available on all routes
 }
 ```
 
+Refresh cookie (path-scoped, longer-lived):
+```javascript
+{
+  httpOnly: true,
+  secure: true,
+  sameSite: 'strict',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/api/auth'        // Only sent with auth endpoints, not every request
+}
+```
+
+The `secure` flag is fail-closed: it defaults to `true` regardless of `NODE_ENV`. Set
+`ALLOW_INSECURE_COOKIES=true` only for local plain-HTTP development.
+
 ### Password Reset (current implementation)
 
-**Status: partially implemented.** `POST /api/auth/forgot-password` generates a reset token, stores its hash + expiry on the User document, and **logs** the token to `logs/combined.log` via Winston. Email delivery is **not yet wired up** — there is no SMTP integration in the codebase, although `SMTP_*` placeholders exist in `backend/.env.example`.
+**Status: partially implemented.** `POST /api/auth/forgot-password` generates a 32-byte random reset token, stores **only the SHA-256 hash** plus expiry on the User document (`User.generatePasswordResetToken`), and returns the plain token. The plain token is **never logged** in any environment.
 
-**Operational implication**: in production, reset tokens are only retrievable by an operator with log access. Before exposing this feature to end users, integrate an email provider (e.g., Nodemailer, SendGrid) in `routes/auth.js` `/forgot-password` handler. The endpoint already returns the same neutral response regardless of whether an account exists, preventing email enumeration.
+Email delivery is **not yet wired up** — there is no SMTP integration in the codebase, although `SMTP_*` placeholders exist in `backend/.env.example`. Until SMTP integration ships:
 
-`POST /api/auth/reset-password/:token` consumes the token (cleared on successful reset) and re-hashes the new password via the User model's `pre('save')` hook.
+- In production: the endpoint returns the neutral message and writes a `warn` log noting that delivery isn't configured. The token is generated and stored but the user has no way to receive it.
+- In non-production (`NODE_ENV !== 'production'`): the response body includes a `devResetToken` field so developers can complete the flow without email.
+
+The endpoint also performs equivalent dummy work (`crypto.randomBytes` + sha256 + a no-op `findOne`) when the email doesn't match a user, so response timing doesn't reveal account existence.
+
+`POST /api/auth/reset-password/:token` hashes the incoming plain token and looks it up by hash via `User.findByResetToken`, consumes the token (cleared on successful reset), and re-hashes the new password via the User model's `pre('save')` hook. Password length policy is 12–128 characters.
 
 ### Password Security
 
@@ -90,11 +113,12 @@ This document details the comprehensive security measures implemented throughout
 - Salt Rounds: 12
 - Pattern: `bcrypt.hash(password, 12)`
 
-**Account Lockout**:
+**Account Lockout** (verified working as of v2.6.0):
 - Trigger: 5 failed login attempts
-- Duration: 2 hours
-- Reset: Successful login clears attempts
+- Duration: 2 hours from the moment of the 5th failure
+- Reset: Successful login clears `loginAttempts` and `lockUntil`
 - Response: HTTP 423 (Locked)
+- Implementation: `User.incrementLoginAttempts(userId)` increments `loginAttempts`, then if the new count is ≥ 5 and the account isn't already locked, sets `lockUntil = now + 2h`.
 
 **Per-User Salt**:
 - Generated on account creation
@@ -156,12 +180,12 @@ if (!item) {
 
 **Algorithm**: AES-256-GCM
 
-**Key Derivation**:
+**Key Derivation** (per-entry random salt + per-user salt):
 ```javascript
-const deriveKey = (masterKey, userSalt) => {
+const deriveKey = (userSalt, additionalSalt) => {
   return crypto.pbkdf2Sync(
-    masterKey,
-    userSalt,
+    PASSWORD_MASTER_KEY,
+    userSalt + additionalSalt,
     100000,  // Iterations
     32,      // Key length (256 bits)
     'sha256'
@@ -169,18 +193,21 @@ const deriveKey = (masterKey, userSalt) => {
 };
 ```
 
-**Encryption Process**:
-1. Derive key from `PASSWORD_MASTER_KEY` + user salt
-2. Generate random 16-byte IV
-3. Create AES-256-GCM cipher
-4. Encrypt password
-5. Store: `iv:authTag:ciphertext`
+**Encryption Process** (`backend/services/passwordService.js`):
+1. Generate a random 32-byte per-entry salt
+2. Derive key from `PASSWORD_MASTER_KEY` + user salt + per-entry salt (PBKDF2-SHA256, 100k iterations)
+3. Generate random 16-byte IV
+4. Create AES-256-GCM cipher
+5. Encrypt plaintext, capture the 16-byte auth tag
+6. Store as `salt:iv:authTag:ciphertext` (all hex)
 
 **Security Features**:
-- Unique key per user
+- Master key never leaves env
+- Per-user salt (32 bytes random, generated on first password save)
+- Per-entry random salt — same plaintext yields different ciphertext per entry, even for the same user
 - Random IV per encryption
-- GCM mode provides authentication
-- Keys never stored
+- GCM mode provides authentication (tampering invalidates auth tag, decrypt fails)
+- Keys derived in memory and discarded
 
 ### Payment Card Encryption
 
@@ -257,11 +284,10 @@ All user input validated using express-validator:
 router.post('/register', [
   body('email')
     .isEmail()
-    .normalizeEmail()
     .withMessage('Valid email required'),
   body('password')
-    .isLength({ min: 6 })
-    .withMessage('Password must be at least 6 characters'),
+    .isLength({ min: 12, max: 128 })
+    .withMessage('Password must be 12-128 characters'),
   body('name')
     .trim()
     .notEmpty()
@@ -274,12 +300,15 @@ router.post('/register', [
 
 | Field | Rules |
 |-------|-------|
-| Email | Valid format, normalized, unique |
-| Password | Min 6 chars, max 128 |
+| Email | Valid format, lowercased on lookup and save, unique |
+| Password | Min 12, max 128 |
 | Name | Min 1 char, max 50, trimmed |
 | IDs | MongoDB ObjectId validation |
 | File uploads | Mime-type, size limits |
 | Text fields | Max length, XSS sanitization |
+| Search inputs | Regex-escaped via `utils/regex.js` before passing to `$regex` (ReDoS defense) |
+| Document image filenames | Must match `^[a-f0-9]{32}\.[a-zA-Z0-9]{1,8}$`; resolved path must stay inside `UPLOAD_DIR/document-images/` |
+| CSV/JSON imports | Capped at 1000 rows per request |
 
 ## HTTP Security Headers
 
@@ -290,45 +319,66 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],   // Tailwind compatibility
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https:"],
+      imgSrc: ["'self'", "data:", "https:"],     // External product images
+      frameAncestors: ["'none'"],                // Clickjacking defense
+      formAction: ["'self'"],                    // No cross-origin form posts
+      baseUri: ["'self'"],                       // No <base> hijack
+      objectSrc: ["'none'"],                     // No <object>/<embed>
     },
   },
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  }
 }));
 ```
+
+Per-response headers:
+- File streaming endpoints (`streamFile`, `getSharedFile`, `serveDocumentImage`) set `X-Content-Type-Options: nosniff`.
+- SVG responses additionally get `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` so embedded `<script>` cannot execute on top-level navigation.
 
 ### Headers Applied
 
 | Header | Value | Purpose |
 |--------|-------|---------|
 | X-Content-Type-Options | nosniff | Prevent MIME sniffing |
-| X-Frame-Options | DENY | Prevent clickjacking |
+| X-Frame-Options | DENY | Prevent clickjacking (also CSP `frame-ancestors`) |
 | X-XSS-Protection | 0 | Disabled (CSP preferred) |
-| Strict-Transport-Security | max-age=31536000 | HTTPS enforcement |
+| Strict-Transport-Security | max-age=31536000 | HTTPS enforcement (Helmet default) |
 | Content-Security-Policy | See config | XSS mitigation |
 
 ## CORS Configuration
 
 ```javascript
+// In production the server aborts startup if FRONTEND_URL is unset, so the
+// fallback to localhost only ever applies in development.
+const FRONTEND_URL = process.env.FRONTEND_URL;
+if (process.env.NODE_ENV === 'production' && !FRONTEND_URL) {
+  process.exit(1);
+}
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: FRONTEND_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type']  // No Authorization — auth is cookies-only.
 }));
 ```
 
 **Security Features**:
-- Whitelist-based origin validation
+- Whitelist-based origin validation, fail-closed in production
 - Credentials allowed (cookies)
 - Limited HTTP methods
-- Explicit allowed headers
+- Cookies-only auth — `Authorization: Bearer` is no longer accepted
+
+## Trust Proxy
+
+```javascript
+const TRUST_PROXY = process.env.TRUST_PROXY || 'loopback, linklocal, uniquelocal';
+app.set('trust proxy', /^\d+$/.test(TRUST_PROXY) ? Number(TRUST_PROXY) : TRUST_PROXY);
+```
+
+Default is internal-only address ranges so a public-facing client cannot spoof
+`X-Forwarded-For` and bypass IP-based rate limits. Set `TRUST_PROXY` to a hop count
+or comma-separated CIDR list when behind a known proxy chain.
 
 ## Environment Variable Security
 

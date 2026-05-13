@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
 const logger = require('../config/logger');
 
+// The `token` column stores a SHA-256 hash of the raw refresh JWT, never the JWT itself,
+// so a database read or backup leak cannot be replayed against /api/auth/refresh.
 const refreshTokenSchema = new mongoose.Schema({
   token: {
     type: String,
@@ -33,17 +36,23 @@ const refreshTokenSchema = new mongoose.Schema({
 // Index for better performance
 refreshTokenSchema.index({ user: 1 });
 
-// Static method to create and save refresh token
+const hashToken = (token) =>
+  crypto.createHash('sha256').update(token).digest('hex');
+
+refreshTokenSchema.statics.hashToken = hashToken;
+
+// Static method to create and save refresh token. Returns the raw JWT to the caller
+// (so it can be sent to the user via cookie); only the hash is persisted.
 refreshTokenSchema.statics.createToken = async function(user, deviceInfo = {}) {
   try {
     const token = user.generateRefreshToken();
     const refreshToken = new this({
-      token,
+      token: hashToken(token),
       user: user._id,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
       deviceInfo
     });
-    
+
     await refreshToken.save();
     return token;
   } catch (error) {
@@ -52,18 +61,18 @@ refreshTokenSchema.statics.createToken = async function(user, deviceInfo = {}) {
   }
 };
 
-// Static method to verify and get refresh token
+// Static method to verify and get refresh token. Caller passes the raw JWT.
 refreshTokenSchema.statics.verifyToken = async function(token) {
   try {
-    const refreshToken = await this.findOne({ 
-      token, 
-      isRevoked: false 
+    const refreshToken = await this.findOne({
+      token: hashToken(token),
+      isRevoked: false
     }).populate('user');
-    
+
     if (!refreshToken || refreshToken.expiresAt < new Date()) {
       return null;
     }
-    
+
     return refreshToken;
   } catch (error) {
     logger.error('Error verifying refresh token:', error);
@@ -71,11 +80,11 @@ refreshTokenSchema.statics.verifyToken = async function(token) {
   }
 };
 
-// Static method to revoke token
+// Static method to revoke token. Caller passes the raw JWT.
 refreshTokenSchema.statics.revokeToken = async function(token) {
   try {
     await this.findOneAndUpdate(
-      { token },
+      { token: hashToken(token) },
       { isRevoked: true }
     );
   } catch (error) {

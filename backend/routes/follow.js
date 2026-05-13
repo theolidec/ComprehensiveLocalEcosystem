@@ -5,6 +5,7 @@ const UserFollow = require('../models/UserFollow');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
 
@@ -150,24 +151,20 @@ router.get('/search', authenticateToken, async (req, res) => {
     }
     
     const skip = (parseInt(page) - 1) * parseInt(limit);
+    const safeQ = escapeRegex(q);
+    const matchFilter = {
+      _id: { $ne: req.user._id },
+      $or: [
+        { name: { $regex: safeQ, $options: 'i' } },
+        { email: { $regex: safeQ, $options: 'i' } }
+      ]
+    };
     const [users, total] = await Promise.all([
-      User.find({
-        _id: { $ne: req.user._id },
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { email: { $regex: q, $options: 'i' } }
-        ]
-      })
+      User.find(matchFilter)
         .select('name email')
         .skip(skip)
         .limit(parseInt(limit)),
-      User.countDocuments({
-        _id: { $ne: req.user._id },
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { email: { $regex: q, $options: 'i' } }
-        ]
-      })
+      User.countDocuments(matchFilter)
     ]);
     
     // Get following status for each user

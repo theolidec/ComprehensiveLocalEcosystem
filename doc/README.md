@@ -145,10 +145,31 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 12, 2026  
-**Version**: 2.5.0
+**Last Updated**: May 13, 2026  
+**Version**: 2.6.0
 
 ## Recent Changes
+
+### Security Hardening Pass (v2.6.0, 2026-05-13)
+A comprehensive backend security audit and hardening pass:
+- **Account lockout**: `incrementLoginAttempts` now correctly sets `lockUntil`.
+- **Token hashing**: Refresh tokens and password-reset tokens are stored as SHA-256 hashes; raw tokens are never persisted or logged.
+- **GDPR deletion cascades**: Account deletion now properly cleans up `PaymentCard`, `DocumentVersion`, `TrackerTask/Question/Response`, and cross-user `WikiPermission`/`WikiWatch` rows.
+- **ReDoS defense**: New `backend/utils/regex.js` `escapeRegex()` helper applied across all `$regex`/`new RegExp()` call sites (passwords, files, wishlist, follow, tracker, calendar, wiki backlinks, File model).
+- **Path traversal**: `/api/files/document-images/:filename` validates filenames and resolves paths inside the intended directory.
+- **Route ordering**: Wiki page literal routes (`/watchlist`, `/recent-changes`, `/all`) are now declared before the `/:pageSlug` catch-all.
+- **Email privacy**: Wiki history populates editor `name` only (not email) to avoid leaking emails on public wikis.
+- **CORS & cookies**: Fail-closed when `FRONTEND_URL` is unset in production; cookie `Secure` defaults to true (opt-out via `ALLOW_INSECURE_COOKIES=true`); refresh-token cookie path scoped to `/api/auth`.
+- **Transport**: nginx HTTP→HTTPS redirect enabled; CSP tightened with `frame-ancestors 'none'`, `form-action 'self'`, `base-uri 'self'`, `object-src 'none'`.
+- **SVG sandbox**: Per-response CSP on SVG file streams to neutralize embedded `<script>`.
+- **Trust proxy**: Defaults to internal-only IP ranges; override via `TRUST_PROXY`.
+- **Password policy**: Raised to 12–128 characters; JWT payload reduced to `userId` only.
+- **Import gating**: Wishlist CSV + Password JSON/CSV imports capped at 1000 rows and rate-limited by `userActionLimiter` (50/hour).
+- **GDPR rate limits**: `/api/user/data` and `/api/user/export` now gated by `userDataLimiter` (10/hour).
+- **Health endpoint**: No longer leaks `uptime` or `environment`.
+- **Auth method**: `Authorization: Bearer` no longer accepted; cookies-only.
+- **Email normalization**: Lowercased at lookup in `findByEmailWithPassword`, `/register`, and `/forgot-password`.
+- **Cron cleanup**: Daily 03:15 job prunes revoked/expired refresh tokens.
 
 ### Documentation Audit (2026-05-12)
 A full doc-vs-code audit was performed and the following inconsistencies were corrected:

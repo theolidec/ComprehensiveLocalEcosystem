@@ -5,13 +5,9 @@ const logger = require('../config/logger');
 
 const authenticateToken = async (req, res, next) => {
   try {
-    // Try to get token from Authorization header first
-    let token = req.headers['authorization']?.split(' ')[1];
-    
-    // If no header, try to get from cookies
-    if (!token && req.cookies?.accessToken) {
-      token = req.cookies.accessToken;
-    }
+    // Tokens are issued via HttpOnly cookies only — no Authorization header support.
+    // Cookies prevent JS from reading the token and pair with sameSite=strict for CSRF.
+    const token = req.cookies?.accessToken;
 
     if (!token) {
       logger.warn('Access denied - No token provided');
@@ -47,8 +43,8 @@ const authenticateToken = async (req, res, next) => {
     // Attach user to request object
     req.user = user;
     req.token = token;
-    
-    logger.info(`User authenticated successfully: ${user.email}`);
+
+    logger.debug(`User authenticated successfully: ${user.email}`);
     next();
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {
@@ -144,18 +140,18 @@ const verifyRefreshToken = async (req, res, next) => {
 // Optional authentication middleware (doesn't throw error if no token)
 const optionalAuth = async (req, res, next) => {
   try {
-    let token = req.headers['authorization']?.split(' ')[1] || req.cookies?.accessToken;
+    const token = req.cookies?.accessToken;
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.userId);
-      
+
       if (user && user.isActive && !user.isLocked) {
         req.user = user;
         req.token = token;
       }
     }
-    
+
     next();
   } catch (error) {
     // Optional auth - continue even if token is invalid
