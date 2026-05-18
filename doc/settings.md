@@ -8,7 +8,7 @@ The Settings module provides comprehensive user preference management including 
 - **Calendar Settings**: Default view, timezone, working hours
 - **Notifications**: Email reminders, event updates, digest
 - **Display**: Theme, language, compact mode
-- **Privacy**: Sharing controls, theme cookies (login page and GeoGebra calculator)
+- **Privacy**: Sharing controls, theme cookies (login page and Graphing Calculator)
 - **Session Management**: View and revoke active sessions
 - **Account & Data**: User rights (GDPR) - view, export, correct, delete data
 - **Reset to Defaults**: One-click settings reset
@@ -53,7 +53,7 @@ The Settings module provides comprehensive user preference management including 
     allowThemeCookie: {
       type: Boolean,
       default: true
-      // Controls both 'theme' cookie (login page) and 'geogebraTheme' cookie
+      // Controls both 'theme' cookie (login page) and 'geogebraTheme' cookie (legacy name; used by Graphing Calculator)
     },
   },
   wishlist: {
@@ -84,7 +84,7 @@ The Settings module provides comprehensive user preference management including 
 | display.showCompletedEvents | true |
 | privacy.shareCalendar | false |
 | privacy.showBusyStatus | true |
-| privacy.allowThemeCookie | true | Controls both login page and GeoGebra calculator theme cookies |
+| privacy.allowThemeCookie | true | Controls both login page and Graphing Calculator theme cookies |
 | wishlist.defaultItemsPerPage | 20 (10-200) |
 
 ## API Endpoints

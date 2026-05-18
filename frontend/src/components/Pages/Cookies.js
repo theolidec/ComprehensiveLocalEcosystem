@@ -1,3 +1,6 @@
+// IMPORTANT: This component is the user-facing rendition of /COOKIE_POLICY.md
+// at the repository root. Both files MUST be kept in sync — the rendered page
+// is what binds you contractually with users. If you change one, change the other.
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -6,7 +9,7 @@ const Cookies = () => {
     <div className="policy-page">
       <div className="policy-container">
         <h1>Cookie Policy</h1>
-        <p className="last-updated">Last Updated: April 23, 2026</p>
+        <p className="last-updated">Last Updated: April 26, 2026</p>
 
         <section>
           <h2>1. Introduction</h2>
@@ -49,9 +52,14 @@ const Cookies = () => {
                 <td>Token refresh - allows automatic session renewal</td>
                 <td>7 days</td>
               </tr>
+              <tr>
+                <td>wishlistItemsPerPage</td>
+                <td>Remembers your preferred number of items to display per page in the wishlist (can be disabled in settings)</td>
+                <td>1 year</td>
+              </tr>
             </tbody>
           </table>
-          
+
           <h3>3.2 Cookie Characteristics</h3>
           <ul>
             <li><strong>Type:</strong> httpOnly cookies</li>
@@ -69,7 +77,17 @@ const Cookies = () => {
             <li>Automatically refresh your access token</li>
             <li>Track device sessions for security</li>
             <li>Prevent unauthorized access</li>
+            <li>Remember display preferences (e.g., wishlist items per page)</li>
           </ul>
+          <p>
+            <strong>Note on User Preferences:</strong> Some display settings (e.g., wishlist items
+            per page) are stored in cookies for immediate availability. You can disable the wishlist
+            items per page cookie in your Wishlist Settings — when disabled, the default value from
+            your account settings will always be used. Other preferences such as default items per
+            page, theme preferences, and other personalized options are stored in your user account
+            in our database. Database-stored preferences are associated with your account and sync
+            across devices when you log in.
+          </p>
         </section>
 
         <section>
@@ -118,6 +136,10 @@ const Cookies = () => {
               <tr>
                 <td>refreshToken</td>
                 <td>7 days</td>
+              </tr>
+              <tr>
+                <td>wishlistItemsPerPage</td>
+                <td>1 year (or until you clear it)</td>
               </tr>
             </tbody>
           </table>

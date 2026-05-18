@@ -12,7 +12,7 @@ const LandingPage = () => {
     { icon: Key, title: 'Passwords', description: 'Securely store and manage your passwords with military-grade encryption' },
     { icon: Gift, title: 'Wishlists', description: 'Create and share wishlists with friends and family' },
     { icon: FileText, title: 'Files', description: 'Store and organize your documents securely up to 500MB each' },
-    { icon: Calculator, title: 'Calculator', description: 'Advanced mathematical calculations and graphing with GeoGebra' },
+    { icon: Calculator, title: 'Calculator', description: 'Advanced mathematical calculations and interactive function graphing' },
     { icon: Users, title: 'Social', description: 'Connect with others while keeping your data private' },
     { icon: BookOpen, title: 'Wiki', description: 'Create and manage knowledge bases with collaborative documentation' }
   ];

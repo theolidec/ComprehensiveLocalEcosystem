@@ -1,8 +1,10 @@
-# GeoGebra Calculator Module
+# Graphing Calculator Module
+
+> **Trademark note:** Despite the historical filename (`geogebra-calculator.md`) and component path (`GeoGebraCalculator.js/.css`), **this module is a custom canvas-based implementation built on the in-house `GraphingEngine` and `MathParser` utilities**. It does **not** embed, link to, ship, or derive from the GeoGebra software, applets, or assets, and is unaffiliated with GeoGebra GmbH. The "GeoGebra" naming is a leftover internal identifier that is being phased out of user-facing copy. Do not market this module as "GeoGebra"; use **Graphing Calculator** instead.
 
 ## Overview
 
-The GeoGebra Calculator provides interactive mathematical graphing capabilities directly in the browser. It supports functions, parametric curves, points, circles, polygons, implicit equations, and inequalities with a canvas-based rendering engine.
+The Graphing Calculator provides interactive mathematical graphing capabilities directly in the browser. It supports functions, parametric curves, points, circles, polygons, implicit equations, and inequalities with a canvas-based rendering engine.
 
 ## Features
 

@@ -96,7 +96,7 @@ The Apps menu (accessed via the AL icon in the Header) provides access to all mo
 | 🔑 | Password Manager | Secure password storage |
 | 🎁 | Wishlist | Gift wishlists and reservations |
 | 📁 | Files | File storage and management |
-| 🧮 | Calculator | GeoGebra calculator tool |
+| 🧮 | Calculator | Graphing Calculator (custom implementation) |
 | 👥 | Following | Social connections and user following |
 | ✅ | Daily Tracker | Habit tracking and daily check-ins |
 | 📚 | Wiki | Knowledge base and documentation |

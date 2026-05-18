@@ -266,6 +266,19 @@ export default function PublicWishlistItem() {
                 <button type="submit" className="submit-btn" disabled={submitting}>
                   {submitting ? 'Submitting...' : 'Reserve Item'}
                 </button>
+
+                <p className="public-wishlist-privacy-notice" style={{ fontSize: '12px', color: 'var(--text-muted, #6b7280)', marginTop: '12px', lineHeight: '1.4' }}>
+                  <strong>Privacy notice:</strong> The name (and email, if you provide it) you enter
+                  above will be shown to the wishlist owner so they know who reserved the item.
+                  This data is processed by the Operator of this instance on the legal basis of
+                  legitimate interest (GDPR Art. 6(1)(f)) to fulfil the reservation purpose. It is
+                  retained until the reservation is cancelled or the wishlist item is deleted.
+                  You may cancel your own reservation at any time using the link the Operator
+                  provides on the public page, and you may exercise your other GDPR rights (access,
+                  rectification, erasure, objection) by contacting the Operator. See the{' '}
+                  <a href="/privacy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                  {' '}for details.
+                </p>
               </form>
             )}
           </div>

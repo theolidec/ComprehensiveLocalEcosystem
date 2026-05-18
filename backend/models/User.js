@@ -49,6 +49,21 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordExpires: {
     type: Date
+  },
+  // GDPR Art. 7(1) requires the controller to be able to demonstrate that the data
+  // subject has consented to processing where consent is the legal basis, and
+  // Art. 13 requires evidence of acceptance of the Terms of Service. We persist
+  // a minimal, immutable record of the user's affirmative acceptance at registration.
+  consent: {
+    acceptedTermsAt: { type: Date },
+    acceptedPrivacyAt: { type: Date },
+    ageConfirmation13Plus: { type: Boolean, default: false },
+    ipAtConsent: { type: String },
+    userAgentAtConsent: { type: String },
+    // Version strings let us re-prompt users when the policies are materially
+    // updated. Bump these in routes/auth.js when releasing a new version.
+    termsVersion: { type: String },
+    privacyVersion: { type: String }
   }
 }, {
   timestamps: true,

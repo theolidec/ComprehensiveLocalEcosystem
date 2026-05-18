@@ -1,18 +1,7 @@
 import React from 'react';
-import { Shield, Github, Twitter, Linkedin, Facebook, Heart, Mail } from 'lucide-react';
-import axios from 'axios';
-import { API_URLS } from '../../config/api';
+import { Shield, Github } from 'lucide-react';
 
 const Footer = () => {
-  const handleDebugTimeout = async () => {
-    try {
-      await axios.post(API_URLS.LOGOUT);
-    } catch (e) {
-      // Ignore logout errors
-    }
-    window.location.reload();
-  };
-
   const products = [
     { name: 'Calendar', href: '/calendar' },
     { name: 'Password Manager', href: '/passwords' },
@@ -23,35 +12,20 @@ const Footer = () => {
     { name: 'Settings', href: '/settings' }
   ];
 
-  const company = [
-    { name: 'About', href: '/about' },
-    { name: 'Blog', href: '/blog' },
-    { name: 'Careers', href: '/careers' },
-    { name: 'Press', href: '/press' },
-    { name: 'Partners', href: '/partners' },
-    { name: 'Security', href: '/security' }
-  ];
-
   const resources = [
-    { name: 'Support Center', href: '/support' },
-    { name: 'Community', href: '/community' },
-    { name: 'Developer API', href: '/api' },
     { name: 'Privacy Policy', href: '/privacy' },
     { name: 'Terms of Service', href: '/terms' },
-    { name: 'Legal', href: '/legal' }
+    { name: 'Cookie Policy', href: '/cookies' }
   ];
 
   const socialLinks = [
-    { icon: Twitter, href: '/placeholder', label: 'Twitter' },
-    { icon: Github, href: 'https://github.com/theolidec/ComprehensiveLocalEcosystem', label: 'GitHub' },
-    { icon: Linkedin, href: '/placeholder', label: 'LinkedIn' },
-    { icon: Facebook, href: '/placeholder', label: 'Facebook' }
+    { icon: Github, href: 'https://github.com/theolidec/ComprehensiveLocalEcosystem', label: 'GitHub' }
   ];
 
   return (
     <footer className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 text-gray-600 dark:text-gray-300">
       <div className="mx-auto px-4 sm:px-6 lg:px-8 py-16" style={{ paddingLeft: '2%', paddingRight: '2%' }}>
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-8 gap-12">
           <div className="lg:col-span-4">
             <div className="flex items-center space-x-3 mb-6">
               <div className="p-2 bg-blue-600 rounded-xl">
@@ -90,19 +64,6 @@ const Footer = () => {
           </div>
 
           <div className="lg:col-span-2">
-            <h3 className="text-gray-900 dark:text-white font-bold text-sm uppercase tracking-wider mb-6">Company</h3>
-            <ul className="space-y-3">
-              {company.map((item, index) => (
-                <li key={index}>
-                  <a href={item.href} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors text-sm">
-                    {item.name}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="lg:col-span-2">
             <h3 className="text-gray-900 dark:text-white font-bold text-sm uppercase tracking-wider mb-6">Resources</h3>
             <ul className="space-y-3">
               {resources.map((item, index) => (
@@ -119,14 +80,11 @@ const Footer = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 mt-12 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center space-x-2 text-gray-500 dark:text-gray-400 text-sm mb-4 md:mb-0">
-              <span>© 2024 Comprehensive Local Ecosystem. All rights reserved.</span>
+              <span>© 2024–{new Date().getFullYear()} Comprehensive Local Ecosystem. All rights reserved.</span>
               <span className="hidden md:inline">•</span>
               <span className="hidden md:inline">Self-hosted with love</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-              <button onClick={handleDebugTimeout} className="text-red-500 dark:text-red-400 hover:text-red-600 dark:hover:text-red-300 transition-colors">
-                [DEBUG: Timeout]
-              </button>
               <a href="/settings" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                 Settings
               </a>

@@ -34,7 +34,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`wishlist.md`](wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
 | [`wiki.md`](wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
 | [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
-| [`geogebra-calculator.md`](geogebra-calculator.md) | Math graphing | Frontend component |
+| [`geogebra-calculator.md`](geogebra-calculator.md) | Graphing Calculator (filename kept for backward compatibility — no GeoGebra code is used) | Frontend component |
 | [`daily-tracker.md`](daily-tracker.md) | Daily tracker | `/api/tracker/*` |
 
 ### Security & Operations
@@ -104,7 +104,7 @@ Start here if you're integrating with the API:
 ### Personal Tools
 - [`passwords.md`](passwords.md) - Password vault
 - [`wishlist.md`](wishlist.md) - Gift registry
-- [`geogebra-calculator.md`](geogebra-calculator.md) - Math graphing
+- [`geogebra-calculator.md`](geogebra-calculator.md) - Graphing Calculator (custom implementation)
 - [`daily-tracker.md`](daily-tracker.md) - Habit & task tracker
 
 ### Organization

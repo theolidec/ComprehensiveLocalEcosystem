@@ -2,6 +2,7 @@
   "name": "full-system-architecture",
   "version": "1.0.0",
   "description": "Full System Architecture with frontend and backend",
+  "license": "MIT",
   "scripts": {
     "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm start --prefix frontend\"",
     "dev:services": "docker-compose up -d mongodb",

@@ -212,6 +212,19 @@ The project uses the following security-focused dependencies:
 
 ## Changelog
 
+- **v2.7.0** (Legal/GDPR hardening pass — 2026-05-18):
+  - **Registration consent gate**: `/api/auth/register` now requires three affirmative-consent flags (`acceptTerms`, `acceptPrivacy`, `confirmAge`) as the literal boolean `true`; missing or false values return 400 (GDPR Art. 7 demonstrable consent).
+  - **Consent record persistence**: `User.consent` subdocument captures `acceptedTermsAt`, `acceptedPrivacyAt`, `ageConfirmation13Plus`, `ipAtConsent`, `userAgentAtConsent`, `termsVersion`, `privacyVersion` at registration. Included in the user data export so users can audit their own consent record.
+  - **Atomic GDPR erasure**: `deleteAccount` wrapped in a MongoDB `session.withTransaction()` block so all cascading deletes succeed-or-rollback atomically. Falls back to non-atomic erasure with a warning log on standalone (non-replica-set) MongoDB.
+  - **Art. 15(4) third-party data leak closed**: `exportUserData` no longer includes other users' email addresses in the `following`/`followers` populated rows — only `id` and `name`.
+  - **Frontend password validator synced**: Register form now enforces the same 12–128 character policy as the backend (was silently allowing 6–11 chars and 400-ing at the server).
+  - **Cookie banner rewritten**: removed misleading "by continuing to use … you agree" wording (ePrivacy doesn't permit implied consent), removed dead `handleDecline` code, renamed localStorage key from `cookieConsent` to `cookieNoticeSeen` to reflect that the popup is informational for strictly-necessary cookies.
+  - **Reservation form privacy notice**: public wishlist reservation form for unauthenticated guests now carries a GDPR Art. 13 notice (legal basis, retention, rights, link to Privacy Policy).
+  - **Legal pages rewritten**: `PRIVACY.md` adds Art. 13 disclosures (controller identity placeholder, legal-basis-per-purpose table, sub-processor categories, international-transfer template, Art. 22 declaration of "no automated decision-making", right to lodge a complaint with IMY); `TERMS.md` adds self-hosted framing, MIT/IP distinction, consumer-protection carve-out for liability and indemnification, Rome I / Brussels Ia mandatory-consumer-rules language, ODR-platform link.
+  - **GeoGebra trademark cleanup**: removed "GeoGebra" branding from all user-visible copy (LandingPage, Home, Settings, README, MIL-STD-498 SUM). Internal filenames (`GeoGebraCalculator.js/.css`), CSS class prefixes (`.geogebra-*`), and cookie name (`geogebraTheme`) retained for backward compatibility, with disclaimers added in `doc/geogebra-calculator.md` and `doc/frontend-architecture.md`.
+  - **THIRD_PARTY_NOTICES.md** added at the repo root listing direct production dependencies and their licenses, with explicit Apache-2.0 NOTICE retention for `pdfjs-dist`/`web-vitals`/`dompurify` and CC BY 4.0 attribution for the Uiverse-derived folder-tree CSS (attribution also inlined at the top of `frontend/src/components/FileManager/FileTree.css`).
+  - **Footer cleanup**: removed `[DEBUG: Timeout]` button (was visible in production), removed dead links to non-existent pages (`/about`, `/blog`, `/careers`, `/press`, `/partners`, `/security`, `/support`, `/community`, `/api`, `/legal`), removed placeholder social links (Twitter/LinkedIn/Facebook → `/placeholder`), kept the working GitHub link, fixed copyright year from "© 2024" to "© 2024–{currentYear}".
+  - **Root `package.json` license field** set to `MIT` for SBOM/scanner clarity.
 - **v2.6.0** (Security hardening pass):
   - Fixed account lockout (`incrementLoginAttempts` was never actually setting `lockUntil`).
   - Fixed GDPR account deletion / data export to use correct per-model field names and to cascade across `PaymentCard`, `DocumentVersion`, `TrackerTask/Question/Response`, and cross-user `WikiPermission`/`WikiWatch` rows.

@@ -121,13 +121,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (email, password, name) => {
+  const register = async (email, password, name, consent = {}) => {
     dispatch({ type: 'REGISTER_START' });
     try {
       const response = await axios.post(API_URLS.REGISTER, {
         email,
         password,
-        name
+        name,
+        // Affirmative-consent flags. The backend rejects registration unless all
+        // three are the literal boolean `true` (GDPR Art. 7 demonstrable consent).
+        acceptTerms: consent.acceptTerms === true,
+        acceptPrivacy: consent.acceptPrivacy === true,
+        confirmAge: consent.confirmAge === true
       });
       
       dispatch({

@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Settings = require('../models/Settings');
 const RefreshToken = require('../models/RefreshToken');
@@ -136,54 +137,93 @@ const deleteAccount = async (req, res) => {
 
     logger.info(`Starting account deletion for user: ${user.email}`);
 
-    // Delete reservations on this user's wishlist items before deleting the items themselves.
-    const userWishlistItemIds = await WishlistItem.find({ user: userId }).distinct('_id');
-    if (userWishlistItemIds.length > 0) {
-      await WishlistReservation.deleteMany({ wishlistItem: { $in: userWishlistItemIds } });
-    }
+    // Perform the full erasure cascade. When called with a session, every operation
+    // participates in the same transaction so that either all data is erased or
+    // none of it is (GDPR Art. 17). When called without a session (standalone
+    // MongoDB without a replica set), operations run non-atomically.
+    const performErasure = async (session) => {
+      const opt = session ? { session } : {};
 
-    // Delete document versions for this user's files (file cleanup will follow).
-    const userFileIds = await File.find({ userId }).distinct('_id');
-    if (userFileIds.length > 0) {
-      await DocumentVersion.deleteMany({ fileId: { $in: userFileIds } });
-    }
+      // Delete reservations on this user's wishlist items before deleting the items.
+      const userWishlistItems = await WishlistItem.find({ user: userId }, null, opt);
+      const userWishlistItemIds = userWishlistItems.map(i => i._id);
+      if (userWishlistItemIds.length > 0) {
+        await WishlistReservation.deleteMany({ wishlistItem: { $in: userWishlistItemIds } }, opt);
+      }
 
-    await Promise.all([
-      RefreshToken.deleteMany({ user: userId }),
-      Settings.deleteOne({ userId }),
-      Event.deleteMany({ user: userId }),
-      Category.deleteMany({ user: userId }),
-      Password.deleteMany({ userId }),
-      PasswordCategory.deleteMany({ userId }),
-      PaymentCard.deleteMany({ userId }),
-      Wishlist.deleteMany({ user: userId }),
-      WishlistCategory.deleteMany({ user: userId }),
-      WishlistItem.deleteMany({ user: userId }),
-      UserFollow.deleteMany({ $or: [{ follower: userId }, { following: userId }] }),
-      File.deleteMany({ userId }),
-      FileFolder.deleteMany({ userId }),
-      TrackerTask.deleteMany({ user: userId }),
-      TrackerQuestion.deleteMany({ user: userId }),
-      TrackerResponse.deleteMany({ user: userId }),
+      // Delete document versions for this user's files (file cleanup will follow).
+      const userFiles = await File.find({ userId }, null, opt);
+      const userFileIds = userFiles.map(f => f._id);
+      if (userFileIds.length > 0) {
+        await DocumentVersion.deleteMany({ fileId: { $in: userFileIds } }, opt);
+      }
+
+      // Inside a transaction, sequential ops avoid write-conflict retries. Outside,
+      // sequential is only marginally slower than Promise.all and far simpler to reason
+      // about for a one-time per-user operation.
+      await RefreshToken.deleteMany({ user: userId }, opt);
+      await Settings.deleteOne({ userId }, opt);
+      await Event.deleteMany({ user: userId }, opt);
+      await Category.deleteMany({ user: userId }, opt);
+      await Password.deleteMany({ userId }, opt);
+      await PasswordCategory.deleteMany({ userId }, opt);
+      await PaymentCard.deleteMany({ userId }, opt);
+      await Wishlist.deleteMany({ user: userId }, opt);
+      await WishlistCategory.deleteMany({ user: userId }, opt);
+      await WishlistItem.deleteMany({ user: userId }, opt);
+      await UserFollow.deleteMany({ $or: [{ follower: userId }, { following: userId }] }, opt);
+      await File.deleteMany({ userId }, opt);
+      await FileFolder.deleteMany({ userId }, opt);
+      await TrackerTask.deleteMany({ user: userId }, opt);
+      await TrackerQuestion.deleteMany({ user: userId }, opt);
+      await TrackerResponse.deleteMany({ user: userId }, opt);
       // Memberships in other users' wikis and watch entries owned by this user
-      WikiPermission.deleteMany({ user: userId }),
-      WikiWatch.deleteMany({ user: userId })
-    ]);
+      await WikiPermission.deleteMany({ user: userId }, opt);
+      await WikiWatch.deleteMany({ user: userId }, opt);
 
-    const userWikis = await Wiki.find({ owner: userId });
-    const wikiIds = userWikis.map(w => w._id);
-    if (wikiIds.length > 0) {
-      await Promise.all([
-        WikiPage.deleteMany({ wiki: { $in: wikiIds } }),
-        WikiCategory.deleteMany({ wiki: { $in: wikiIds } }),
-        WikiPermission.deleteMany({ wiki: { $in: wikiIds } }),
-        WikiVersion.deleteMany({ wiki: { $in: wikiIds } }),
-        WikiWatch.deleteMany({ wiki: { $in: wikiIds } }),
-        Wiki.deleteMany({ owner: userId })
-      ]);
+      const userWikis = await Wiki.find({ owner: userId }, null, opt);
+      const wikiIds = userWikis.map(w => w._id);
+      if (wikiIds.length > 0) {
+        await WikiPage.deleteMany({ wiki: { $in: wikiIds } }, opt);
+        await WikiCategory.deleteMany({ wiki: { $in: wikiIds } }, opt);
+        await WikiPermission.deleteMany({ wiki: { $in: wikiIds } }, opt);
+        await WikiVersion.deleteMany({ wiki: { $in: wikiIds } }, opt);
+        await WikiWatch.deleteMany({ wiki: { $in: wikiIds } }, opt);
+        await Wiki.deleteMany({ owner: userId }, opt);
+      }
+
+      await User.findByIdAndDelete(userId, opt);
+    };
+
+    let session = null;
+    try {
+      session = await mongoose.startSession();
+      await session.withTransaction(() => performErasure(session));
+    } catch (txErr) {
+      // Standalone (non-replica-set) MongoDB does not support transactions. In that
+      // case, fall back to non-atomic erasure and warn the operator. This is the only
+      // error we tolerate here; everything else is re-thrown.
+      const isStandaloneError =
+        txErr && (
+          txErr.code === 20 ||
+          txErr.codeName === 'IllegalOperation' ||
+          /Transaction numbers are only allowed on a replica set/i.test(String(txErr.message || ''))
+        );
+      if (!isStandaloneError) {
+        throw txErr;
+      }
+      logger.warn(
+        'MongoDB transactions are unavailable on this deployment (standalone server). ' +
+        'Performing non-atomic GDPR erasure; if this fails partway through, an operator ' +
+        'must run a sweeper to remove orphan records. Enable a replica set to make ' +
+        'erasure atomic.'
+      );
+      await performErasure(null);
+    } finally {
+      if (session) {
+        await session.endSession();
+      }
     }
-
-    await User.findByIdAndDelete(userId);
 
     logger.info(`Account deleted successfully for user ID: ${userId}`);
 
@@ -230,8 +270,8 @@ const exportUserData = async (req, res) => {
       Wishlist.find({ user: userId }),
       WishlistCategory.find({ user: userId }),
       WishlistItem.find({ user: userId }),
-      UserFollow.find({ follower: userId }).populate('following', 'name email'),
-      UserFollow.find({ following: userId }).populate('follower', 'name email'),
+      UserFollow.find({ follower: userId }).populate('following', 'name'),
+      UserFollow.find({ following: userId }).populate('follower', 'name'),
       File.find({ userId }),
       FileFolder.find({ userId }),
       Wiki.find({ owner: userId }),
@@ -247,7 +287,11 @@ const exportUserData = async (req, res) => {
         email: user.email,
         name: user.name,
         createdAt: user.createdAt,
-        lastLogin: user.lastLogin
+        lastLogin: user.lastLogin,
+        // Demonstrable-consent record (GDPR Art. 7(1)). Included in the export so
+        // the user can see exactly what they accepted, when, from which IP, and
+        // against which version of our policies.
+        consent: user.consent || null
       },
       settings: settings || {},
       calendar: {
@@ -347,20 +391,18 @@ const exportUserData = async (req, res) => {
       social: {
         following: following.map(f => ({
           id: f._id,
-          user: {
+          user: f.following ? {
             id: f.following._id,
-            name: f.following.name,
-            email: f.following.email
-          },
+            name: f.following.name
+          } : null,
           createdAt: f.createdAt
         })),
         followers: followers.map(f => ({
           id: f._id,
-          user: {
+          user: f.follower ? {
             id: f.follower._id,
-            name: f.follower.name,
-            email: f.follower.email
-          },
+            name: f.follower.name
+          } : null,
           createdAt: f.createdAt
         }))
       },

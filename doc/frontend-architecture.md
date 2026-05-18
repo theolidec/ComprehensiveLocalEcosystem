@@ -114,8 +114,8 @@ components/
 │   ├── WishlistShareModal.js    # Sharing dialog
 │   └── PublicWishlistItem.js    # Public view
 ├── Math/                       # Calculator
-│   ├── GeoGebraCalculator.js    # Main calculator
-│   └── GeoGebraCalculator.css   # Styles
+│   ├── GeoGebraCalculator.js    # Main calculator (custom implementation; file name historical — no GeoGebra code or assets are used)
+│   └── GeoGebraCalculator.css   # Styles (custom; file name historical)
 ├── Tracker/                    # Daily Tracker
 │   └── DailyTracker.js          # Habit & task tracker (~66KB) with 4 tabs (Today, Tasks, Questions, Statistics)
 ├── Editor/                     # Custom TipTap extensions

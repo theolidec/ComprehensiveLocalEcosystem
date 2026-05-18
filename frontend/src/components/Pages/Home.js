@@ -933,7 +933,7 @@ function Home() {
             <li>• Store passwords securely in the Password Manager with AES-256 encryption</li>
             <li>• Share wishlist items publicly or keep them private</li>
             <li>• Upload and organize files with the File Manager</li>
-            <li>• Plot mathematical functions with the GeoGebra Calculator</li>
+            <li>• Plot mathematical functions with the Graphing Calculator</li>
           </ul>
         </div>
       </div>

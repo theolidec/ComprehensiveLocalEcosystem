@@ -59,16 +59,31 @@ mongoose.connect(process.env.MONGODB_URI, {
 {
   // Required fields
   email: String,           // Unique, lowercase, validated
-  password: String,        // Hashed, min 6 chars, select: false
+  password: String,        // Hashed, min 12 chars, select: false
   name: String,            // Required, trimmed, max 50 chars
-  
+
   // Status fields
   isActive: Boolean,       // Default: true
   lastLogin: Date,         // Updated on successful login
   loginAttempts: Number,   // Default: 0
   lockUntil: Date,         // Account lock expiry
   passwordSalt: String,    // 32-byte salt, select: false
-  
+
+  // Password reset
+  resetPasswordToken: String,    // SHA-256 hash, select: false
+  resetPasswordExpires: Date,    // Token TTL
+
+  // GDPR Art. 7 demonstrable-consent record (captured at registration)
+  consent: {
+    acceptedTermsAt: Date,
+    acceptedPrivacyAt: Date,
+    ageConfirmation13Plus: Boolean,   // Default: false
+    ipAtConsent: String,
+    userAgentAtConsent: String,
+    termsVersion: String,             // e.g., '2026-05-18'
+    privacyVersion: String            // e.g., '2026-05-18'
+  },
+
   // Timestamps
   createdAt: Date,
   updatedAt: Date
@@ -390,7 +405,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   privacy: {
     shareCalendar: Boolean,
     showBusyStatus: Boolean,
-    allowThemeCookie: Boolean    // Login page + GeoGebra theme cookies
+    allowThemeCookie: Boolean    // Login page + Graphing Calculator theme cookies
   },
 
   wishlist: {

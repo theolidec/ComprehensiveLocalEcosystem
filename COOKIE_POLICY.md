@@ -67,6 +67,7 @@ We do not use third-party advertising or tracking cookies. Our cookies are used 
 |-------------|------------------|
 | accessToken | 15 minutes |
 | refreshToken | 7 days |
+| wishlistItemsPerPage | 1 year (or until you clear it) |
 
 Refresh tokens are automatically deleted from our database after 7 days or upon logout.
 

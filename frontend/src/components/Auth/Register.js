@@ -7,7 +7,10 @@ const Register = ({ onToggleMode }) => {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    acceptTerms: false,
+    acceptPrivacy: false,
+    confirmAge: false
   });
   const [fieldErrors, setFieldErrors] = useState({});
   const { register, loading, error } = useAuth();
@@ -29,8 +32,10 @@ const Register = ({ onToggleMode }) => {
     
     if (!formData.password) {
       errors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      errors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 12) {
+      errors.password = 'Password must be at least 12 characters';
+    } else if (formData.password.length > 128) {
+      errors.password = 'Password cannot exceed 128 characters';
     } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
       errors.password = 'Password must contain uppercase, lowercase, and number';
     }
@@ -40,21 +45,32 @@ const Register = ({ onToggleMode }) => {
     } else if (formData.password !== formData.confirmPassword) {
       errors.confirmPassword = 'Passwords do not match';
     }
-    
+
+    if (!formData.acceptTerms) {
+      errors.acceptTerms = 'You must accept the Terms of Service';
+    }
+    if (!formData.acceptPrivacy) {
+      errors.acceptPrivacy = 'You must accept the Privacy Policy';
+    }
+    if (!formData.confirmAge) {
+      errors.confirmAge = 'You must confirm you are at least 13 years old';
+    }
+
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleChange = (e) => {
+    const { name, type, checked, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: type === 'checkbox' ? checked : value
     });
-    // Clear field error when user starts typing
-    if (fieldErrors[e.target.name]) {
+    // Clear field error when user starts typing/toggling
+    if (fieldErrors[name]) {
       setFieldErrors({
         ...fieldErrors,
-        [e.target.name]: ''
+        [name]: ''
       });
     }
   };
@@ -66,7 +82,11 @@ const Register = ({ onToggleMode }) => {
       return;
     }
     
-    await register(formData.email, formData.password, formData.name);
+    await register(formData.email, formData.password, formData.name, {
+      acceptTerms: formData.acceptTerms,
+      acceptPrivacy: formData.acceptPrivacy,
+      confirmAge: formData.confirmAge
+    });
   };
 
   return (
@@ -156,8 +176,8 @@ const Register = ({ onToggleMode }) => {
               {formData.password && !fieldErrors.password && (
                 <div className="mt-2 space-y-1">
                   <div className="flex items-center text-xs">
-                    <div className={`w-2 h-2 rounded-full mr-2 ${formData.password.length >= 6 ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
-                    <span className={formData.password.length >= 6 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>At least 6 characters</span>
+                    <div className={`w-2 h-2 rounded-full mr-2 ${formData.password.length >= 12 && formData.password.length <= 128 ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
+                    <span className={formData.password.length >= 12 && formData.password.length <= 128 ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}>12–128 characters</span>
                   </div>
                   <div className="flex items-center text-xs">
                     <div className={`w-2 h-2 rounded-full mr-2 ${/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password) ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}></div>
@@ -193,6 +213,67 @@ const Register = ({ onToggleMode }) => {
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="space-y-3">
+            <label className="flex items-start text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="confirmAge"
+                checked={formData.confirmAge}
+                onChange={handleChange}
+                className="mt-0.5 mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span>I am at least 13 years old (or the higher minimum age set by my country under GDPR Art. 8).</span>
+            </label>
+            {fieldErrors.confirmAge && (
+              <p className="text-sm text-red-600 dark:text-red-400 flex items-center -mt-2">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {fieldErrors.confirmAge}
+              </p>
+            )}
+
+            <label className="flex items-start text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="acceptTerms"
+                checked={formData.acceptTerms}
+                onChange={handleChange}
+                className="mt-0.5 mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span>
+                I have read and accept the{' '}
+                <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Terms of Service</a>.
+              </span>
+            </label>
+            {fieldErrors.acceptTerms && (
+              <p className="text-sm text-red-600 dark:text-red-400 flex items-center -mt-2">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {fieldErrors.acceptTerms}
+              </p>
+            )}
+
+            <label className="flex items-start text-sm text-gray-700 dark:text-gray-300">
+              <input
+                type="checkbox"
+                name="acceptPrivacy"
+                checked={formData.acceptPrivacy}
+                onChange={handleChange}
+                className="mt-0.5 mr-2 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span>
+                I acknowledge the{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Privacy Policy</a>{' '}
+                and the{' '}
+                <a href="/cookies" target="_blank" rel="noopener noreferrer" className="text-blue-600 dark:text-blue-400 hover:underline">Cookie Policy</a>.
+              </span>
+            </label>
+            {fieldErrors.acceptPrivacy && (
+              <p className="text-sm text-red-600 dark:text-red-400 flex items-center -mt-2">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {fieldErrors.acceptPrivacy}
+              </p>
+            )}
           </div>
 
           <div>

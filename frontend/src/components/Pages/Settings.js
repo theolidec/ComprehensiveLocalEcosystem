@@ -507,9 +507,9 @@ const Settings = () => {
                   defaultChecked={settings.privacy?.allowThemeCookie ?? true}
                   value="true"
                 />
-                Save Theme to Cookie (for login page and GeoGebra calculator)
+                Save Theme to Cookie (for login page and graphing calculator)
                 <small style={{ display: 'block', color: 'var(--text-muted)', marginTop: '4px' }}>
-                  Allows your theme preference to persist on the login page and in the GeoGebra calculator
+                  Allows your theme preference to persist on the login page and in the graphing calculator
                 </small>
               </label>
             </div>

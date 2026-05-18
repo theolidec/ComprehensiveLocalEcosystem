@@ -129,7 +129,7 @@ SUM/SIOM (User Manuals)
 - **Large File Support**: Up to 500MB per file
 - **Secure Storage**: Files stored with unique hashed filenames
 
-### GeoGebra Calculator
+### Graphing Calculator
 - **Interactive Graphing**: Plot functions, equations, and inequalities
 - **Multiple Object Types**: Functions, parametric curves, points, circles, polygons, implicit equations
 - **Advanced Mathematics**: Support for inequalities, conic sections, geometric shapes
@@ -330,7 +330,7 @@ For detailed application flow and usage instructions, see [DOCUMENTATION.md](DOC
 - **Passwords**: `/passwords` for secure password management
 - **Wishlist**: `/wishlist` for gift registry
 - **Files**: `/files` or `/drive` for file management
-- **Calculator**: `/calculator` for GeoGebra graphing
+- **Calculator**: `/calculator` for interactive function graphing
 - **Wiki**: `/wikis` for knowledge base system
 - **Tracker**: `/tracker` for daily habit & task tracking
 - **Settings**: `/settings` for user preferences
@@ -441,7 +441,7 @@ curl -X POST http://localhost:3001/api/wishlist \
 - File upload/download/streaming (up to 500MB)
 - File trash and restore functionality
 - File sharing with public tokens
-- GeoGebra Calculator with interactive graphing
+- Graphing Calculator with interactive graphing
 - GraphingEngine with multiple object types support
 - MathParser for expression evaluation
 - Wiki System with hierarchical pages and version control

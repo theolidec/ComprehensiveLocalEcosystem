@@ -44,11 +44,24 @@ const clearAuthCookies = (res) => {
   res.clearCookie('refreshToken', { path: '/api/auth' });
 };
 
+// Current published version of the legal documents. Bump these whenever a
+// material change is made to TERMS.md or PRIVACY.md so existing users can be
+// re-prompted to accept the new version.
+const CURRENT_TERMS_VERSION = '2026-05-18';
+const CURRENT_PRIVACY_VERSION = '2026-05-18';
+
 // Register new user
 router.post('/register', authLimiter, [
   body('email').isEmail().withMessage('Valid email required'),
   body('password').isLength({ min: 12, max: 128 }).withMessage('Password must be 12-128 characters'),
-  body('name').trim().notEmpty().withMessage('Name is required')
+  body('name').trim().notEmpty().withMessage('Name is required'),
+  // Affirmative consent / age gate. All three must be the literal boolean `true`
+  // so that "checkbox unchecked" (false) and "checkbox missing" (undefined) are
+  // both rejected. This satisfies GDPR Art. 7 ("clear affirmative action") and
+  // gives the controller demonstrable consent.
+  body('acceptTerms').custom(v => v === true).withMessage('You must accept the Terms of Service'),
+  body('acceptPrivacy').custom(v => v === true).withMessage('You must accept the Privacy Policy'),
+  body('confirmAge').custom(v => v === true).withMessage('You must confirm you are at least 13 years old')
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -73,8 +86,23 @@ router.post('/register', authLimiter, [
       });
     }
 
-    // Create new user
-    const user = new User({ email, password, name });
+    // Create new user. The consent record is captured at the same moment as the
+    // account so we have evidence of acceptance contemporaneous with registration.
+    const consentTimestamp = new Date();
+    const user = new User({
+      email,
+      password,
+      name,
+      consent: {
+        acceptedTermsAt: consentTimestamp,
+        acceptedPrivacyAt: consentTimestamp,
+        ageConfirmation13Plus: true,
+        ipAtConsent: req.ip,
+        userAgentAtConsent: req.get('User-Agent') || '',
+        termsVersion: CURRENT_TERMS_VERSION,
+        privacyVersion: CURRENT_PRIVACY_VERSION
+      }
+    });
     await user.save();
 
     // Create default categories for the new user

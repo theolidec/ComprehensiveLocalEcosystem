@@ -60,13 +60,25 @@ The authentication system provides secure JWT-based authentication with refresh 
 ```javascript
 {
   email: String (required, unique, lowercase),
-  password: String (required, minlength: 6, select: false),
+  password: String (required, minlength: 12, select: false),
   name: String (required, trim, maxlength: 50),
   isActive: Boolean (default: true),
   lastLogin: Date,
   loginAttempts: Number (default: 0),
   lockUntil: Date,
-  passwordSalt: String (select: false)
+  passwordSalt: String (select: false),
+  resetPasswordToken: String (select: false),
+  resetPasswordExpires: Date,
+  // GDPR Art. 7 demonstrable-consent record captured at registration
+  consent: {
+    acceptedTermsAt: Date,
+    acceptedPrivacyAt: Date,
+    ageConfirmation13Plus: Boolean (default: false),
+    ipAtConsent: String,
+    userAgentAtConsent: String,
+    termsVersion: String,        // e.g., '2026-05-18'
+    privacyVersion: String       // e.g., '2026-05-18'
+  }
 }
 ```
 
@@ -130,8 +142,11 @@ Content-Type: application/json
 
 {
   "email": "user@example.com",
-  "password": "securePassword123",
-  "name": "John Doe"
+  "password": "securePassword123!",
+  "name": "John Doe",
+  "acceptTerms": true,
+  "acceptPrivacy": true,
+  "confirmAge": true
 }
 
 # Response 201
@@ -144,6 +159,11 @@ Content-Type: application/json
   }
 }
 # Sets HttpOnly cookies: accessToken, refreshToken
+# Persists a consent subdocument on the User containing acceptedTermsAt,
+# acceptedPrivacyAt, ageConfirmation13Plus, ipAtConsent, userAgentAtConsent,
+# termsVersion, privacyVersion. All three consent flags must be the literal
+# boolean `true`; any other value (missing, false, "true" as string) returns
+# 400 VALIDATION_ERROR (GDPR Art. 7 demonstrable consent).
 ```
 
 **Login:**

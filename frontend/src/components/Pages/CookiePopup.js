@@ -6,19 +6,14 @@ const CookiePopup = () => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const cookieConsent = localStorage.getItem('cookieConsent');
-    if (!cookieConsent) {
+    const cookieNoticeSeen = localStorage.getItem('cookieNoticeSeen');
+    if (!cookieNoticeSeen) {
       setIsVisible(true);
     }
   }, []);
 
-  const handleAccept = () => {
-    localStorage.setItem('cookieConsent', 'accepted');
-    setIsVisible(false);
-  };
-
-  const handleDecline = () => {
-    localStorage.setItem('cookieConsent', 'declined');
+  const handleAcknowledge = () => {
+    localStorage.setItem('cookieNoticeSeen', 'true');
     setIsVisible(false);
   };
 
@@ -32,18 +27,24 @@ const CookiePopup = () => {
         </div>
         <div className="cookie-popup-content">
           <p>
-            We use essential cookies to ensure our Service works properly. These cookies are 
-            required for authentication and session management. By continuing to use our 
-            application, you agree to our use of cookies as described in our{' '}
+            We use only <strong>strictly necessary cookies</strong> required to authenticate
+            you and keep you signed in. No consent is required for these under the ePrivacy
+            Directive — we are informing you, not asking permission.
+          </p>
+          <p>
+            We also store a small amount of data in your browser's{' '}
+            <code>localStorage</code> (theme preference, dismissal of this notice). We do not
+            use advertising or third-party tracking cookies. Full details are in our{' '}
             <Link to="/cookies" onClick={() => setIsVisible(false)}>Cookie Policy</Link>.
           </p>
           <p className="cookie-popup-info">
-            <strong>Note:</strong> Essential cookies cannot be declined as they are necessary 
-            for the Service to function. They are httpOnly and secure.
+            <strong>Note:</strong> Acknowledging this notice only dismisses it from view. It
+            does not create a contract and does not waive your right to lodge a complaint
+            with your supervisory authority.
           </p>
         </div>
         <div className="cookie-popup-actions">
-          <button className="cookie-btn cookie-btn-accept" onClick={handleAccept}>
+          <button className="cookie-btn cookie-btn-accept" onClick={handleAcknowledge}>
             Acknowledge
           </button>
         </div>
