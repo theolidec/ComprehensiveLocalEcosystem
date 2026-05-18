@@ -404,6 +404,10 @@ React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
 
 **Important**: The `/wiki/:slug/new` route does not define a `:pageSlug` param, so `useParams()` returns only `{ slug }` with no `pageSlug`. `WikiPageEditor` uses `useLocation().pathname.endsWith('/new')` to detect new-page mode instead of relying on `pageSlug === 'new'` from route params. When on the new-page route, `pageSlug` is set to `'new'` locally so all downstream logic (save, back navigation, etc.) works correctly.
 
+### Scroll to Top on Route Change
+
+`AppContent` listens to `location.pathname` via `useLocation()` and calls `window.scrollTo(0, 0)` on every route change. This ensures users always land at the top of the page when navigating between modules, even if they were previously scrolled down on the homepage.
+
 ### ProtectedRoute Component
 
 ```javascript

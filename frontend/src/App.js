@@ -83,7 +83,11 @@ function RootRoute() {
 
 function AppContent() {
   const location = useLocation();
-  
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   useEffect(() => {
     const theme = getInitialTheme();
     document.documentElement.setAttribute('data-theme', theme);
