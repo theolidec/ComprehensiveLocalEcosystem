@@ -43,7 +43,15 @@ const defaultSettings = {
     theme: 'system',
     language: 'en',
     compactMode: false,
-    showCompletedEvents: true
+    showCompletedEvents: true,
+    homepageLayout: {
+      showDailyTracker: true,
+      showEvents: true,
+      showQuickAccess: true,
+      showProTips: true,
+      order: ['dailyTracker', 'events', 'quickAccess', 'proTips'],
+      quickActions: ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker']
+    }
   },
   privacy: {
     shareCalendar: false,

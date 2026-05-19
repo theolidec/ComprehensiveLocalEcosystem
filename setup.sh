@@ -255,7 +255,7 @@ print_next_steps() {
     echo "   Health:   http://localhost:3001/health"
     echo
     echo "For more information, see:"
-    echo "   - DOCUMENTATION.md"
+    echo "   - /doc"
     echo "   - MIGRATION_GUIDE.md"
     echo
 }

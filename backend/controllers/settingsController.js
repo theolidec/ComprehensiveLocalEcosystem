@@ -149,7 +149,7 @@ const settingsController = {
 
   updateDisplaySettings: async (req, res) => {
     try {
-      const allowedFields = ['theme', 'language', 'compactMode', 'showCompletedEvents'];
+      const allowedFields = ['theme', 'language', 'compactMode', 'showCompletedEvents', 'homepageLayout'];
       
       const updates = {};
       for (const field of allowedFields) {

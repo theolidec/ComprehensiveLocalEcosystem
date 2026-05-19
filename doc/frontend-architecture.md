@@ -76,7 +76,7 @@ components/
 │   └── Toast.js                 # Notification toast
 ├── Pages/                      # Main pages
 │   ├── Home.js                  # Dashboard (~46KB)
-│   ├── Calendar.js              # Full calendar (~72KB)
+│   ├── HomeLayoutEditor.js      # Home layout editor (/home/edit) for toggling/reordering homepage widgets and Quick Access shortcuts
 │   ├── Settings.js + Settings.css   # User settings (~36KB)
 │   ├── PasswordManager.js       # Password + payment cards vault (~58KB)
 │   ├── FileManager.js           # File explorer (~41KB)

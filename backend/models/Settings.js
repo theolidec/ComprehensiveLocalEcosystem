@@ -99,6 +99,32 @@ const settingsSchema = new mongoose.Schema({
     showCompletedEvents: {
       type: Boolean,
       default: true
+    },
+    homepageLayout: {
+      showDailyTracker: {
+        type: Boolean,
+        default: true
+      },
+      showEvents: {
+        type: Boolean,
+        default: true
+      },
+      showQuickAccess: {
+        type: Boolean,
+        default: true
+      },
+      showProTips: {
+        type: Boolean,
+        default: true
+      },
+      order: {
+        type: [String],
+        default: ['dailyTracker', 'events', 'quickAccess', 'proTips']
+      },
+      quickActions: {
+        type: [String],
+        default: ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker']
+      }
     }
   },
   privacy: {

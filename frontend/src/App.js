@@ -10,6 +10,7 @@ import ProtectedRoute from './components/Auth/ProtectedRoute';
 import AuthPage from './components/Auth/AuthPage';
 import Header from './components/Layout/Header';
 import Home from './components/Pages/Home';
+import HomeLayoutEditor from './components/Pages/HomeLayoutEditor';
 import LandingPage from './components/Pages/LandingPage';
 import Footer from './components/Layout/Footer';
 import Toast from './components/Layout/Toast';
@@ -131,9 +132,23 @@ function AppContent() {
             <div key={location.pathname}>
               <Header />
               <Row>
-                <Sidebar inline />
+                {/* <Sidebar inline /> */}
                 <div style={{ flex: 1 }}>
                   <Home />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/home/edit" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                {/* <Sidebar inline /> */}
+                <div style={{ flex: 1 }}>
+                  <HomeLayoutEditor />
                 </div>
               </Row>
               <Footer />

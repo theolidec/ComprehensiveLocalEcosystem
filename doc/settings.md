@@ -7,7 +7,7 @@ The Settings module provides comprehensive user preference management including 
 - **Profile Management**: Name, bio, avatar
 - **Calendar Settings**: Default view, timezone, working hours
 - **Notifications**: Email reminders, event updates, digest
-- **Display**: Theme, language, compact mode
+- **Display**: Theme, language, compact mode, **homepage layout** (per-user control of Home widgets)
 - **Privacy**: Sharing controls, theme cookies (login page and Graphing Calculator)
 - **Session Management**: View and revoke active sessions
 - **Account & Data**: User rights (GDPR) - view, export, correct, delete data
@@ -45,7 +45,15 @@ The Settings module provides comprehensive user preference management including 
     theme: String (enum: light/dark/system, default: 'system'),
     language: String (default: 'en'),
     compactMode: Boolean (default: false),
-    showCompletedEvents: Boolean (default: true)
+    showCompletedEvents: Boolean (default: true),
+    homepageLayout: {
+      showDailyTracker: Boolean (default: true),
+      showEvents: Boolean (default: true),
+      showQuickAccess: Boolean (default: true),
+      showProTips: Boolean (default: true),
+      order: [String] (default: ['dailyTracker', 'events', 'quickAccess', 'proTips']),
+      quickActions: [String] (default: ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker'])
+    }
   },
   privacy: {
     shareCalendar: Boolean,
@@ -82,6 +90,12 @@ The Settings module provides comprehensive user preference management including 
 | display.language | 'en' |
 | display.compactMode | false |
 | display.showCompletedEvents | true |
+| display.homepageLayout.showDailyTracker | true |
+| display.homepageLayout.showEvents | true |
+| display.homepageLayout.showQuickAccess | true |
+| display.homepageLayout.showProTips | true |
+| display.homepageLayout.order | ['dailyTracker', 'events', 'quickAccess', 'proTips'] | Controls the visual order of sections in the home layout editor and on the /home page |
+| display.homepageLayout.quickActions | ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker'] | Controls which shortcuts appear in the Quick Access section and their order |
 | privacy.shareCalendar | false |
 | privacy.showBusyStatus | true |
 | privacy.allowThemeCookie | true | Controls both login page and Graphing Calculator theme cookies |

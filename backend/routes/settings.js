@@ -58,7 +58,8 @@ router.put('/display', settingsLimiter, [
   body('theme').optional().isIn(['light', 'dark', 'system']),
   body('language').optional().isString(),
   body('compactMode').optional().isBoolean(),
-  body('showCompletedEvents').optional().isBoolean()
+  body('showCompletedEvents').optional().isBoolean(),
+  body('homepageLayout').optional().isObject()
 ], validateSettingsUpdate, settingsController.updateDisplaySettings);
 
 router.put('/privacy', settingsLimiter, [

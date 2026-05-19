@@ -326,6 +326,8 @@ For detailed application flow and usage instructions, see [doc/README.md](doc/RE
 
 **Quick Navigation:**
 - **Authentication**: `/login` and `/register` pages
+- **Home**: `/home` personal dashboard
+- **Home Layout Editor**: `/home/edit` toggle homepage widgets (Daily Tracker, Today\'s Events)
 - **Calendar**: `/calendar/month` with multiple views
 - **Passwords**: `/passwords` for secure password management
 - **Wishlist**: `/wishlist` for gift registry
