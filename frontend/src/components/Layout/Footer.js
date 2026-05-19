@@ -1,7 +1,9 @@
 import React from 'react';
 import { Shield, Github } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Footer = () => {
+  const navigate = useNavigate();
   const products = [
     { name: 'Calendar', href: '/calendar' },
     { name: 'Password Manager', href: '/passwords' },
@@ -55,9 +57,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {products.map((item, index) => (
                 <li key={index}>
-                  <a href={item.href} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors text-sm">
+                  <button onClick={() => navigate(item.href)} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors text-sm">
                     {item.name}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -68,9 +70,9 @@ const Footer = () => {
             <ul className="space-y-3">
               {resources.map((item, index) => (
                 <li key={index}>
-                  <a href={item.href} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors text-sm">
+                  <button onClick={() => navigate(item.href)} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors text-sm">
                     {item.name}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -85,18 +87,18 @@ const Footer = () => {
               <span className="hidden md:inline">Self-hosted with love</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 text-sm">
-              <a href="/settings" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+              <button onClick={() => navigate('/settings')} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                 Settings
-              </a>
-              <a href="/privacy" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+              </button>
+              <button onClick={() => navigate('/privacy')} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                 Privacy
-              </a>
-              <a href="/terms" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+              </button>
+              <button onClick={() => navigate('/terms')} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                 Terms
-              </a>
-              <a href="/cookies" className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
+              </button>
+              <button onClick={() => navigate('/cookies')} className="text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-white transition-colors">
                 Cookies
-              </a>
+              </button>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
 import { useAuth } from '../../contexts/AuthContext';
@@ -167,13 +167,13 @@ const Settings = () => {
     else showMessage(result.error, 'error');
   };
 
-  const handleReset = async () => {
+  const handleReset = useCallback(async () => {
     if (window.confirm('Are you sure you want to reset all settings to defaults?')) {
       const result = await resetSettings();
       if (result.success) showMessage('Settings reset to defaults');
       else showMessage(result.error, 'error');
     }
-  };
+  }, [resetSettings]);
 
   const tabs = [
     { id: 'profile', label: 'Profile', icon: '?' },
@@ -244,7 +244,7 @@ const Settings = () => {
     ]);
 
     return () => clearPageActions();
-  }, [activeTab, registerPageActions, clearPageActions, handleReset]);
+  }, [activeTab, registerPageActions, clearPageActions]);
 
   return (
     <div className="settings-container">

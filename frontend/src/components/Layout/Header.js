@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users, BookOpen, CheckSquare } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users, BookOpen, CheckSquare, Flame } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -184,63 +184,70 @@ const Header = () => {
                       Apps
                     </div>
                     <button
-                      onClick={() => window.location.href = '/home'}
+                      onClick={() => navigate('/home')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Home className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span>Home</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/calendar'}
+                      onClick={() => navigate('/calendar')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                       <span>Calendar</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/passwords'}
+                      onClick={() => navigate('/passwords')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Key className="h-4 w-4 text-orange-600" />
                       <span>Password Manager</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/wishlist'}
+                      onClick={() => navigate('/wishlist')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Gift className="h-4 w-4 text-purple-600" />
                       <span>Wishlist</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/files'}
+                      onClick={() => navigate('/files')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <FolderOpen className="h-4 w-4 text-teal-600" />
                       <span>Files</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/calculator'}
+                      onClick={() => navigate('/music')}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Flame className="h-4 w-4 text-pink-500" />
+                      <span>Music</span>
+                    </button>
+                    <button
+                      onClick={() => navigate('/calculator')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Calculator className="h-4 w-4 text-teal-600" />
                       <span>Calculator</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/following'}
+                      onClick={() => navigate('/following')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Users className="h-4 w-4 text-pink-600" />
                       <span>Following</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/tracker'}
+                      onClick={() => navigate('/tracker')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <CheckSquare className="h-4 w-4 text-emerald-600" />
                       <span>Daily Tracker</span>
                     </button>
                     <button
-                      onClick={() => window.location.href = '/wikis'}
+                      onClick={() => navigate('/wikis')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <BookOpen className="h-4 w-4 text-amber-600" />
@@ -264,14 +271,14 @@ const Header = () => {
                 {isProfileOpen && (
                   <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                     <button
-                      onClick={() => { window.location.href = '/passwords'; setIsProfileOpen(false); }}
+                      onClick={() => { navigate('/passwords'); setIsProfileOpen(false); }}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Key className="h-4 w-4" />
                       <span>Passwords</span>
                     </button>
                     <button
-                      onClick={() => { window.location.href = '/settings'; setIsProfileOpen(false); }}
+                      onClick={() => { navigate('/settings'); setIsProfileOpen(false); }}
                       className="flex items-center space-x-2 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <Settings className="h-4 w-4" />

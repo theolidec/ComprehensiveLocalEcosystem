@@ -1,5 +1,17 @@
 # Frontend Architecture
 
+## Music Module
+- `/music` route: Upload, browse, and play music (Spotify style)
+- `MusicPage` component: main UI for music
+- `FloatingMusicPlayer`: floating player, globally visible on all pages
+- `components/music/MusicUpload.js`: Upload form (audio validation)
+- `components/music/MusicPlayer.js`: Main player UI (play/pause, progress, metadata)
+- `components/music/Playlist.js`: Playlist management (create, add/remove, public/private)
+- `components/FloatingMusicPlayer.js`: Floating player visible across site (bottom right)
+- Integrates with backend `/api/music` endpoints
+- Maintains current theme and style
+
+
 ## Overview
 
 The frontend is built with **React 19.2.4** using modern hooks and functional components. It uses **Tailwind CSS** for styling, **Lucide React** for icons, and **Axios** for API communication.
@@ -93,8 +105,10 @@ components/
 │   ├── Cookies.js               # Cookie policy
 │   ├── CookiePopup.js + .css    # Cookie consent
 │   ├── LinkNotFound.js + .css   # 404 page
+│   ├── Music.js                 # Music page shell (/music) — renders MusicPage with MusicProvider layout
 │   └── CategoryManager.js       # Event category management
-├── (root)                      # Loose calendar pieces shared across views
+├── (root)                      # Shared/loose components
+│   ├── FloatingMusicPlayer.js   # Persistent floating music player (bottom-right, all pages)
 │   ├── CalendarHeader.js        # Calendar navigation
 │   ├── CalendarSidebar.js       # Calendar filters
 │   ├── EventForm.js             # Event editor
@@ -120,9 +134,13 @@ components/
 │   └── DailyTracker.js          # Habit & task tracker (~66KB) with 4 tabs (Today, Tasks, Questions, Statistics)
 ├── Editor/                     # Custom TipTap extensions
 │   └── FontSize.js              # Font-size mark for DocumentEditor
-└── FileManager/                # File-manager sub-widgets
-    ├── FileTree.js              # Folder tree sidebar
-    └── FileTree.css
+├── FileManager/                # File-manager sub-widgets
+│   ├── FileTree.js              # Folder tree sidebar
+│   └── FileTree.css
+└── music/                      # Music module sub-components
+    ├── MusicUpload.js           # Audio file upload form (audio MIME validation)
+    ├── MusicPlayer.js           # Per-track player UI (play/pause, progress, metadata)
+    └── Playlist.js              # Playlist management (create, add/remove songs, public/private)
 ```
 
 ### Component Patterns
@@ -273,6 +291,36 @@ onDateSelect(date)
 
 Similar pattern for page-level actions.
 
+### MusicContext
+
+**File**: `src/context/MusicContext.js`
+
+> **Note**: `MusicContext` lives in `src/context/` (singular), which is separate from the main `src/contexts/` folder. This is intentional — it was added with the Music module and co-located for clarity.
+
+Manages music playback state, playlist queue, and shuffle mode globally so the floating player persists across all pages.
+
+```javascript
+// State
+{
+  currentTrack: Music | null,
+  isPlaying: boolean,
+  queue: Music[],             // Active playlist track list
+  currentIndex: number,
+  shuffle: boolean,
+  loop: boolean,
+  currentPlaylist: Playlist | null
+}
+
+// Key methods
+playTrack(track, queue?, index?)
+togglePlay()
+nextTrack()
+prevTrack()
+toggleShuffle()
+toggleLoop()
+setCurrentPlaylist(playlist)
+```
+
 ### WikiContext
 
 **File**: `src/contexts/WikiContext.js`
@@ -393,8 +441,12 @@ React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
   <Route path="/wiki/:slug/:pageSlug" element={<ProtectedRoute><WikiPageView /></ProtectedRoute>} />
   <Route path="/wiki/:slug/edit/:pageSlug" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
   
+  {/* Music */}
+  <Route path="/music" element={<ProtectedRoute><MusicPage /></ProtectedRoute>} />
+  
   {/* Redirects */}
   <Route path="/pass" element={<Navigate to="/passwords" />} />
+  <Route path="/drive" element={<Navigate to="/files" />} />
 </Routes>
 ```
 

@@ -48,6 +48,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 | TrackerTask | `TrackerTask.js` | Daily tracker tasks | References User |
 | TrackerQuestion | `TrackerQuestion.js` | Tracker questions | References User |
 | TrackerResponse | `TrackerResponse.js` | Daily check-in responses | References User |
+| Music | `Music.js` | Uploaded audio files | References User |
+| Playlist | `Playlist.js` | Music playlists | References User, Music |
 
 ---
 
@@ -806,6 +808,66 @@ mongoose.connect(process.env.MONGODB_URI, {
 
 ---
 
+## Music Model
+
+**File**: `backend/models/Music.js`
+
+```javascript
+{
+  userId: ObjectId,          // Ref: 'User', required, indexed
+  filename: String,          // Stored name, required
+  originalName: String,      // Original file name, required
+  mimeType: String,          // MIME type (audio/*), required
+  size: Number,              // Bytes, required
+  path: String,              // Filesystem path, required
+  isPublic: Boolean,         // Default: false
+  playlistIds: [ObjectId],   // Ref: 'Playlist'
+  title: String,             // Display name
+  artist: String,
+  album: String,
+  coverUrl: String,
+  duration: Number,          // Seconds
+  description: String,       // Max 500 chars
+  tags: [String],            // Each max 50 chars
+  isFavorite: Boolean,       // Default: false
+  isDeleted: Boolean,        // Default: false
+  deletedAt: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `userId: 1` — User's tracks
+- `userId: 1, isDeleted: 1` — Soft-delete filtering
+- `userId: 1, isFavorite: 1` — Favorites
+
+---
+
+## Playlist Model
+
+**File**: `backend/models/Playlist.js`
+
+```javascript
+{
+  userId: ObjectId,          // Ref: 'User', required, indexed
+  name: String,              // Required, trimmed
+  description: String,       // Max 500 chars
+  musicIds: [ObjectId],      // Ref: 'Music' — ordered track list
+  isPublic: Boolean,         // Default: false
+  isDeleted: Boolean,        // Default: false
+  deletedAt: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+**Indexes**:
+- `userId: 1` — User's playlists
+- `userId: 1, isDeleted: 1` — Soft-delete filtering
+
+---
+
 ## Schema Patterns
 
 ### Common Options
@@ -890,6 +952,8 @@ User
 ├── TrackerTasks (1:N)
 ├── TrackerQuestions (1:N)
 ├── TrackerResponses (1:N, unique per [user, date])
+├── Music (1:N)                                     # Uploaded audio tracks
+├── Playlists (1:N)                                 # Music playlists (reference Music)
 └── Wikis (1:N, as owner)
     ├── WikiPages (1:N)
     │   └── WikiVersions (1:N)

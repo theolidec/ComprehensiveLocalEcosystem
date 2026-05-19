@@ -335,7 +335,7 @@ const CalendarApp = () => {
     }
   };
 
-  const createDummyEvents = async () => {
+  const createDummyEvents = useCallback(async () => {
     try {
       // Ensure "Testing" category exists
       const testingCategory = categories.find(cat => cat.name === 'Testing');
@@ -383,9 +383,9 @@ const CalendarApp = () => {
     } catch (err) {
       alert(err.message || 'Failed to create dummy events');
     }
-  };
+  }, [categories, fetchCategories, fetchEvents]);
 
-  const removeDummyEvents = async () => {
+  const removeDummyEvents = useCallback(async () => {
     try {
       const testingEvents = events.filter(event => event.category === 'testing');
       
@@ -405,7 +405,7 @@ const CalendarApp = () => {
     } catch (err) {
       alert(err.message || 'Failed to remove dummy events');
     }
-  };
+  }, [events]);
 
   const handleEditEvent = (event) => {
     setEditingEvent(event);
@@ -414,23 +414,15 @@ const CalendarApp = () => {
     setShowEventDetails(null);
   };
 
-  const exportCalendar = async () => {
+  const exportCalendar = useCallback(async () => {
     try {
       await calendarAPI.exportEvents();
     } catch (err) {
       alert(err.message || 'Failed to export events');
     }
-  };
+  }, []);
 
-  const handleImportFile = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      importCalendar(file);
-      e.target.value = '';
-    }
-  };
-
-  const importCalendar = async (file) => {
+  const importCalendar = useCallback(async (file) => {
     try {
       const result = await calendarAPI.importEvents(file);
       alert(result.message);
@@ -438,7 +430,15 @@ const CalendarApp = () => {
     } catch (err) {
       alert(err.message || 'Failed to import events');
     }
-  };
+  }, [fetchEvents]);
+
+  const handleImportFile = useCallback((e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      importCalendar(file);
+      e.target.value = '';
+    }
+  }, [importCalendar]);
 
   const getUpcomingEvents = () => {
     const today = new Date();
@@ -515,7 +515,7 @@ const CalendarApp = () => {
       clearActions();
       clearPageActions();
     };
-  }, [registerActions, clearActions, setIsCalendarPage, handleImportFile, exportCalendar, createDummyEvents, removeDummyEvents, selectedDate, setSelectedDate, setShowEventForm, registerPageActions, clearPageActions]);
+  }, [registerActions, clearActions, setIsCalendarPage, registerPageActions, clearPageActions, selectedDate]);
 
   // Week view generation
   const generateWeekDays = () => {

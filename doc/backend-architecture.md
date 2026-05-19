@@ -34,17 +34,26 @@ The backend is built on **Node.js** with **Express.js**, using **MongoDB** with 
 
 ## Project Structure
 
+### Music Module
+- `models/Music.js` — Music file schema (audio validation, public/private, metadata)
+- `models/Playlist.js` — Playlist schema (music references, public/private)
+- `controllers/musicController.js` — Handles upload, streaming, playlist logic
+- `routes/music.js` — API endpoints for music and playlist
+- Registered as `/api/music` in `server.js`
+
+
 ```
 backend/
 ├── config/              # Configuration files
 │   ├── database.js      # MongoDB connection + legacy index cleanup
 │   ├── logger.js        # Winston logging setup
 │   └── rateLimiter.js   # Rate limiting rules (8 limiters)
-├── controllers/         # Request handlers (business logic) — 11 files
+├── controllers/         # Request handlers (business logic) — 12 files
 │   ├── calendarController.js
 │   ├── categoryController.js
 │   ├── fileController.js
 │   ├── fileFolderController.js
+│   ├── musicController.js
 │   ├── passwordController.js
 │   ├── passwordCategoryController.js
 │   ├── paymentCardController.js
@@ -316,7 +325,7 @@ module.exports = router;
 
 ### Route Registration (server.js)
 
-All 17 API namespaces mounted under `/api/*`:
+All 18 API namespaces mounted under `/api/*`:
 
 ```javascript
 app.use('/api/auth', authRoutes);
@@ -336,6 +345,7 @@ app.use('/api/wikis', wikiRoutes);
 app.use('/api/wikis/:slug/pages', wikiPageRoutes);  // Nested mount; :slug forwarded
 app.use('/api/user', userRightsRoutes);              // GDPR endpoints
 app.use('/api/tracker', trackerRoutes);
+app.use('/api/music', musicRoutes);
 ```
 
 **Note**: `wikiPageRoutes` is mounted under `/api/wikis/:slug/pages`, so the wiki slug is available via `req.params.slug` inside the page router (Express forwards parent params).
@@ -749,6 +759,7 @@ Multiple rate limiters protect against abuse:
 | `userActionLimiter` | 50 | 1 hour | User actions |
 | `settingsLimiter` | 100 | 15 min | Settings changes |
 | `publicReservationLimiter` | 10 | 1 hour | Public reservations |
+| `userDataLimiter` | 10 | 1 hour | GDPR data access/export/delete |
 
 ## Testing
 

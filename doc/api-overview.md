@@ -1,5 +1,35 @@
 # API Overview
 
+## Music Module
+
+- `/music` route and FloatingMusicPlayer component available on frontend, linking to backend endpoints.
+
+
+### Endpoints
+- POST `/api/music/upload` — Upload a music file (audio only, JWT required)
+- GET `/api/music/my` — Get your uploaded music (JWT required)
+- GET `/api/music/public` — Get all public music
+- GET `/api/music/stream/:id` — Stream music file (public or user-owned)
+- POST `/api/music/playlist` — Create a playlist (JWT required)
+- GET `/api/music/playlist/my` — Get your playlists (JWT required)
+- GET `/api/music/playlist/public` — Get all public playlists
+- POST `/api/music/playlist/add` — Add music to playlist (JWT required)
+- POST `/api/music/playlist/remove` — Remove music from playlist (JWT required)
+
+### Models
+- Music: userId, filename, originalName, mimeType, size, path, isPublic, playlistIds, title, artist, album, coverUrl, duration, description, tags, isFavorite, isDeleted, deletedAt
+- Playlist: userId, name, description, musicIds, isPublic, isDeleted, deletedAt
+
+### Auth
+- Most endpoints require JWT. Public endpoints allow unauthenticated access to public music/playlists.
+
+### File Validation
+- Only audio files are accepted for upload.
+
+### Streaming
+- Supports HTTP range requests for efficient music playback.
+
+
 Complete reference of all REST API endpoints in the Comprehensive Local Ecosystem.
 
 **Base URL**: `http://localhost:3001/api`
@@ -626,11 +656,11 @@ GET /api/user/export
 ```json
 {
   "status": "OK",
-  "timestamp": "2026-04-19T12:00:00.000Z",
-  "uptime": 3600,
-  "environment": "development"
+  "timestamp": "2026-04-19T12:00:00.000Z"
 }
 ```
+
+> **Note**: `uptime` and `environment` were removed in v2.6.0 (security hardening) to avoid leaking server fingerprint information.
 
 ### Server Info
 

@@ -36,6 +36,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
 | [`geogebra-calculator.md`](geogebra-calculator.md) | Graphing Calculator (filename kept for backward compatibility — no GeoGebra code is used) | Frontend component |
 | [`daily-tracker.md`](daily-tracker.md) | Daily tracker | `/api/tracker/*` |
+| [`MUSIC_MODULE.md`](MUSIC_MODULE.md) | Music system | `/api/music/*` |
 
 ### Security & Operations
 
@@ -106,6 +107,7 @@ Start here if you're integrating with the API:
 - [`wishlist.md`](wishlist.md) - Gift registry
 - [`geogebra-calculator.md`](geogebra-calculator.md) - Graphing Calculator (custom implementation)
 - [`daily-tracker.md`](daily-tracker.md) - Habit & task tracker
+- [`MUSIC_MODULE.md`](MUSIC_MODULE.md) - Music library and playlist player
 
 ### Organization
 - [`categories.md`](categories.md) - Event categories
@@ -145,10 +147,22 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 13, 2026  
-**Version**: 2.6.0
+**Last Updated**: May 19, 2026  
+**Version**: 2.7.0
 
 ## Recent Changes
+
+### Music System (v2.7.0, 2026-05-19)
+- **Backend**: `Music` and `Playlist` models; `musicController.js`; `routes/music.js` mounted at `/api/music`
+  - Upload, stream (HTTP range), and manage audio files
+  - Playlist CRUD with ordered track lists
+  - Public/private visibility per track and playlist
+- **Frontend**: `components/music/` (MusicUpload, MusicPlayer, Playlist); `components/Pages/Music.js`; `FloatingMusicPlayer.js`
+  - `MusicContext` (`src/context/MusicContext.js`) manages global playback state
+  - Floating player visible on all pages (bottom-right)
+  - Shuffle, loop, auto-advance, and visual playlist indicators
+- **Config**: `src/config/api.js` expanded with all `MUSIC_*` endpoint constants
+- **Documentation**: Added `doc/MUSIC_MODULE.md`; updated `doc/database-models.md`, `doc/backend-architecture.md`, `doc/frontend-architecture.md`, `doc/api-overview.md`, and root `README.md`
 
 ### Security Hardening Pass (v2.6.0, 2026-05-13)
 A comprehensive backend security audit and hardening pass:

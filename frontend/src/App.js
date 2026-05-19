@@ -40,6 +40,9 @@ import WikiSettings from './components/Wiki/WikiSettings';
 import WikiRecentChanges from './components/Wiki/WikiRecentChanges';
 import DailyTracker from './components/Tracker/DailyTracker';
 import './App.css';
+import MusicPage from './components/Pages/Music';
+import FloatingMusicPlayer from './components/FloatingMusicPlayer';
+import { MusicProvider } from './context/MusicContext';
 
 const getInitialTheme = () => {
   if (typeof window === 'undefined') return 'light';
@@ -118,6 +121,7 @@ function AppContent() {
         <Route path="/drive" element={<Navigate to="/files" replace />} />
 
         {/* Auth routes */}
+      <Route path="/music" element={<ProtectedRoute><MusicPage /></ProtectedRoute>} />
         <Route path="/login" element={<AuthPage />} />
 
         {/* Legal routes */}
@@ -412,16 +416,19 @@ function App() {
     <Router>
       <NotificationProvider>
         <AuthProvider>
-          <SettingsProvider>
-            <WikiProvider>
-              <PageActionsProvider>
-                <CalendarActionsProvider>
-                  <AppContent />
-                  <Toast />
-                </CalendarActionsProvider>
-              </PageActionsProvider>
-            </WikiProvider>
-          </SettingsProvider>
+          <MusicProvider>
+            <FloatingMusicPlayer />
+            <SettingsProvider>
+              <WikiProvider>
+                <PageActionsProvider>
+                  <CalendarActionsProvider>
+                    <AppContent />
+                    <Toast />
+                  </CalendarActionsProvider>
+                </PageActionsProvider>
+              </WikiProvider>
+            </SettingsProvider>
+          </MusicProvider>
         </AuthProvider>
       </NotificationProvider>
     </Router>

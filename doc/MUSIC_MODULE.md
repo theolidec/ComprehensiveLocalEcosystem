@@ -1,0 +1,45 @@
+# Music Module Overview
+
+## Features
+- Upload, validate, and play music/audio files
+- Public/private music
+- Playlist creation and management
+- Playlist playback (auto-advance to next song, loop from end to start)
+- Shuffle/scrambled playback
+- Spotify-style UI
+- Floating player visible on all pages (appears when a song is selected)
+
+## Backend
+- Endpoints: `/api/music` (see `doc/api-overview.md`)
+- Models: `Music`, `Playlist`
+- Controller: `musicController.js`
+- Route: `routes/music.js`
+
+## Frontend
+- Route: `/music`
+- Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`
+- Floating player is always visible (bottom right)
+- Context: `MusicContext` manages playback state, playlist queue, and shuffle
+
+## Usage
+- Go to `/music` to upload and manage music
+- Select an audio file - a popup will appear to enter Song Name, Artist, and optionally add to a playlist
+- Click "New Playlist" to create a new playlist with name and description
+- Click on a playlist to view and play songs in it
+- Click "Play All" to start playing the entire playlist from the first song
+- Click any song in a playlist to start playing from that song (playlist becomes the active queue)
+- Click "Add to Playlist" on any song to add it to an existing playlist
+- Click the ✕ button on a song in a playlist to remove it
+- Click "Delete Playlist" to remove a playlist (songs are not deleted)
+- Click the 🗑 button on any song to delete it (with confirmation popup)
+- Play music from anywhere using the floating player
+- Visual indicators show which playlist is currently playing (green border + ▶ icon)
+- Currently playing track is highlighted in the playlist view
+- Floating player shows playlist name and track position (e.g., "Playlist Name (2/5)")
+- Use ⏮/⏭ buttons to skip to previous/next track in the playlist
+- Use ⇌ button to toggle shuffle mode (randomizes playback order)
+- Use ↻ button to toggle loop mode (single track loop)
+- When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
+
+## Architecture References
+- See also: `doc/backend-architecture.md`, `doc/frontend-architecture.md`, `doc/api-overview.md`

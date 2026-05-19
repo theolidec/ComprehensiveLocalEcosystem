@@ -81,6 +81,19 @@ const API_ENDPOINTS = {
     EXPORT: '/api/tracker/export',
     IMPORT: '/api/tracker/import',
   },
+
+  // Music endpoints
+  MUSIC: {
+    UPLOAD: '/api/music/upload',
+    MY: '/api/music/my',
+    PUBLIC: '/api/music/public',
+    STREAM: '/api/music/stream',
+    PLAYLIST: '/api/music/playlist',
+    PLAYLIST_MY: '/api/music/playlist/my',
+    PLAYLIST_PUBLIC: '/api/music/playlist/public',
+    PLAYLIST_ADD: '/api/music/playlist/add',
+    PLAYLIST_REMOVE: '/api/music/playlist/remove',
+  },
 };
 
 // Create full URLs for endpoints
@@ -132,4 +145,13 @@ export const API_URLS = {
   TRACKER_HEATMAP: createApiUrl(API_ENDPOINTS.TRACKER.HEATMAP),
   TRACKER_EXPORT: createApiUrl(API_ENDPOINTS.TRACKER.EXPORT),
   TRACKER_IMPORT: createApiUrl(API_ENDPOINTS.TRACKER.IMPORT),
+  MUSIC_UPLOAD: createApiUrl(API_ENDPOINTS.MUSIC.UPLOAD),
+  MUSIC_MY: createApiUrl(API_ENDPOINTS.MUSIC.MY),
+  MUSIC_PUBLIC: createApiUrl(API_ENDPOINTS.MUSIC.PUBLIC),
+  MUSIC_STREAM: createApiUrl(API_ENDPOINTS.MUSIC.STREAM),
+  MUSIC_PLAYLIST: createApiUrl(API_ENDPOINTS.MUSIC.PLAYLIST),
+  MUSIC_PLAYLIST_MY: createApiUrl(API_ENDPOINTS.MUSIC.PLAYLIST_MY),
+  MUSIC_PLAYLIST_PUBLIC: createApiUrl(API_ENDPOINTS.MUSIC.PLAYLIST_PUBLIC),
+  MUSIC_PLAYLIST_ADD: createApiUrl(API_ENDPOINTS.MUSIC.PLAYLIST_ADD),
+  MUSIC_PLAYLIST_REMOVE: createApiUrl(API_ENDPOINTS.MUSIC.PLAYLIST_REMOVE),
 };

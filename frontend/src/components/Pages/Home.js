@@ -298,6 +298,15 @@ function Home() {
       lightColor: 'bg-purple-100',
       textColor: 'text-purple-600'
     },
+    music: {
+      icon: Flame,
+      title: 'Music',
+      description: 'Listen to your music',
+      link: '/music',
+      color: 'bg-pink-600',
+      lightColor: 'bg-pink-100',
+      textColor: 'text-pink-600'
+    },
     calculator: {
       icon: Calculator,
       title: 'Calculator',
@@ -337,7 +346,7 @@ function Home() {
   };
 
   const savedQuickActions = settings?.display?.homepageLayout?.quickActions;
-  const defaultQuickActionKeys = ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker'];
+  const defaultQuickActionKeys = ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker'];
   const quickActionKeys = Array.isArray(savedQuickActions) && savedQuickActions.length > 0
     ? savedQuickActions.filter(k => allQuickActions[k])
     : defaultQuickActionKeys;

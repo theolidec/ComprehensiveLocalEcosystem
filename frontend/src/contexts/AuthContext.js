@@ -65,6 +65,70 @@ const initialState = {
 // Configure axios to work with cookies
 axios.defaults.withCredentials = true;
 
+// Track if a token refresh is in progress to prevent multiple simultaneous refreshes
+let isRefreshing = false;
+// Queue of failed requests to retry after token refresh
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Add response interceptor for automatic token refresh
+axios.interceptors.response.use(
+  response => response,
+  async error => {
+    const originalRequest = error.config;
+
+    // Only handle TOKEN_EXPIRED errors that haven't been retried yet
+    if (error.response?.status === 403 && 
+        error.response?.data?.code === 'TOKEN_EXPIRED' && 
+        !originalRequest._retry) {
+      
+      if (isRefreshing) {
+        // If already refreshing, queue this request
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(token => {
+            originalRequest.headers['Authorization'] = `Bearer ${token}`;
+            return axios(originalRequest);
+          })
+          .catch(err => Promise.reject(err));
+      }
+
+      originalRequest._retry = true;
+      isRefreshing = true;
+
+      try {
+        // Trigger token refresh - new tokens are set as HttpOnly cookies automatically
+        await axios.post(API_URLS.REFRESH);
+        
+        processQueue(null, 'refreshed');
+        
+        // Retry the original request - browser will use the new cookie
+        return axios(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        // Refresh failed, logout user
+        window.location.href = '/login?from=' + encodeURIComponent(window.location.pathname);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
   const navigate = useNavigate();

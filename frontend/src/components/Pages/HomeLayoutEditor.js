@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, CheckSquare, Calendar, Save, RotateCcw, Key, Gift, HardDrive, Calculator, Users, Book, ChevronDown } from 'lucide-react';
+import { Home, CheckSquare, Calendar, Save, RotateCcw, Key, Gift, HardDrive, Calculator, Users, Book, ChevronDown, Flame } from 'lucide-react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
 
@@ -23,6 +23,7 @@ const HomeLayoutEditor = () => {
     { key: 'passwords', label: 'Passwords', icon: Key },
     { key: 'wishlist', label: 'Wishlist', icon: Gift },
     { key: 'files', label: 'Files', icon: HardDrive },
+    { key: 'music', label: 'Music', icon: Flame },
     { key: 'calculator', label: 'Calculator', icon: Calculator },
     { key: 'following', label: 'Following', icon: Users },
     { key: 'wikis', label: 'Wikis', icon: Book },
@@ -42,7 +43,12 @@ const HomeLayoutEditor = () => {
     const filtered = savedOrder.filter((k) => validKeys.includes(k));
     const withMissing = [...filtered, ...validKeys.filter((k) => !filtered.includes(k))];
     setOrder(withMissing);
+    // Insert 'music' after 'files' for defaultQuickActions
     const defaultQuickActions = allQuickActionDefs.map(d => d.key);
+    if (!defaultQuickActions.includes('music')) {
+      const filesIdx = defaultQuickActions.indexOf('files');
+      defaultQuickActions.splice(filesIdx + 1, 0, 'music');
+    }
     const savedQuickActions = Array.isArray(layout.quickActions)
       ? layout.quickActions
       : defaultQuickActions;

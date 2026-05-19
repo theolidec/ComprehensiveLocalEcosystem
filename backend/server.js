@@ -28,6 +28,7 @@ const wikiRoutes = require('./routes/wikis');
 const wikiPageRoutes = require('./routes/wikiPages');
 const userRightsRoutes = require('./routes/userRights');
 const trackerRoutes = require('./routes/tracker');
+const musicRoutes = require('./routes/music');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -146,6 +147,7 @@ app.use('/api/wikis', wikiRoutes);
 app.use('/api/wikis/:slug/pages', wikiPageRoutes);
 app.use('/api/user', userRightsRoutes);
 app.use('/api/tracker', trackerRoutes);
+app.use('/api/music', musicRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

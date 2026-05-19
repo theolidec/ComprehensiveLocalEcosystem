@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "license": "MIT",
+  "proxy": "https://localhost:3443",
   "dependencies": {
     "@tailwindcss/typography": "^0.5.19",
     "@testing-library/dom": "^10.4.1",

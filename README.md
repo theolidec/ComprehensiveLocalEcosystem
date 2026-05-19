@@ -139,6 +139,16 @@ SUM/SIOM (User Manuals)
 - **Object Management**: Add, edit, delete, and label mathematical objects
 - **Command Interface**: Text-based input for rapid object creation
 
+### Music System
+- **Audio Upload**: Upload and stream audio files with HTTP range request support
+- **Playlist Management**: Create and manage playlists, add/remove tracks, reorder
+- **Shuffle & Loop**: Shuffle mode for randomised playback, single-track loop mode
+- **Auto-Advance**: Playlist auto-advances to the next track; loops back at the end
+- **Floating Player**: Spotify-style persistent floating player (bottom-right) visible on all pages
+- **Public/Private Tracks**: Control visibility of individual songs
+- **Metadata**: Store title, artist, album, cover URL, duration per track
+- **Visual Indicators**: Currently-playing track highlighted; active playlist shown with green border and ▶ icon
+
 ### Daily Tracker System
 - **Recurring Tasks**: Daily, weekly, monthly, custom recurrence with day selection
 - **Custom Daily Questions**: Yes/No, scale (1-5), text, and number response types
@@ -317,6 +327,7 @@ For detailed API documentation including request/response examples, see [doc/api
 - Folders: `/api/file-folders/*` - Folder organization
 - Wiki: `/api/wikis/*` - Knowledge base system
 - Tracker: `/api/tracker/*` - Daily habit & task tracker
+- Music: `/api/music/*` - Music library and playlist streaming
 - Settings: `/api/settings/*` - User preferences
 - Follow: `/api/follow/*` - Social features
 
@@ -335,6 +346,7 @@ For detailed application flow and usage instructions, see [doc/README.md](doc/RE
 - **Calculator**: `/calculator` for interactive function graphing
 - **Wiki**: `/wikis` for knowledge base system
 - **Tracker**: `/tracker` for daily habit & task tracking
+- **Music**: `/music` for music library and playlist management
 - **Settings**: `/settings` for user preferences
 
 ## Security
@@ -452,6 +464,9 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Daily Tracker with recurring tasks and custom check-in questions
 - Activity heatmap, streak tracking, and mood trends
 - Task completion analytics and question statistics
+- Music System with audio upload, streaming, and playlist management
+- Floating music player persisting across all pages
+- Shuffle, loop, and auto-advance playlist playback
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -530,7 +545,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.6.0
-**Last Updated**: 2026-05-13
+**Version**: 2.7.0
+**Last Updated**: 2026-05-19
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
