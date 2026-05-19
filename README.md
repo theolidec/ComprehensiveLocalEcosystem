@@ -54,7 +54,7 @@ SUM/SIOM (User Manuals)
 
 ### For Everyone
 - **[README.md](README.md)** - This file: Project overview and quick start
-- **[DOCUMENTATION.md](DOCUMENTATION.md)** - Comprehensive technical documentation
+- **[doc/api-overview.md](doc/api-overview.md)** - Complete API reference
 
 ### For Developers
 - **[doc/README.md](doc/README.md)** - Documentation index
@@ -306,7 +306,7 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 
 ## API Endpoints
 
-For detailed API documentation including request/response examples, see [DOCUMENTATION.md](DOCUMENTATION.md) or [doc/api-overview.md](doc/api-overview.md).
+For detailed API documentation including request/response examples, see [doc/api-overview.md](doc/api-overview.md).
 
 **Quick API Reference:**
 - Authentication: `/api/auth/*` - Register, login, logout, password reset
@@ -322,7 +322,7 @@ For detailed API documentation including request/response examples, see [DOCUMEN
 
 ## Application Flow
 
-For detailed application flow and usage instructions, see [DOCUMENTATION.md](DOCUMENTATION.md).
+For detailed application flow and usage instructions, see [doc/README.md](doc/README.md).
 
 **Quick Navigation:**
 - **Authentication**: `/login` and `/register` pages
@@ -348,7 +348,7 @@ For detailed security implementation, see [SECURITY.md](SECURITY.md) and [doc/se
 
 ## Project Structure
 
-For detailed project structure and architecture documentation, see [DOCUMENTATION.md](DOCUMENTATION.md), [doc/backend-architecture.md](doc/backend-architecture.md), and [doc/frontend-architecture.md](doc/frontend-architecture.md).
+For detailed project structure and architecture documentation, see [doc/backend-architecture.md](doc/backend-architecture.md) and [doc/frontend-architecture.md](doc/frontend-architecture.md).
 
 **High-Level Structure:**
 ```
@@ -493,7 +493,6 @@ curl http://localhost:3001/health
 ## Additional Documentation
 
 ### Technical & Development
-- **Technical Documentation:** [DOCUMENTATION.md](./DOCUMENTATION.md)
 - **Documentation Index:** [doc/README.md](./doc/README.md)
 - **Backend Architecture:** [doc/backend-architecture.md](./doc/backend-architecture.md)
 - **Frontend Architecture:** [doc/frontend-architecture.md](./doc/frontend-architecture.md)

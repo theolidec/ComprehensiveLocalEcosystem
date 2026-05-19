@@ -19,7 +19,7 @@ const Footer = () => {
   ];
 
   const socialLinks = [
-    { icon: Github, href: 'https://github.com/theolidec/ComprehensiveLocalEcosystem', label: 'GitHub' }
+    { icon: Github, href: 'https://github.com/theolidec/ComprehensiveLocalEcosystem', label: 'GitHub'}
   ];
 
   return (

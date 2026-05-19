@@ -39,3 +39,6 @@ Thumbs.db
 
 # Windsurf workspace files
 .windsurf/
+
+# Personal planning file
+NEXT.md

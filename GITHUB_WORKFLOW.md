@@ -289,7 +289,7 @@ ComprehensiveLocalEcosystem/
 ├── package.json      # Root package configuration
 ├── docker-compose.yml # Docker configuration
 ├── README.md         # Main project documentation
-├── DOCUMENTATION.md  # Technical documentation
+├── doc/              # Modular technical documentation
 ├── SECURITY.md       # Security policy
 ├── PRIVACY.md        # Privacy policy
 ├── TERMS.md          # Terms of service
