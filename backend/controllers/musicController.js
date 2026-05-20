@@ -1,5 +1,6 @@
 const Music = require('../models/Music');
 const Playlist = require('../models/Playlist');
+const User = require('../models/User');
 const fs = require('fs');
 const path = require('path');
 const logger = require('../config/logger');
@@ -70,6 +71,43 @@ const musicController = {
     } catch (error) {
       logger.error('Delete music error:', error);
       res.status(500).json({ error: 'Failed to delete music', code: 'DELETE_ERROR' });
+    }
+  },
+  toggleVisibility: async (req, res) => {
+    try {
+      const music = await Music.findOne({ _id: req.params.id, userId: req.user._id, isDeleted: false });
+      if (!music) return res.status(404).json({ error: 'Music not found', code: 'NOT_FOUND' });
+      music.isPublic = !music.isPublic;
+      await music.save();
+      res.json(music);
+    } catch (error) {
+      logger.error('Toggle visibility error:', error);
+      res.status(500).json({ error: 'Failed to toggle visibility', code: 'TOGGLE_ERROR' });
+    }
+  },
+  transferOwnership: async (req, res) => {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ error: 'Email is required', code: 'VALIDATION_ERROR' });
+      
+      const music = await Music.findOne({ _id: req.params.id, userId: req.user._id, isDeleted: false });
+      if (!music) return res.status(404).json({ error: 'Music not found', code: 'NOT_FOUND' });
+      
+      const newOwner = await User.findOne({ email: email.toLowerCase().trim() });
+      if (!newOwner) return res.status(404).json({ error: 'User not found', code: 'NOT_FOUND' });
+      
+      if (String(newOwner._id) === String(req.user._id)) {
+        return res.status(400).json({ error: 'Cannot transfer to yourself', code: 'SAME_USER' });
+      }
+      
+      music.userId = newOwner._id;
+      await music.save();
+      
+      logger.info(`Music "${music.title}" transferred from ${req.user.email} to ${newOwner.email}`);
+      res.json({ message: 'Ownership transferred successfully', music });
+    } catch (error) {
+      logger.error('Transfer ownership error:', error);
+      res.status(500).json({ error: 'Failed to transfer ownership', code: 'TRANSFER_ERROR' });
     }
   },
   getPublicMusic: async (req, res) => {

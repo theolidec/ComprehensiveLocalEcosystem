@@ -375,7 +375,7 @@ const UserFollowing = () => {
           {followers.length > 0 && (
             <>
               <div className="uf-user-grid">
-                {followers.map(u => renderUserCard(u, false))}
+                {followers.map(u => renderUserCard(u, true))}
               </div>
               {renderPagination(followersPagination, fetchFollowers)}
             </>

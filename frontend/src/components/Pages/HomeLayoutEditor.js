@@ -13,7 +13,7 @@ const HomeLayoutEditor = () => {
   const [showQuickAccess, setShowQuickAccess] = useState(true);
   const [showProTips, setShowProTips] = useState(true);
   const [order, setOrder] = useState(['dailyTracker', 'events', 'quickAccess', 'proTips']);
-  const [quickActions, setQuickActions] = useState(['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker']);
+  const [quickActions, setQuickActions] = useState(['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker']);
   const [quickActionsExpanded, setQuickActionsExpanded] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);

@@ -42,6 +42,12 @@ router.get('/my', authenticateToken, musicController.getMyMusic);
 // Delete music
 router.delete('/:id', authenticateToken, musicController.deleteMusic);
 
+// Toggle music visibility (public/private)
+router.put('/:id/visibility', authenticateToken, musicController.toggleVisibility);
+
+// Transfer ownership of music to another user
+router.put('/:id/transfer', authenticateToken, musicController.transferOwnership);
+
 // Get public music
 router.get('/public', optionalAuth, musicController.getPublicMusic);
 

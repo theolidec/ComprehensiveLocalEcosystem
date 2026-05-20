@@ -2,7 +2,7 @@
 
 ## Features
 - Upload, validate, and play music/audio files
-- Public/private music
+- **Public/private music** - songs can be marked as public (discoverable by anyone) or private (only visible to owner)
 - Playlist creation and management
 - Playlist playback (auto-advance to next song, loop from end to start)
 - Shuffle/scrambled playback
@@ -24,6 +24,11 @@
 ## Usage
 - Go to `/music` to upload and manage music
 - Select an audio file - a popup will appear to enter Song Name, Artist, and optionally add to a playlist
+- Check "Make this song public" to make a song publicly discoverable (default is private)
+- Each song shows a 🔓 Public or 🔒 Private badge in "All Your Music"
+- Click the 🔒/🔓 button next to any song to toggle its visibility
+- Expand "Public Music" section to browse songs shared by all users
+- Public songs can be added to your playlists but can only be deleted by their owners
 - Click "New Playlist" to create a new playlist with name and description
 - Click on a playlist to view and play songs in it
 - Click "Play All" to start playing the entire playlist from the first song

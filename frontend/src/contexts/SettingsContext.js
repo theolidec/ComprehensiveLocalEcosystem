@@ -50,7 +50,7 @@ const defaultSettings = {
       showQuickAccess: true,
       showProTips: true,
       order: ['dailyTracker', 'events', 'quickAccess', 'proTips'],
-      quickActions: ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker']
+      quickActions: ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker']
     }
   },
   privacy: {
