@@ -30,6 +30,7 @@ const FloatingMusicPlayer = () => {
       )}
       <div className="text-sm font-semibold truncate w-full text-center mb-2">
         {currentTrack.title || currentTrack.originalName}
+        {currentTrack.artist && <span className="text-gray-500 font-normal ml-1">- {currentTrack.artist}</span>}
       </div>
       <div className="flex gap-1 items-center w-full">
         <button

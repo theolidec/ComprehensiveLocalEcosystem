@@ -43,6 +43,9 @@ export const MusicProvider = ({ children }) => {
   const savedProgress = useRef(storedState?.progress || 0);
   const isRestored = useRef(false);
   const loopRef = useRef(storedState?.loop || false);
+  const isPlayingRef = useRef(storedState?.isPlaying || false);
+  const autoAdvancingRef = useRef(false);
+  const isInitialMountRef = useRef(true);
   const shuffleRef = useRef(storedState?.shuffle || false);
   const currentIndexRef = useRef(storedState?.currentIndex ?? -1);
   const playlistQueueRef = useRef(storedState?.playlistQueue || []);
@@ -60,6 +63,10 @@ export const MusicProvider = ({ children }) => {
   }, [shuffledQueue]);
 
   useEffect(() => {
+    currentIndexRef.current = currentIndex;
+  }, [currentIndex]);
+
+  useEffect(() => {
     if (!globalAudio) {
       globalAudio = new Audio();
       globalAudio.preload = 'auto';
@@ -75,8 +82,11 @@ export const MusicProvider = ({ children }) => {
         audio.currentTime = savedProgress.current;
         isRestored.current = true;
       }
+    };
+    const handleCanPlayOnce = () => {
+      audio.removeEventListener('canplay', handleCanPlayOnce);
       if (storedState?.isPlaying) {
-        audio.play().then(() => setIsPlaying(true)).catch(() => {});
+        audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
       }
     };
     const handleEnded = () => {
@@ -87,11 +97,17 @@ export const MusicProvider = ({ children }) => {
       
       if (queue.length > 0 && idx >= 0) {
         const nextIndex = (idx + 1) % queue.length;
+        const nextTrack = queue[nextIndex];
         currentIndexRef.current = nextIndex;
+        autoAdvancingRef.current = true;
+        audio.src = `/api/music/stream/${nextTrack._id}`;
+        audio.loop = loopRef.current;
+        audio.load();
+        audio.play().catch(() => {});
         setCurrentIndex(nextIndex);
         savedProgress.current = 0;
         setProgress(0);
-        setCurrentTrack(queue[nextIndex]);
+        setCurrentTrack(nextTrack);
       }
     };
     const handlePlay = () => setIsPlaying(true);
@@ -99,6 +115,7 @@ export const MusicProvider = ({ children }) => {
 
     audio.addEventListener('timeupdate', handleTimeUpdate);
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('canplay', handleCanPlayOnce);
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('play', handlePlay);
     audio.addEventListener('pause', handlePause);
@@ -112,6 +129,7 @@ export const MusicProvider = ({ children }) => {
     return () => {
       audio.removeEventListener('timeupdate', handleTimeUpdate);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('canplay', handleCanPlayOnce);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('play', handlePlay);
       audio.removeEventListener('pause', handlePause);
@@ -119,7 +137,7 @@ export const MusicProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const save = () => {
       if (currentTrack && audioRef.current) {
         setCookie({
           track: currentTrack,
@@ -133,7 +151,9 @@ export const MusicProvider = ({ children }) => {
           shuffledQueue: shuffledQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName }))
         });
       }
-    }, 100);
+    };
+    save();
+    const interval = setInterval(save, 100);
     return () => clearInterval(interval);
   }, [currentTrack, isPlaying, loop, currentPlaylist, playlistQueue, currentIndex, shuffle, shuffledQueue]);
 
@@ -141,18 +161,34 @@ export const MusicProvider = ({ children }) => {
     const audio = audioRef.current;
     if (!audio || !currentTrack) return;
     
+    if (isInitialMountRef.current) {
+      isInitialMountRef.current = false;
+      return;
+    }
+    if (autoAdvancingRef.current) {
+      autoAdvancingRef.current = false;
+      return;
+    }
     const newSrc = `/api/music/stream/${currentTrack._id}`;
     if (audio.src !== newSrc) {
       audio.src = newSrc;
       audio.loop = loopRef.current;
-      audio.load();
       isRestored.current = false;
+      if (isPlayingRef.current) {
+        const onCanPlay = () => {
+          audio.removeEventListener('canplay', onCanPlay);
+          audio.play().catch(() => {});
+        };
+        audio.addEventListener('canplay', onCanPlay);
+      }
+      audio.load();
     }
   }, [currentTrack]);
 
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    isPlayingRef.current = isPlaying;
     
     if (isPlaying) {
       audio.play().catch(() => {});
@@ -270,6 +306,8 @@ export const MusicProvider = ({ children }) => {
         }
         setShuffledQueue(shuffled);
         setCurrentIndex(0);
+      } else if (!newShuffle) {
+        queueRef.current = playlistQueueRef.current;
       }
       
       return newShuffle;

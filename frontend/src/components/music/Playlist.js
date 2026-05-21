@@ -388,6 +388,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                         onClick={() => playTrack(track, selectedPlaylist, selectedPlaylist.musicIds)}
                       >
                         {track.title || track.originalName}
+                        {track.artist && <span className="text-gray-500 ml-1">- {track.artist}</span>}
                       </button>
                     </div>
                     <button

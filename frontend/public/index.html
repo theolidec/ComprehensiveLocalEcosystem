@@ -25,9 +25,33 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>Comprehensive Local Ecosystem - Your Personal Digital Sanctuary</title>
+    <script>
+      (function() {
+        var theme = null;
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+          var c = cookies[i].trim();
+          if (c.indexOf('theme=') === 0) {
+            theme = c.substring(6);
+            break;
+          }
+        }
+        if (!theme) {
+          theme = localStorage.getItem('theme');
+        }
+        if (!theme) {
+          theme = 'light';
+        }
+        if (theme === 'system') {
+          theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
 </html>
+
