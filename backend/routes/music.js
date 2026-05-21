@@ -42,6 +42,9 @@ router.get('/my', authenticateToken, musicController.getMyMusic);
 // Delete music
 router.delete('/:id', authenticateToken, musicController.deleteMusic);
 
+// Update music (title, artist)
+router.put('/:id', authenticateToken, musicController.updateMusic);
+
 // Toggle music visibility (public/private)
 router.put('/:id/visibility', authenticateToken, musicController.toggleVisibility);
 

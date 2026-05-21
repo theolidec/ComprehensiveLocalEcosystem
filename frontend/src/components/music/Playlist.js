@@ -2,7 +2,7 @@ import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'rea
 import axios from 'axios';
 import { useMusic } from '../../context/MusicContext';
 
-const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false }, ref) => {
+const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false, showArtistsOnly = false }, ref) => {
   const { currentTrack, currentPlaylist, playTrack, playPlaylist } = useMusic();
   const [playlists, setPlaylists] = useState([]);
   const [music, setMusic] = useState([]);
@@ -22,6 +22,11 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
   const [error, setError] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSongs, setSelectedSongs] = useState(new Set());
+  const [showArtists, setShowArtists] = useState(showArtistsOnly);
+  const [selectedArtist, setSelectedArtist] = useState(null);
+  const [editingTrack, setEditingTrack] = useState(null);
+  const [editTitle, setEditTitle] = useState('');
+  const [editArtist, setEditArtist] = useState('');
 
   const fetchData = () => {
     axios.get('/api/music/playlist/my', { withCredentials: true })
@@ -40,6 +45,16 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
       .then(res => setPublicMusic(res.data))
       .catch(() => {});
   };
+
+  useEffect(() => {
+    if (showArtistsOnly) {
+      setShowArtists(true);
+    }
+  }, [showArtistsOnly]);
+
+  useEffect(() => {
+    fetchData();
+  }, [showArtistsOnly]);
 
   const handleToggleVisibility = async (musicId) => {
     try {
@@ -142,6 +157,27 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     }
   };
 
+  const handleUpdateMusic = async (e) => {
+    e.preventDefault();
+    if (!editingTrack) return;
+    try {
+      await axios.put(`/api/music/${editingTrack._id}`, {
+        title: editTitle,
+        artist: editArtist
+      }, { withCredentials: true });
+      setEditingTrack(null);
+      fetchData();
+    } catch (err) {
+      setError('Failed to update song');
+    }
+  };
+
+  const openEditModal = (track) => {
+    setEditingTrack(track);
+    setEditTitle(track.title || track.originalName || '');
+    setEditArtist(track.artist || '');
+  };
+
   const handleTransferOwnership = async (e) => {
     e.preventDefault();
     if (!transferEmail.trim()) return;
@@ -223,6 +259,41 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
            (track.originalName || '').toLowerCase().includes(query);
   });
 
+  const allMusicForArtists = showArtistsOnly ? [...music, ...publicMusic] : music;
+  const artists = allMusicForArtists.reduce((acc, track) => {
+    const artistNames = track.artist ? track.artist.split(',').map(a => a.trim()) : ['No Artist'];
+    artistNames.forEach(artistName => {
+      if (!acc[artistName]) acc[artistName] = [];
+      if (!acc[artistName].some(t => t._id === track._id)) {
+        acc[artistName].push(track);
+      }
+    });
+    return acc;
+  }, {});
+  const artistList = Object.keys(artists).sort((a, b) => {
+    if (a === 'No Artist') return 1;
+    if (b === 'No Artist') return -1;
+    return a.localeCompare(b);
+  });
+
+  const filteredArtistList = searchQuery
+    ? artistList.filter(artist =>
+        artist.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        artists[artist].some(track =>
+          (track.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (track.originalName || '').toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      )
+    : artistList;
+
+  const getFilteredArtistTracks = (artistName) => {
+    if (!searchQuery) return artists[artistName];
+    return artists[artistName].filter(track =>
+      (track.title || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (track.originalName || '').toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <div className="mb-4">
@@ -230,10 +301,11 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search songs..."
+          placeholder={showArtistsOnly ? "Search artists or songs..." : "Search songs..."}
           className="w-full p-3 border rounded-lg dark:bg-gray-700 dark:border-gray-600"
         />
       </div>
+      {!showArtistsOnly && (
       <div className="flex justify-between items-center">
         <h2 className="text-xl font-bold">Your Playlists</h2>
         <button
@@ -243,8 +315,9 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
           + New Playlist
         </button>
       </div>
+      )}
 
-      {playlists.length === 0 ? (
+      {!showArtistsOnly && playlists.length === 0 ? (
         <p className="text-gray-500">No playlists yet. Create one to get started!</p>
       ) : (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -271,7 +344,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
         </div>
       )}
 
-      {selectedPlaylist && (
+      {!showArtistsOnly && selectedPlaylist && (
         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
           <div className="flex justify-between items-center mb-4">
             <div className="flex items-center gap-2">
@@ -332,6 +405,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
         </div>
       )}
 
+      {!showArtistsOnly && (
       <div className="mt-6">
         <button
           onClick={() => setShowMyMusic(!showMyMusic)}
@@ -434,6 +508,13 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                     + Add to Playlist
                   </button>
                   <button
+                    onClick={() => openEditModal(track)}
+                    className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-yellow-500 hover:text-white transition-colors"
+                    title="Edit song"
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
                     onClick={() => handleDeleteMusic(track._id)}
                     className="ml-2 px-3 py-1 text-sm bg-red-200 dark:bg-red-800 text-red-700 dark:text-red-300 rounded hover:bg-red-500 hover:text-white transition-colors"
                     title="Delete song"
@@ -447,7 +528,9 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
           )
         )}
       </div>
+      )}
 
+      {!showArtistsOnly && (
       <div className="mt-6">
         <button
           onClick={() => setShowPublicMusic(!showPublicMusic)}
@@ -487,6 +570,77 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
           )
         )}
       </div>
+      )}
+
+      {showArtistsOnly ? (
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold mb-4">Artists</h2>
+          {allMusicForArtists.length === 0 ? (
+            <p className="text-gray-500">No music available.</p>
+          ) : (
+            <>
+              {!selectedArtist ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                  {filteredArtistList.map(artist => (
+                    <div
+                      key={artist}
+                      onClick={() => setSelectedArtist(artist)}
+                      className="p-4 rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    >
+                      <div className="font-semibold truncate">{artist}</div>
+                      <div className="text-sm text-gray-500">{artists[artist].length} songs</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div>
+                  <button
+                    onClick={() => setSelectedArtist(null)}
+                    className="mb-4 text-blue-500 hover:text-blue-700 flex items-center gap-1"
+                  >
+                    ← Back to Artists
+                  </button>
+                  <h3 className="text-lg font-semibold mb-4">{selectedArtist}</h3>
+                  <ul className="space-y-2">
+                    {getFilteredArtistTracks(selectedArtist).map(track => {
+                      const isCurrentlyPlaying = currentTrack?._id === track._id;
+                      const isOwner = music.some(m => m._id === track._id);
+                      return (
+                        <li key={track._id} className={`flex justify-between items-center bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm ${isCurrentlyPlaying ? 'ring-2 ring-green-500' : ''}`}>
+                          <button 
+                            className="flex-1 text-left hover:text-blue-500 truncate"
+                            onClick={() => onSelectTrack(track)}
+                          >
+                            <span className="font-medium">{track.title || track.originalName}</span>
+                            <span className={`ml-2 text-xs px-2 py-0.5 rounded ${track.isPublic ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : 'bg-gray-200 text-gray-600 dark:bg-gray-600 dark:text-gray-300'}`}>
+                              {track.isPublic ? '🔓 Public' : '🔒 Private'}
+                            </span>
+                          </button>
+                          {isOwner && (
+                            <button
+                              onClick={() => openEditModal(track)}
+                              className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-yellow-500 hover:text-white transition-colors"
+                              title="Edit song"
+                            >
+                              ✏️ Edit
+                            </button>
+                          )}
+                          <button
+                            onClick={() => setShowAddToPlaylistModal(track._id)}
+                            className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
+                          >
+                            + Add to Playlist
+                          </button>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      ) : null}
 
       {error && (
         <div className="fixed bottom-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg">
@@ -652,6 +806,52 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                   className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Transfer
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingTrack && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg w-full max-w-md">
+            <h3 className="text-lg font-bold mb-4">Edit Song</h3>
+            <form onSubmit={handleUpdateMusic}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <input
+                  type="text"
+                  value={editTitle}
+                  onChange={(e) => setEditTitle(e.target.value)}
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  placeholder="Song title"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Artist</label>
+                <input
+                  type="text"
+                  value={editArtist}
+                  onChange={(e) => setEditArtist(e.target.value)}
+                  className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
+                  placeholder="Artist name (separate multiple with comma)"
+                />
+              </div>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingTrack(null)}
+                  className="px-4 py-2 bg-gray-300 dark:bg-gray-600 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                  Save
                 </button>
               </div>
             </form>

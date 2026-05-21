@@ -3,6 +3,8 @@
 ## Features
 - Upload, validate, and play music/audio files
 - **Public/private music** - songs can be marked as public (discoverable by anyone) or private (only visible to owner)
+- **Transfer ownership** - transfer any owned song to another user by email
+- **Edit metadata** - update song title and artist after upload
 - Playlist creation and management
 - Playlist playback (auto-advance to next song, loop from end to start)
 - Shuffle/scrambled playback
@@ -16,13 +18,18 @@
 - Route: `routes/music.js`
 
 ## Frontend
-- Route: `/music`
+- Routes:
+  - `/music` → redirects to `/music/library`
+  - `/music/library` → My Library tab
+  - `/music/artists` → Artists tab
+  - `/music/discover` → Discover tab (public music)
+  - `/music/upload` → Upload tab
 - Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`
 - Floating player is always visible (bottom right)
 - Context: `MusicContext` manages playback state, playlist queue, and shuffle
 
 ## Usage
-- Go to `/music` to upload and manage music
+- Go to `/music/library` to view your music library
 - Select an audio file - a popup will appear to enter Song Name, Artist, and optionally add to a playlist
 - Check "Make this song public" to make a song publicly discoverable (default is private)
 - Each song shows a 🔓 Public or 🔒 Private badge in "All Your Music"
@@ -37,6 +44,8 @@
 - Click the ✕ button on a song in a playlist to remove it
 - Click "Delete Playlist" to remove a playlist (songs are not deleted)
 - Click the 🗑 button on any song to delete it (with confirmation popup)
+- Click the ✏️ button on any song to edit its title or artist
+- Click the ↪️ button on any song to transfer ownership to another user (enter their email)
 - Play music from anywhere using the floating player
 - Visual indicators show which playlist is currently playing (green border + ▶ icon)
 - Currently playing track is highlighted in the playlist view

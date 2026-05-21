@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 
+const formatTime = (seconds) => {
+  if (!seconds || isNaN(seconds)) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
 const MusicPlayer = ({ track, onPlay, onPause, isPlaying, onEnded }) => {
   const audioRef = useRef();
   const [progress, setProgress] = useState(0);
@@ -56,7 +63,7 @@ const MusicPlayer = ({ track, onPlay, onPause, isPlaying, onEnded }) => {
           disabled={!track}
         />
         <span className="text-xs w-16 text-right">
-          {Math.floor(progress)}/{Math.floor(duration)}s
+          {formatTime(progress)}/{formatTime(duration)}
         </span>
       </div>
     </div>

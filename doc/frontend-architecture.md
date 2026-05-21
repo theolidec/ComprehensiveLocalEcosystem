@@ -1,7 +1,12 @@
 # Frontend Architecture
 
 ## Music Module
-- `/music` route: Upload, browse, and play music (Spotify style)
+- Routes:
+  - `/music` → redirects to `/music/library`
+  - `/music/library` → My Library tab
+  - `/music/artists` → Artists tab
+  - `/music/discover` → Discover tab (public music)
+  - `/music/upload` → Upload tab
 - `MusicPage` component: main UI for music
 - `FloatingMusicPlayer`: floating player, globally visible on all pages
 - `components/music/MusicUpload.js`: Upload form (audio validation)
@@ -105,7 +110,7 @@ components/
 │   ├── Cookies.js               # Cookie policy
 │   ├── CookiePopup.js + .css    # Cookie consent
 │   ├── LinkNotFound.js + .css   # 404 page
-│   ├── Music.js                 # Music page shell (/music) — renders MusicPage with MusicProvider layout
+│   ├── Music.js                 # Music page shell (/music/*) — renders MusicPage with MusicProvider layout
 │   └── CategoryManager.js       # Event category management
 ├── (root)                      # Shared/loose components
 │   ├── FloatingMusicPlayer.js   # Persistent floating music player (bottom-right, all pages)
@@ -442,7 +447,11 @@ React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
   <Route path="/wiki/:slug/edit/:pageSlug" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
   
   {/* Music */}
-  <Route path="/music" element={<ProtectedRoute><MusicPage /></ProtectedRoute>} />
+  <Route path="/music" element={<Navigate to="/music/library" replace />} />
+  <Route path="/music/library" element={<ProtectedRoute><MusicPage tab="library" /></ProtectedRoute>} />
+  <Route path="/music/artists" element={<ProtectedRoute><MusicPage tab="artists" /></ProtectedRoute>} />
+  <Route path="/music/discover" element={<ProtectedRoute><MusicPage tab="discover" /></ProtectedRoute>} />
+  <Route path="/music/upload" element={<ProtectedRoute><MusicPage tab="upload" /></ProtectedRoute>} />
   
   {/* Redirects */}
   <Route path="/pass" element={<Navigate to="/passwords" />} />

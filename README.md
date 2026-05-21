@@ -492,6 +492,19 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Check cookie settings in browser
 - Ensure CORS configuration matches frontend URL
 
+**Accessing from a Phone / Device on the Local Network:**
+- The frontend automatically derives the API URL from `window.location.hostname`, so accessing `https://192.168.1.128:3000` will call `https://192.168.1.128:3443` — no extra config needed.
+- CORS allows any RFC 1918 private-network origin in `development` mode.
+- The SSL cert (`backend/ssl/server.crt`) must include the machine's LAN IP as a Subject Alternative Name (SAN). Regenerate if your LAN IP changes:
+  ```bash
+  openssl req -x509 -newkey rsa:2048 \
+    -keyout backend/ssl/server.key -out backend/ssl/server.crt \
+    -days 365 -nodes \
+    -subj "/C=US/ST=State/L=City/O=Development/CN=localhost" \
+    -addext "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:<YOUR_LAN_IP>"
+  ```
+- On the phone, navigate to `https://<machine-ip>:3443` once and accept the self-signed certificate warning. The browser will then trust it for API calls.
+
 **Password Encryption:**
 - Ensure `PASSWORD_MASTER_KEY` is set in `.env`
 - Key should be at least 32 characters for security
@@ -546,6 +559,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Version**: 2.7.0
-**Last Updated**: 2026-05-19
+**Last Updated**: 2026-05-20
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

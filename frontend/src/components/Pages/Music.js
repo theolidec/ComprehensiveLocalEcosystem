@@ -1,13 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useMusic } from '../../context/MusicContext';
 import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
 import MusicUpload from '../music/MusicUpload';
 import Playlist from '../music/Playlist';
 
-const MusicPage = () => {
+const MusicPage = ({ tab }) => {
   const { playlistRef, playTrack, refreshPlaylists } = useMusic();
-  const [activeTab, setActiveTab] = useState('library');
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(tab || 'library');
+
+  useEffect(() => {
+    if (tab) {
+      setActiveTab(tab);
+    }
+  }, [tab]);
+
+  const handleTabChange = (tabId) => {
+    setActiveTab(tabId);
+    navigate(`/music/${tabId}`);
+  };
 
   const handleUpload = () => {
     refreshPlaylists();
@@ -15,6 +29,7 @@ const MusicPage = () => {
 
   const tabs = [
     { id: 'library', label: 'My Library', icon: '🎵' },
+    { id: 'artists', label: 'Artists', icon: '👤' },
     { id: 'upload', label: 'Upload', icon: '⬆️' },
     { id: 'discover', label: 'Discover', icon: '🌍' },
   ];
@@ -37,7 +52,7 @@ const MusicPage = () => {
               {tabs.map(tab => (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => handleTabChange(tab.id)}
                   className={`px-5 py-3 font-medium transition-all duration-300 whitespace-nowrap relative ${
                     activeTab === tab.id
                       ? 'text-blue-600 dark:text-blue-400'
@@ -84,6 +99,17 @@ const MusicPage = () => {
                   ref={playlistRef}
                   onSelectTrack={track => playTrack(track)}
                   initialShowPublic={true}
+                />
+              </div>
+            )}
+
+            {activeTab === 'artists' && (
+              <div className="animate-fade-in mt-6">
+                <Playlist
+                  key="artists"
+                  ref={playlistRef}
+                  onSelectTrack={track => playTrack(track)}
+                  showArtistsOnly={true}
                 />
               </div>
             )}

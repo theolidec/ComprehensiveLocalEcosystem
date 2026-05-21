@@ -10,14 +10,19 @@
 - GET `/api/music/my` — Get your uploaded music (JWT required)
 - GET `/api/music/public` — Get all public music
 - GET `/api/music/stream/:id` — Stream music file (public or user-owned)
+- PUT `/api/music/:id` — Update music title/artist (JWT required, owner only)
+- PUT `/api/music/:id/visibility` — Toggle public/private visibility (JWT required, owner only)
+- PUT `/api/music/:id/transfer` — Transfer ownership to another user by email (JWT required, owner only)
+- DELETE `/api/music/:id` — Delete music (JWT required, owner only)
 - POST `/api/music/playlist` — Create a playlist (JWT required)
 - GET `/api/music/playlist/my` — Get your playlists (JWT required)
 - GET `/api/music/playlist/public` — Get all public playlists
 - POST `/api/music/playlist/add` — Add music to playlist (JWT required)
 - POST `/api/music/playlist/remove` — Remove music from playlist (JWT required)
+- DELETE `/api/music/playlist/:id` — Delete playlist (JWT required, owner only)
 
 ### Models
-- Music: userId, filename, originalName, mimeType, size, path, isPublic, playlistIds, title, artist, album, coverUrl, duration, description, tags, isFavorite, isDeleted, deletedAt
+- Music: userId, filename, originalName, mimeType, size, path, isPublic, title, artist, album, description, tags, isFavorite, isDeleted, deletedAt (coverUrl and duration fields defined but not populated)
 - Playlist: userId, name, description, musicIds, isPublic, isDeleted, deletedAt
 
 ### Auth

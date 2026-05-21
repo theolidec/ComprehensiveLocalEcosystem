@@ -87,9 +87,32 @@ app.use(helmet({
   },
 }));
 
+// CORS origin validator. Always allows the explicitly-configured FRONTEND_URL.
+// In development also accepts any private-network origin (RFC 1918) so that
+// phones and tablets on the LAN can reach the API without extra config.
+const corsOriginValidator = (origin, callback) => {
+  if (!origin) return callback(null, true);
+  if (origin === CORS_ORIGIN) return callback(null, true);
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      const { hostname } = new URL(origin);
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        /^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname)
+      ) {
+        return callback(null, true);
+      }
+    } catch (_) {}
+  }
+  callback(new Error('CORS: origin not allowed'));
+};
+
 // CORS configuration
 app.use(cors({
-  origin: CORS_ORIGIN,
+  origin: corsOriginValidator,
   credentials: true, // Allow cookies
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type'],

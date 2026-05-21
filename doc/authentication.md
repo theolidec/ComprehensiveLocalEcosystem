@@ -343,6 +343,14 @@ axios.defaults.withCredentials = true;
 </ProtectedRoute>
 ```
 
+### API Base URL (LAN / Mobile Access)
+
+`API_BASE_URL` in `frontend/src/config/api.js` is derived at runtime:
+
+1. Start from `REACT_APP_API_URL` (e.g. `https://localhost:3443`).
+2. If `window.location.hostname` differs from the configured hostname, substitute it. A phone opening `https://192.168.1.128:3000` will therefore call `https://192.168.1.128:3443` automatically.
+3. No `.env` change required for LAN access.
+
 ## Error Codes
 
 | Code | Description | HTTP Status |
@@ -376,6 +384,10 @@ BCRYPT_SALT_ROUNDS=12
 # Cookie Domain (production)
 FRONTEND_URL=http://localhost:3000
 ```
+
+## CORS
+
+`CORS_ORIGIN` (= `FRONTEND_URL` env var) is always allowed. In `development` mode the origin validator (`corsOriginValidator` in `backend/server.js`) also permits any RFC 1918 private-network origin (`192.168.x.x`, `10.x.x.x`, `172.16-31.x.x`) so that phones and tablets on the local network can reach the API without extra configuration. In `production` mode only `FRONTEND_URL` is accepted.
 
 ## Integration Points
 

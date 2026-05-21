@@ -40,7 +40,8 @@ const musicController = {
         tags: tags ? (Array.isArray(tags) ? tags : [tags]) : []
       });
       await music.save();
-      logger.info(`Music uploaded: ${music.originalName} by user ${req.user.email}`);
+      const artistDisplay = music.artist ? music.artist : 'Unknown Artist';
+      logger.info(`Music uploaded: ${music.originalName} by ${artistDisplay} (user: ${req.user.email})`);
       res.status(201).json(music);
     } catch (error) {
       logger.error('Music upload error:', error);
@@ -71,6 +72,21 @@ const musicController = {
     } catch (error) {
       logger.error('Delete music error:', error);
       res.status(500).json({ error: 'Failed to delete music', code: 'DELETE_ERROR' });
+    }
+  },
+  updateMusic: async (req, res) => {
+    try {
+      const { title, artist } = req.body;
+      const music = await Music.findOne({ _id: req.params.id, userId: req.user._id, isDeleted: false });
+      if (!music) return res.status(404).json({ error: 'Music not found', code: 'NOT_FOUND' });
+      if (title) music.title = title;
+      if (artist !== undefined) music.artist = artist;
+      await music.save();
+      logger.info(`Music updated: ${music.title} by ${music.artist || 'Unknown'} (user: ${req.user.email})`);
+      res.json(music);
+    } catch (error) {
+      logger.error('Update music error:', error);
+      res.status(500).json({ error: 'Failed to update music', code: 'UPDATE_ERROR' });
     }
   },
   toggleVisibility: async (req, res) => {

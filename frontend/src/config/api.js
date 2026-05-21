@@ -1,5 +1,21 @@
 // API configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+// Derive the API base URL at runtime so that devices on the local network
+// (phones, tablets) that load the app from e.g. https://192.168.1.128:3000
+// will call the backend on the same host instead of their own `localhost`.
+const _configuredApiUrl = process.env.REACT_APP_API_URL || 'https://localhost:3443';
+const API_BASE_URL = (() => {
+  if (typeof window !== 'undefined') {
+    const pageHostname = window.location.hostname;
+    try {
+      const configuredUrl = new URL(_configuredApiUrl);
+      if (configuredUrl.hostname !== pageHostname) {
+        configuredUrl.hostname = pageHostname;
+        return configuredUrl.origin;
+      }
+    } catch (_) {}
+  }
+  return _configuredApiUrl;
+})();
 
 const API_ENDPOINTS = {
   // Authentication endpoints
