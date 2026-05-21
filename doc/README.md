@@ -147,10 +147,18 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 19, 2026  
-**Version**: 2.7.0
+**Last Updated**: May 21, 2026  
+**Version**: 2.7.1
 
 ## Recent Changes
+
+### Mobile Compliance (v2.7.1, 2026-05-21)
+- **`Row.js`**: Removed inline `flexDirection: 'row'` style; direction now managed exclusively by `.layout-row` CSS so media queries can override it.
+- **`index.css`**: Added `.layout-row` definition (flex-row on desktop, flex-column on mobile ≤768px) and global `overflow-x: hidden` on `html, body`.
+- **`Sidebar.css`**: `.sidebar-inline` hidden via `display: none` on ≤768px (media query placed after base rule for correct cascade).
+- **`Header.js`**: Mobile hamburger menu now exposes full navigation: Calendar actions, current page's sidebar actions (from `PageActionsContext`), all app links, and account section. Home-page welcome greeting hidden on mobile (`hidden sm:block`).
+- **`FloatingMusicPlayer.js`**: Responsive sizing — `w-72` (288px) on mobile vs `w-80` (320px) on desktop, smaller padding and offset on small screens, capped with `max-w-[calc(100vw-1rem)]`.
+- **Documentation**: Added `## Mobile Compliance` section to `doc/frontend-architecture.md`.
 
 ### Music System (v2.7.0, 2026-05-19)
 - **Backend**: `Music` and `Playlist` models; `musicController.js`; `routes/music.js` mounted at `/api/music`

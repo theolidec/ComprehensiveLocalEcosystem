@@ -22,7 +22,7 @@ const FloatingMusicPlayer = () => {
   const hasQueue = playlistQueue.length > 0;
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-4 flex flex-col items-center w-80 transition-transform hover:scale-105 animate-fade-in">
+    <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-3 sm:p-4 flex flex-col items-center w-72 sm:w-80 max-w-[calc(100vw-1rem)] transition-transform hover:scale-105 animate-fade-in">
       {currentPlaylist && (
         <div className="text-xs text-blue-500 truncate w-full text-center mb-1">
           ▶ {currentPlaylist.name}

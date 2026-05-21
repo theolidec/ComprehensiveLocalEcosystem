@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Prevent horizontal overflow on all viewports */
+html, body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Layout row: desktop = side-by-side, mobile = stacked */
+.layout-row {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .layout-row {
+    flex-direction: column;
+  }
+}
+
 :root {
   --bg-primary: #ffffff;
   --bg-secondary: #f9fafb;

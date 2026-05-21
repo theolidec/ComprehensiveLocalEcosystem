@@ -110,7 +110,7 @@ const Header = () => {
               <span className="text-xl font-bold text-gray-900 dark:text-white">{getHeaderTitle()}</span>
             </div>
             {isAuthenticated && isHomePage && (
-              <div style={{ paddingLeft: '16px', alignItems: 'center', paddingTop: '2px'}}>
+              <div className="hidden sm:block" style={{ paddingLeft: '16px', alignItems: 'center', paddingTop: '2px'}}>
                 <h2 style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-primary, #111827)', margin: 0, lineHeight: 1}}>
                   Welcome, {user?.name?.split(' ')[0] || 'User'}!
                 </h2>
@@ -317,18 +317,121 @@ const Header = () => {
         </div>
 
         {isMenuOpen && (
-          <div className="md:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-              <div className="pt-4 pb-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="md:hidden border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg max-h-[80vh] overflow-y-auto">
+            <div className="px-2 py-3 space-y-0.5">
+
+              {/* Calendar-specific actions */}
+              {isAuthenticated && isCalendarPage && (
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Calendar</div>
+                  <button
+                    onClick={() => { fileInputRef.current?.click(); setIsMenuOpen(false); }}
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                  >
+                    <Upload className="h-4 w-4" />
+                    <span>Import Events</span>
+                  </button>
+                  <button
+                    onClick={() => { onExport(); setIsMenuOpen(false); }}
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                  >
+                    <Download className="h-4 w-4" />
+                    <span>Export Events</span>
+                  </button>
+                  <button
+                    onClick={() => { onAddEvent(); setIsMenuOpen(false); }}
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Add Event</span>
+                  </button>
+                  <button
+                    onClick={() => { onCreateTestEvents(); setIsMenuOpen(false); }}
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-green-600 dark:text-green-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                  >
+                    <Plus className="h-4 w-4" />
+                    <span>Create Test Events</span>
+                  </button>
+                  <button
+                    onClick={() => { onRemoveTestEvents(); setIsMenuOpen(false); }}
+                    className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    <span>Remove Test Events</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Current page sidebar actions */}
+              {isAuthenticated && sidebarItems.length > 0 && (
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</div>
+                  {sidebarItems.map((action, index) => (
+                    <button
+                      key={index}
+                      onClick={() => { action.onClick?.(); setIsMenuOpen(false); }}
+                      className={`flex items-center space-x-2 w-full px-3 py-2 text-sm rounded-lg text-left hover:bg-gray-100 dark:hover:bg-gray-800 ${
+                        action.variant === 'primary' ? 'text-blue-600 dark:text-blue-400' :
+                        action.variant === 'danger' ? 'text-red-600 dark:text-red-400' :
+                        action.variant === 'success' ? 'text-green-600 dark:text-green-400' :
+                        'text-gray-700 dark:text-gray-300'
+                      }`}
+                    >
+                      {action.icon && <span className="h-4 w-4 flex items-center justify-center flex-shrink-0">{action.icon}</span>}
+                      <span>{action.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* App navigation */}
+              {isAuthenticated && (
+                <div className="border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Apps</div>
+                  {[
+                    { icon: <Home className="h-4 w-4 text-blue-600 dark:text-blue-400" />, label: 'Home', path: '/home' },
+                    { icon: <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />, label: 'Calendar', path: '/calendar' },
+                    { icon: <Key className="h-4 w-4 text-orange-600" />, label: 'Password Manager', path: '/passwords' },
+                    { icon: <Gift className="h-4 w-4 text-purple-600" />, label: 'Wishlist', path: '/wishlist' },
+                    { icon: <FolderOpen className="h-4 w-4 text-teal-600" />, label: 'Files', path: '/files' },
+                    { icon: <Flame className="h-4 w-4 text-pink-500" />, label: 'Music', path: '/music' },
+                    { icon: <Calculator className="h-4 w-4 text-teal-600" />, label: 'Calculator', path: '/calculator' },
+                    { icon: <Users className="h-4 w-4 text-pink-600" />, label: 'Following', path: '/following' },
+                    { icon: <CheckSquare className="h-4 w-4 text-emerald-600" />, label: 'Daily Tracker', path: '/tracker' },
+                    { icon: <BookOpen className="h-4 w-4 text-amber-600" />, label: 'Wiki', path: '/wikis' },
+                  ].map((app) => (
+                    <button
+                      key={app.path}
+                      onClick={() => { navigate(app.path); setIsMenuOpen(false); }}
+                      className="flex items-center space-x-3 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                    >
+                      {app.icon}
+                      <span>{app.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {/* User account section */}
+              <div>
                 {isAuthenticated ? (
                   <>
                     <div className="flex items-center space-x-2 px-3 py-2">
-                      <User className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                      <span className="text-base font-medium text-gray-700 dark:text-gray-300">Welcome, {user?.name}</span>
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <span className="text-white text-sm font-medium">{user?.name?.charAt(0).toUpperCase()}</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{user?.name}</span>
                     </div>
-                    <button 
-                      onClick={logout}
-                      className="flex items-center space-x-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left"
+                    <button
+                      onClick={() => { navigate('/settings'); setIsMenuOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                    >
+                      <Settings className="h-4 w-4" />
+                      <span>Settings</span>
+                    </button>
+                    <button
+                      onClick={() => { logout(); setIsMenuOpen(false); }}
+                      className="flex items-center space-x-2 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
                     >
                       <LogOut className="h-4 w-4" />
                       <span>Logout</span>
@@ -336,10 +439,16 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <button className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left">
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 block px-3 py-2 text-base font-medium w-full text-left"
+                    >
                       Sign in
                     </button>
-                    <button className="bg-blue-600 text-white hover:bg-blue-700 block px-3 py-2 rounded-lg text-base font-medium w-full mt-2">
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="bg-blue-600 text-white hover:bg-blue-700 block px-3 py-2 rounded-lg text-base font-medium w-full mt-2"
+                    >
                       Get started
                     </button>
                   </>

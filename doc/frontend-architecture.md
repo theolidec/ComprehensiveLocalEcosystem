@@ -17,6 +17,52 @@
 - Maintains current theme and style
 
 
+## Mobile Compliance
+
+All pages use a responsive layout system implemented across the following files:
+
+### Responsive Layout (`Row.js` + `index.css`)
+
+`Row` renders a `div.layout-row`. The `.layout-row` class is defined in `src/index.css`:
+
+```css
+.layout-row {
+  display: flex;
+  flex-direction: row; /* side-by-side on desktop */
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .layout-row {
+    flex-direction: column; /* stacked on mobile */
+  }
+}
+```
+
+This means on mobile (≤768px) the sidebar and main content stack vertically. `overflow-x: hidden` is also applied globally on `html, body` to prevent horizontal scroll from any content that overflows.
+
+### Inline Sidebar on Mobile (`Sidebar.css`)
+
+`.sidebar-inline` is hidden on mobile (≤768px). Its CSS `display: none` media query is placed **after** the base `display: flex` rule to ensure correct cascade override.
+
+### Mobile Header Menu (`Header.js`)
+
+The hamburger menu (`md:hidden`) exposes all navigation on small screens:
+- **Calendar actions** section (Import, Export, Add Event, Create/Remove Test Events) — shown only on `/calendar` routes.
+- **Actions** section — the current page's sidebar items from `PageActionsContext` (e.g. "New File", "Add Password").
+- **Apps** section — all app navigation links (Home, Calendar, Passwords, Wishlist, Files, Music, Calculator, Following, Tracker, Wiki).
+- **Account** section — avatar, Settings link, Logout.
+
+The home-page welcome greeting (`Welcome, {name}!`) is hidden on mobile (`hidden sm:block`) to prevent header overflow.
+
+### Floating Music Player (`FloatingMusicPlayer.js`)
+
+Responsive positioning and sizing:
+- Desktop: `bottom-6 right-6`, `w-80` (320px), `p-4`
+- Mobile: `bottom-4 right-2`, `w-72` (288px), `p-3`, capped at `max-w-[calc(100vw-1rem)]`
+
+---
+
 ## Overview
 
 The frontend is built with **React 19.2.4** using modern hooks and functional components. It uses **Tailwind CSS** for styling, **Lucide React** for icons, and **Axios** for API communication.

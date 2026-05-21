@@ -174,3 +174,9 @@
   padding: 0.75rem;
   overflow-y: auto;
 }
+
+@media (max-width: 768px) {
+  .sidebar-inline {
+    display: none;
+  }
+}
