@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare, Flame, Target, CheckCircle, Plus, X } from 'lucide-react';
+import { Calendar, Key, Gift, HardDrive, Calculator, Users, ArrowRight, Clock, MapPin, Book, CheckSquare, Flame, Target, CheckCircle, Plus, X, Activity } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import calendarAPI from '../../services/calendarAPI';
@@ -342,6 +342,15 @@ function Home() {
       color: 'bg-emerald-600',
       lightColor: 'bg-emerald-100',
       textColor: 'text-emerald-600'
+    },
+    radiation: {
+      icon: Activity,
+      title: 'Radiation Monitor',
+      description: 'Log radiation measurements',
+      link: '/radiation',
+      color: 'bg-green-600',
+      lightColor: 'bg-green-100',
+      textColor: 'text-green-600'
     }
   };
 

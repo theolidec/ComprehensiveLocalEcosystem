@@ -1,5 +1,43 @@
 # API Overview
 
+## Radiation Module
+
+Route prefix: `/api/radiation` — All endpoints require JWT authentication except the public measurements feed.
+
+### Locations
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/radiation/locations` | Required | List user's locations |
+| POST | `/api/radiation/locations` | Required | Create location |
+| PUT | `/api/radiation/locations/:id` | Required | Update location |
+| DELETE | `/api/radiation/locations/:id` | Required | Delete location |
+
+### Measurements
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/radiation/measurements` | Required | List measurements (with filters) |
+| GET | `/api/radiation/measurements/public` | Optional | Public measurements feed |
+| POST | `/api/radiation/measurements` | Required | Create measurement |
+| PUT | `/api/radiation/measurements/:id` | Required | Update measurement |
+| PUT | `/api/radiation/measurements/:id/visibility` | Required | Toggle public/private |
+| PUT | `/api/radiation/measurements/:id/restore` | Required | Restore soft-deleted |
+| DELETE | `/api/radiation/measurements/:id` | Required | Soft delete (with reason + snapshot) |
+| DELETE | `/api/radiation/measurements/:id/hard` | Required | Hard delete (permanent) |
+
+### Analytics
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| GET | `/api/radiation/analytics/timeseries` | Required | Time-series data (filterable by date/location) |
+| GET | `/api/radiation/analytics/by-location` | Required | Average level per location (aggregated) |
+| GET | `/api/radiation/analytics/heatmap` | Required | Daily average calendar heatmap |
+
+### Settings
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| PUT | `/api/settings/radiation` | Required | Update radiation preferences (unit, CPM factor, default location) |
+
+---
+
 ## Music Module
 
 - `/music` route and FloatingMusicPlayer component available on frontend, linking to backend endpoints.

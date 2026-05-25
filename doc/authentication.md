@@ -283,7 +283,7 @@ router.get('/public-content', optionalAuth, handler);
 
 - **Hashing**: bcrypt with 12 salt rounds
 - **Per-user salt**: 32-byte random salt for password encryption
-- **Minimum length**: 6 characters
+- **Minimum length**: 12 characters
 - **Not returned**: Password field excluded from queries by default
 
 ### Cookie Security

@@ -24,6 +24,8 @@ const WikiWatch = require('../models/WikiWatch');
 const TrackerTask = require('../models/TrackerTask');
 const TrackerQuestion = require('../models/TrackerQuestion');
 const TrackerResponse = require('../models/TrackerResponse');
+const RadiationMeasurement = require('../models/RadiationMeasurement');
+const RadiationLocation = require('../models/RadiationLocation');
 const logger = require('../config/logger');
 
 const getUserData = async (req, res) => {
@@ -177,6 +179,8 @@ const deleteAccount = async (req, res) => {
       await TrackerTask.deleteMany({ user: userId }, opt);
       await TrackerQuestion.deleteMany({ user: userId }, opt);
       await TrackerResponse.deleteMany({ user: userId }, opt);
+      await RadiationMeasurement.deleteMany({ userId }, opt);
+      await RadiationLocation.deleteMany({ userId }, opt);
       // Memberships in other users' wikis and watch entries owned by this user
       await WikiPermission.deleteMany({ user: userId }, opt);
       await WikiWatch.deleteMany({ user: userId }, opt);
@@ -259,7 +263,9 @@ const exportUserData = async (req, res) => {
       wikis,
       trackerTasks,
       trackerQuestions,
-      trackerResponses
+      trackerResponses,
+      radiationMeasurements,
+      radiationLocations
     ] = await Promise.all([
       Settings.findOne({ userId }),
       Event.find({ user: userId }).sort({ date: -1 }),
@@ -277,7 +283,9 @@ const exportUserData = async (req, res) => {
       Wiki.find({ owner: userId }),
       TrackerTask.find({ user: userId }),
       TrackerQuestion.find({ user: userId }),
-      TrackerResponse.find({ user: userId })
+      TrackerResponse.find({ user: userId }),
+      RadiationMeasurement.find({ userId }),
+      RadiationLocation.find({ userId })
     ]);
 
     const exportData = {
@@ -426,6 +434,31 @@ const exportUserData = async (req, res) => {
           isFavorite: f.isFavorite,
           createdAt: f.createdAt,
           updatedAt: f.updatedAt
+        }))
+      },
+      radiation: {
+        locations: radiationLocations.map(l => ({
+          id: l._id,
+          name: l.name,
+          description: l.description,
+          coordinates: l.coordinates,
+          createdAt: l.createdAt
+        })),
+        measurements: radiationMeasurements.map(m => ({
+          id: m._id,
+          date: m.date,
+          timeStart: m.timeStart,
+          timeEnd: m.timeEnd,
+          locationName: m.locationName,
+          averageLevel: m.averageLevel,
+          peakLevel: m.peakLevel,
+          comments: m.comments,
+          notes: m.notes,
+          tags: m.tags,
+          status: m.status,
+          isPublic: m.isPublic,
+          createdAt: m.createdAt,
+          updatedAt: m.updatedAt
         }))
       },
       wikis: wikis.map(w => ({

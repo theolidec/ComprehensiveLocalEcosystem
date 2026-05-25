@@ -157,6 +157,7 @@ components/
 │   ├── CookiePopup.js + .css    # Cookie consent
 │   ├── LinkNotFound.js + .css   # 404 page
 │   ├── Music.js                 # Music page shell (/music/*) — renders MusicPage with MusicProvider layout
+│   ├── Radiation.js             # Radiation monitor with measurements, analytics, locations
 │   └── CategoryManager.js       # Event category management
 ├── (root)                      # Shared/loose components
 │   ├── FloatingMusicPlayer.js   # Persistent floating music player (bottom-right, all pages)
@@ -300,6 +301,8 @@ updateCalendarSettings(data)
 updateNotificationSettings(data)
 updateDisplaySettings(data)
 updatePrivacySettings(data)
+updateWishlistSettings(data)
+updateRadiationSettings(data) // Radiation unit, CPM factor, default location
 resetSettings()             // Restore defaults
 uploadAvatar(file)          // Upload profile picture
 removeAvatar()              // Delete avatar
@@ -453,6 +456,7 @@ export const createData = async (data) => {
 | `fileService.js` | File upload/download, folders, sharing, document content |
 | `passwordAPI.js` | Password vault (passwords + categories), CSV/JSON import/export |
 | `paymentCardAPI.js` | Payment card CRUD + decrypt + favorite/default |
+| `radiationAPI.js` | Radiation measurements, locations, analytics, settings |
 | `settingsAPI.js` | User settings, sessions, avatar |
 | `userRightsAPI.js` | GDPR endpoints (`/api/user/*`): access, update, delete, export |
 | `wishlistAPI.js` | Wishlists, items, reservations, public links |

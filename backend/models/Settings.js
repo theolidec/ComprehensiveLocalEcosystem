@@ -152,6 +152,24 @@ const settingsSchema = new mongoose.Schema({
       type: Boolean,
       default: true
     }
+  },
+  radiation: {
+    preferredUnit: {
+      type: String,
+      enum: ['µSv/h', 'mSv/h', 'nSv/h', 'µGy/h', 'mGy/h', 'mR/h', 'CPM'],
+      default: 'µSv/h'
+    },
+    defaultLocationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'RadiationLocation',
+      default: null
+    },
+    cpmConversionFactor: {
+      type: Number,
+      min: 1,
+      max: 10000,
+      default: 151
+    }
   }
 }, {
   timestamps: true,

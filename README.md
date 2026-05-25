@@ -159,6 +159,16 @@ SUM/SIOM (User Manuals)
 - **Mood Trends**: Color-coded mood visualization over time
 - **Data Export/Import**: Full JSON export and import of tracker data
 
+### Radiation Monitor
+- **Measurement Logging**: Log radiation readings with date, time window, location, average/peak levels
+- **Location Management**: Named measurement locations with optional GPS coordinates
+- **Unit Conversion**: Display in µSv/h, mSv/h, nSv/h, µGy/h, mGy/h, mR/h, or CPM
+- **CPM Support**: User-configurable conversion factor (default 151 CPM/µSv/h for SBM-20)
+- **Status Workflow**: Draft → Verified / Flagged / Archived
+- **Public Sharing**: Make measurements public for community sharing
+- **Soft Delete**: Audit trail with deletion reason and state snapshot
+- **Analytics**: Time-series charts, per-location averages, GitHub-style heatmap calendar
+
 ### Wiki System
 - **Wiki Spaces**: Create multiple wiki workspaces for different projects
 - **Hierarchical Pages**: Parent-child page relationships for organized structure
@@ -328,6 +338,7 @@ For detailed API documentation including request/response examples, see [doc/api
 - Wiki: `/api/wikis/*` - Knowledge base system
 - Tracker: `/api/tracker/*` - Daily habit & task tracker
 - Music: `/api/music/*` - Music library and playlist streaming
+- Radiation: `/api/radiation/*` - Radiation measurements and analytics
 - Settings: `/api/settings/*` - User preferences
 - Follow: `/api/follow/*` - Social features
 
@@ -347,6 +358,7 @@ For detailed application flow and usage instructions, see [doc/README.md](doc/RE
 - **Wiki**: `/wikis` for knowledge base system
 - **Tracker**: `/tracker` for daily habit & task tracking
 - **Music**: `/music` for music library and playlist management
+- **Radiation**: `/radiation` for radiation monitoring and analytics
 - **Settings**: `/settings` for user preferences
 
 ## Security
@@ -467,6 +479,7 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Music System with audio upload, streaming, and playlist management
 - Floating music player persisting across all pages
 - Shuffle, loop, and auto-advance playlist playback
+- Radiation Monitor with measurements, locations, analytics, and public sharing
 
 ### Development Guidelines
 - Follow existing code patterns and conventions

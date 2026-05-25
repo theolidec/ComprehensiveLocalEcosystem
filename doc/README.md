@@ -37,6 +37,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`geogebra-calculator.md`](geogebra-calculator.md) | Graphing Calculator (filename kept for backward compatibility — no GeoGebra code is used) | Frontend component |
 | [`daily-tracker.md`](daily-tracker.md) | Daily tracker | `/api/tracker/*` |
 | [`MUSIC_MODULE.md`](MUSIC_MODULE.md) | Music system | `/api/music/*` |
+| [`radiation.md`](radiation.md) | Radiation monitor | `/api/radiation/*` |
 
 ### Security & Operations
 
@@ -108,6 +109,7 @@ Start here if you're integrating with the API:
 - [`geogebra-calculator.md`](geogebra-calculator.md) - Graphing Calculator (custom implementation)
 - [`daily-tracker.md`](daily-tracker.md) - Habit & task tracker
 - [`MUSIC_MODULE.md`](MUSIC_MODULE.md) - Music library and playlist player
+- [`radiation.md`](radiation.md) - Radiation monitor
 
 ### Organization
 - [`categories.md`](categories.md) - Event categories
@@ -147,10 +149,14 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 21, 2026  
-**Version**: 2.7.1
+**Last Updated**: May 22, 2026  
+**Version**: 2.7.2
 
 ## Recent Changes
+
+### Bug Fix: Mobile Header Radiation Link (v2.7.2, 2026-05-22)
+- **`Header.js`**: Added missing Radiation Monitor entry to the mobile hamburger menu apps list. The desktop dropdown already had it; the mobile list was not updated when the module was added.
+- **Documentation**: Updated `doc/settings.md` (radiation schema block, quickActions default, `PUT /radiation` endpoint, `updateRadiationSettings` controller method); `doc/database-models.md` (Settings model radiation sub-document); `doc/frontend-architecture.md` (SettingsContext methods).
 
 ### Mobile Compliance (v2.7.1, 2026-05-21)
 - **`Row.js`**: Removed inline `flexDirection: 'row'` style; direction now managed exclusively by `.layout-row` CSS so media queries can override it.
@@ -235,6 +241,20 @@ A full doc-vs-code audit was performed and the following inconsistencies were co
 - **API Service**: New `paymentCardAPI.js` for frontend API calls
 - **Styles**: Added payment card CSS styles to App.css
 - **Documentation**: Updated passwords.md with payment card details
+
+### Radiation Module (v3.0.0)
+- **Backend**: New models `RadiationLocation` and `RadiationMeasurement` (full soft-delete audit trail)
+- **Backend**: `radiationController.js` — locations CRUD, measurements CRUD (soft + hard delete, restore, toggle visibility), analytics (time-series, by-location, heatmap)
+- **Backend**: `routes/radiation.js` mounted at `/api/radiation`
+- **Backend**: `Settings` model extended with `radiation` block (`preferredUnit`, `defaultLocationId`, `cpmConversionFactor`)
+- **Backend**: `settingsController.updateRadiationSettings` + `PUT /api/settings/radiation` route
+- **Backend**: GDPR cascade — `userRightsController` now deletes and exports radiation data on account deletion/export
+- **Frontend**: `radiationAPI.js` service, `radiationUnits.js` util (7-unit conversion incl. CPM)
+- **Frontend**: `Radiation.js` page — 6 tabs: Measurements table, Analytics (3 charts), Locations, Public, Trash, Settings
+- **Frontend**: Analytics charts built with pure SVG/Tailwind (no extra dependencies): time-series line chart, per-location bar chart, heatmap calendar
+- **Frontend**: Wired into `App.js`, Header apps dropdown, `Home.js` quickActions, `HomeLayoutEditor.js`
+- **Frontend**: `SettingsContext` extended with `updateRadiationSettings`
+- **Documentation**: `doc/radiation.md` created; `doc/database-models.md`, `doc/api-overview.md`, `doc/README.md` updated
 
 ### Wiki System Updates (v2.3.1)
 - **WikiContext**: Added `permissions` state for role-based UI controls

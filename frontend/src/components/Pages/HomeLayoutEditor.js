@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, CheckSquare, Calendar, Save, RotateCcw, Key, Gift, HardDrive, Calculator, Users, Book, ChevronDown, Flame } from 'lucide-react';
+import { Home, CheckSquare, Calendar, Save, RotateCcw, Key, Gift, HardDrive, Calculator, Users, Book, ChevronDown, Flame, Activity } from 'lucide-react';
 import { useSettings } from '../../contexts/SettingsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
 
@@ -27,7 +27,8 @@ const HomeLayoutEditor = () => {
     { key: 'calculator', label: 'Calculator', icon: Calculator },
     { key: 'following', label: 'Following', icon: Users },
     { key: 'wikis', label: 'Wikis', icon: Book },
-    { key: 'tracker', label: 'Daily Tracker', icon: CheckSquare }
+    { key: 'tracker', label: 'Daily Tracker', icon: CheckSquare },
+    { key: 'radiation', label: 'Radiation Monitor', icon: Activity }
   ];
 
   useEffect(() => {

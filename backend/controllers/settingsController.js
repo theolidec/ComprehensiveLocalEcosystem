@@ -18,7 +18,7 @@ const settingsController = {
 
   updateSettings: async (req, res) => {
     try {
-      const allowedUpdates = ['profile', 'calendar', 'notifications', 'display', 'privacy', 'wishlist'];
+      const allowedUpdates = ['profile', 'calendar', 'notifications', 'display', 'privacy', 'wishlist', 'radiation'];
       const updates = {};
       
       for (const key of allowedUpdates) {
@@ -285,6 +285,35 @@ const settingsController = {
       logger.error('Revoke session error:', error);
       res.status(500).json({ 
         error: 'Failed to revoke session',
+        code: 'SERVER_ERROR'
+      });
+    }
+  },
+
+  updateRadiationSettings: async (req, res) => {
+    try {
+      const allowedFields = ['preferredUnit', 'defaultLocationId', 'cpmConversionFactor'];
+      const updates = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updates[`radiation.${field}`] = req.body[field];
+        }
+      }
+
+      const settings = await Settings.findOneAndUpdate(
+        { userId: req.user._id },
+        { $set: updates },
+        { new: true, runValidators: true }
+      );
+
+      res.json({
+        message: 'Radiation settings updated successfully',
+        radiation: settings.radiation
+      });
+    } catch (error) {
+      logger.error('Update radiation settings error:', error);
+      res.status(500).json({
+        error: 'Failed to update radiation settings',
         code: 'SERVER_ERROR'
       });
     }

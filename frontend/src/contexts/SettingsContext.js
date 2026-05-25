@@ -50,7 +50,7 @@ const defaultSettings = {
       showQuickAccess: true,
       showProTips: true,
       order: ['dailyTracker', 'events', 'quickAccess', 'proTips'],
-      quickActions: ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker']
+      quickActions: ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker', 'radiation']
     }
   },
   privacy: {
@@ -61,6 +61,11 @@ const defaultSettings = {
   wishlist: {
     defaultItemsPerPage: 20,
     saveItemsPerPageCookie: true
+  },
+  radiation: {
+    preferredUnit: 'µSv/h',
+    defaultLocationId: null,
+    cpmConversionFactor: 151
   }
 };
 
@@ -180,6 +185,17 @@ export const SettingsProvider = ({ children }) => {
     }
   };
 
+  const updateRadiationSettings = async (radiation) => {
+    try {
+      const data = await settingsAPI.updateRadiationSettings(radiation);
+      const newSettings = { ...state.settings, radiation: data.radiation };
+      dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
   const resetSettings = async () => {
     try {
       const data = await settingsAPI.resetSettings();
@@ -272,6 +288,7 @@ export const SettingsProvider = ({ children }) => {
     updateDisplaySettings,
     updatePrivacySettings,
     updateWishlistSettings,
+    updateRadiationSettings,
     resetSettings,
     clearError,
     getActiveSessions,

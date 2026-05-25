@@ -11,7 +11,7 @@ const Footer = () => {
     { name: 'Wishlist', href: '/wishlist' },
     { name: 'Calculator', href: '/calculator' },
     { name: 'Wiki', href: '/wikis' },
-    { name: 'Settings', href: '/settings' }
+    { name: 'Music', href: '/music' },
   ];
 
   const resources = [

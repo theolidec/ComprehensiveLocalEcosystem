@@ -29,7 +29,8 @@ router.put('/', settingsLimiter, [
   body('notifications').optional().isObject(),
   body('display').optional().isObject(),
   body('privacy').optional().isObject(),
-  body('wishlist').optional().isObject()
+  body('wishlist').optional().isObject(),
+  body('radiation').optional().isObject()
 ], validateSettingsUpdate, settingsController.updateSettings);
 
 router.put('/profile', settingsLimiter, [
@@ -70,6 +71,12 @@ router.put('/privacy', settingsLimiter, [
 router.put('/wishlist', settingsLimiter, [
   body('defaultItemsPerPage').optional().isInt({ min: 10, max: 200 })
 ], validateSettingsUpdate, settingsController.updateWishlistSettings);
+
+router.put('/radiation', settingsLimiter, [
+  body('preferredUnit').optional().isIn(['µSv/h', 'mSv/h', 'nSv/h', 'µGy/h', 'mGy/h', 'mR/h', 'CPM']),
+  body('defaultLocationId').optional({ nullable: true }),
+  body('cpmConversionFactor').optional().isFloat({ min: 1, max: 10000 })
+], validateSettingsUpdate, settingsController.updateRadiationSettings);
 
 router.get('/sessions', settingsController.getActiveSessions);
 

@@ -50,6 +50,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 | TrackerResponse | `TrackerResponse.js` | Daily check-in responses | References User |
 | Music | `Music.js` | Uploaded audio files | References User |
 | Playlist | `Playlist.js` | Music playlists | References User, Music |
+| RadiationLocation | `RadiationLocation.js` | Named measurement locations with optional GPS | References User |
+| RadiationMeasurement | `RadiationMeasurement.js` | Radiation level log entries with soft-delete audit trail | References User, RadiationLocation |
 
 ---
 
@@ -413,6 +415,12 @@ mongoose.connect(process.env.MONGODB_URI, {
   wishlist: {
     defaultItemsPerPage: Number, // 10-200, default: 20
     saveItemsPerPageCookie: Boolean // Default: true
+  },
+
+  radiation: {
+    preferredUnit: String,       // Enum: µSv/h|mSv/h|nSv/h|µGy/h|mGy/h|mR/h|CPM, default: 'µSv/h'
+    defaultLocationId: ObjectId, // Ref: 'RadiationLocation', default: null
+    cpmConversionFactor: Number  // 1-10000, default: 151 (SBM-20 tube)
   },
 
   createdAt: Date,
@@ -954,6 +962,8 @@ User
 ├── TrackerResponses (1:N, unique per [user, date])
 ├── Music (1:N)                                     # Uploaded audio tracks
 ├── Playlists (1:N)                                 # Music playlists (reference Music)
+├── RadiationLocations (1:N)                        # Named measurement spots
+├── RadiationMeasurements (1:N)                     # Radiation log entries
 └── Wikis (1:N, as owner)
     ├── WikiPages (1:N)
     │   └── WikiVersions (1:N)

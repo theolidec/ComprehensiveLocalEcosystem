@@ -52,7 +52,7 @@ The Settings module provides comprehensive user preference management including 
       showQuickAccess: Boolean (default: true),
       showProTips: Boolean (default: true),
       order: [String] (default: ['dailyTracker', 'events', 'quickAccess', 'proTips']),
-      quickActions: [String] (default: ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker'])
+      quickActions: [String] (default: ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker', 'radiation'])
     }
   },
   privacy: {
@@ -66,6 +66,11 @@ The Settings module provides comprehensive user preference management including 
   },
   wishlist: {
     defaultItemsPerPage: Number (default: 20, min: 10, max: 200)
+  },
+  radiation: {
+    preferredUnit: String (enum: µSv/h|mSv/h|nSv/h|µGy/h|mGy/h|mR/h|CPM, default: 'µSv/h'),
+    defaultLocationId: ObjectId (ref: 'RadiationLocation', default: null),
+    cpmConversionFactor: Number (min: 1, max: 10000, default: 151)
   },
   createdAt: Date,
   updatedAt: Date
@@ -95,7 +100,10 @@ The Settings module provides comprehensive user preference management including 
 | display.homepageLayout.showQuickAccess | true |
 | display.homepageLayout.showProTips | true |
 | display.homepageLayout.order | ['dailyTracker', 'events', 'quickAccess', 'proTips'] | Controls the visual order of sections in the home layout editor and on the /home page |
-| display.homepageLayout.quickActions | ['calendar', 'passwords', 'wishlist', 'files', 'calculator', 'following', 'wikis', 'tracker'] | Controls which shortcuts appear in the Quick Access section and their order |
+| display.homepageLayout.quickActions | ['calendar', 'passwords', 'wishlist', 'files', 'music', 'calculator', 'following', 'wikis', 'tracker', 'radiation'] | Controls which shortcuts appear in the Quick Access section and their order |
+| radiation.preferredUnit | 'µSv/h' (enum: µSv/h, mSv/h, nSv/h, µGy/h, mGy/h, mR/h, CPM) | |
+| radiation.defaultLocationId | null | ObjectId ref to RadiationLocation |
+| radiation.cpmConversionFactor | 151 (min: 1, max: 10000) | CPM per µSv/h; SBM-20 default |
 | privacy.shareCalendar | false |
 | privacy.showBusyStatus | true |
 | privacy.allowThemeCookie | true | Controls both login page and Graphing Calculator theme cookies |
@@ -114,6 +122,7 @@ The Settings module provides comprehensive user preference management including 
 | PUT | `/display` | Update display prefs |
 | PUT | `/privacy` | Update privacy prefs |
 | PUT | `/wishlist` | Update wishlist prefs |
+| PUT | `/radiation` | Update radiation prefs |
 | DELETE | `/reset` | Reset all to defaults |
 
 ### Sessions (`/api/settings/sessions`)
@@ -210,6 +219,8 @@ Downloads a JSON file containing all user data:
   - `updateNotificationSettings()` - Notifications
   - `updateDisplaySettings()` - Display options
   - `updatePrivacySettings()` - Privacy controls
+  - `updateWishlistSettings()` - Wishlist prefs
+  - `updateRadiationSettings()` - Radiation preferences (unit, CPM factor, default location)
   - `getActiveSessions()` - List sessions
   - `revokeSession()` - Invalidate session
   - `resetSettings()` - Restore defaults

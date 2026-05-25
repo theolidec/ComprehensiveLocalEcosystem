@@ -17,24 +17,46 @@ const router = express.Router();
 const cookieSecure = process.env.ALLOW_INSECURE_COOKIES !== 'true';
 
 const setAuthCookies = (res, accessToken, refreshToken) => {
-  // Set access token cookie (short-lived)
+  // Parse access token expiry from env (default: 7 days)
+  const accessTokenMaxAge = parseTokenExpiry(process.env.ACCESS_TOKEN_EXPIRES_IN || '7d');
+  // Parse refresh token expiry from env (default: 7 days)
+  const refreshTokenMaxAge = parseTokenExpiry(process.env.REFRESH_TOKEN_EXPIRES_IN || '7d');
+
+  // Set access token cookie
   res.cookie('accessToken', accessToken, {
     httpOnly: true,
     secure: cookieSecure,
     sameSite: 'strict',
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    maxAge: accessTokenMaxAge,
     path: '/'
   });
 
-  // Set refresh token cookie (longer-lived). Path is scoped so the long-lived
+  // Set refresh token cookie. Path is scoped so the long-lived
   // cookie isn't sent with every API request.
   res.cookie('refreshToken', refreshToken, {
     httpOnly: true,
     secure: cookieSecure,
     sameSite: 'strict',
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    maxAge: refreshTokenMaxAge,
     path: '/api/auth'
   });
+};
+
+// Helper to parse token expiry string (e.g., "7d", "15m", "24h") to milliseconds
+const parseTokenExpiry = (expiry) => {
+  const match = expiry.match(/^(\d+)([smhd])$/);
+  if (!match) return 7 * 24 * 60 * 60 * 1000; // Default: 7 days
+  
+  const value = parseInt(match[1], 10);
+  const unit = match[2];
+  
+  switch (unit) {
+    case 's': return value * 1000;
+    case 'm': return value * 60 * 1000;
+    case 'h': return value * 60 * 60 * 1000;
+    case 'd': return value * 24 * 60 * 60 * 1000;
+    default: return 7 * 24 * 60 * 60 * 1000;
+  }
 };
 
 // Helper function to clear auth cookies. Paths must match the values used in setAuthCookies

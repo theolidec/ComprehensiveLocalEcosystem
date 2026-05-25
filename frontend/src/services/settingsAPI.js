@@ -52,6 +52,11 @@ const settingsAPI = {
     return response.data;
   },
 
+  updateRadiationSettings: async (radiation) => {
+    const response = await axios.put(`${API_URLS.SETTINGS}/radiation`, radiation);
+    return response.data;
+  },
+
   resetSettings: async () => {
     const response = await axios.post(`${API_URLS.SETTINGS}/reset`);
     return response.data;

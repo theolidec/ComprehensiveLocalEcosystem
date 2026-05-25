@@ -43,6 +43,7 @@ import './App.css';
 import MusicPage from './components/Pages/Music';
 import FloatingMusicPlayer from './components/FloatingMusicPlayer';
 import { MusicProvider } from './context/MusicContext';
+import RadiationPage from './components/Pages/Radiation';
 
 const getInitialTheme = () => {
   if (typeof window === 'undefined') return 'light';
@@ -397,6 +398,20 @@ function AppContent() {
                 <Sidebar inline />
                 <div style={{ flex: 1 }}>
                   <DailyTracker />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/radiation" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <Sidebar inline />
+                <div style={{ flex: 1 }}>
+                  <RadiationPage />
                 </div>
               </Row>
               <Footer />

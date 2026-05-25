@@ -48,7 +48,7 @@ backend/
 │   ├── database.js      # MongoDB connection + legacy index cleanup
 │   ├── logger.js        # Winston logging setup
 │   └── rateLimiter.js   # Rate limiting rules (8 limiters)
-├── controllers/         # Request handlers (business logic) — 12 files
+├── controllers/         # Request handlers (business logic) — 13 files
 │   ├── calendarController.js
 │   ├── categoryController.js
 │   ├── fileController.js
@@ -57,6 +57,7 @@ backend/
 │   ├── passwordController.js
 │   ├── passwordCategoryController.js
 │   ├── paymentCardController.js
+│   ├── radiationController.js
 │   ├── settingsController.js
 │   ├── userRightsController.js
 │   ├── wikiController.js
@@ -89,17 +90,20 @@ backend/
 │   ├── TrackerTask.js
 │   ├── TrackerQuestion.js
 │   └── TrackerResponse.js
-├── routes/              # API route definitions — 20 files
+├── routes/              # API route definitions — 22 files
 │   ├── auth.js
 │   ├── calendar.js
 │   ├── categories.js
 │   ├── files.js
 │   ├── fileFolders.js
 │   ├── follow.js
+│   ├── music.js
 │   ├── passwords.js
 │   ├── passwordCategories.js
 │   ├── paymentCards.js
+│   ├── radiation.js
 │   ├── settings.js
+│   ├── tracker.js
 │   ├── userRights.js
 │   ├── wikiPages.js
 │   ├── wikis.js
@@ -108,8 +112,7 @@ backend/
 │   ├── wishlistReservations.js  # Reservation operations
 │   ├── wishlistPublic.js        # Public token-based access (with caching)
 │   ├── wishlistCategories.js
-│   ├── wishlists.js
-│   └── tracker.js
+│   └── wishlists.js
 ├── services/            # Business logic services
 │   ├── passwordService.js
 │   └── recurringEventService.js
@@ -212,9 +215,13 @@ const getItems = async (req, res) => {
 | `categoryController.js` | Category CRUD operations | ~150 lines |
 | `fileController.js` | File upload, download, streaming, sharing | ~500 lines |
 | `fileFolderController.js` | Folder management, organization | ~250 lines |
+| `musicController.js` | Music upload, streaming, playlist management | ~280 lines |
 | `passwordController.js` | Password CRUD, encryption, favorites | ~230 lines |
 | `passwordCategoryController.js` | Password category management | ~100 lines |
+| `paymentCardController.js` | Payment card CRUD, encryption | ~200 lines |
+| `radiationController.js` | Radiation measurements, locations, analytics | ~400 lines |
 | `settingsController.js` | User settings, profile, sessions | ~250 lines |
+| `userRightsController.js` | GDPR user rights (access, export, delete) | ~450 lines |
 | `wikiController.js` | Wiki space management, permissions | ~360 lines |
 | `wikiPageController.js` | Wiki pages, versions, history | ~900 lines |
 
@@ -325,7 +332,7 @@ module.exports = router;
 
 ### Route Registration (server.js)
 
-All 18 API namespaces mounted under `/api/*`:
+All 19 API namespaces mounted under `/api/*`:
 
 ```javascript
 app.use('/api/auth', authRoutes);
@@ -346,6 +353,7 @@ app.use('/api/wikis/:slug/pages', wikiPageRoutes);  // Nested mount; :slug forwa
 app.use('/api/user', userRightsRoutes);              // GDPR endpoints
 app.use('/api/tracker', trackerRoutes);
 app.use('/api/music', musicRoutes);
+app.use('/api/radiation', radiationRoutes);
 ```
 
 **Note**: `wikiPageRoutes` is mounted under `/api/wikis/:slug/pages`, so the wiki slug is available via `req.params.slug` inside the page router (Express forwards parent params).
