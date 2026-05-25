@@ -409,7 +409,7 @@ function AppContent() {
             <div key={location.pathname}>
               <Header />
               <Row>
-                <Sidebar inline />
+                {/* <Sidebar inline /> */}
                 <div style={{ flex: 1 }}>
                   <RadiationPage />
                 </div>
