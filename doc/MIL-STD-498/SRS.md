@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SRS-001  
-**Revision**: 1.0  
-**Date**: May 10, 2026  
+**Revision**: 1.1  
+**Date**: May 26, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -16,7 +16,7 @@ This document defines the Software Requirements Specification (SRS) for the Comp
 
 ### 1.2 Purpose
 
-The purpose of this system is to provide users with an integrated suite of tools for managing personal data including calendars, passwords, files, wikis, wishlists, and daily tracking capabilities. The system operates as a self-hosted web application with a React frontend and Node.js/Express backend.
+The purpose of this system is to provide users with an integrated suite of tools for managing personal data including calendars, passwords, payment cards, files, rich-text documents, wikis, wishlists, daily tracking, music libraries, radiation measurements, and a graphing calculator. The system operates as a self-hosted web application with a React frontend and Node.js/Express backend.
 
 ### 3.1 Product Perspective
 
@@ -58,14 +58,15 @@ End users are individuals seeking a personal productivity platform with the foll
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
-| FR-AUTH-001 | User Registration | System shall allow users to create accounts with email, password, and display name |
+| FR-AUTH-001 | User Registration | System shall allow users to create accounts with email, password (12-128 chars), and display name |
 | FR-AUTH-002 | User Login | System shall authenticate users using email and password credentials |
 | FR-AUTH-003 | JWT Authentication | System shall use JSON Web Tokens for API authentication with 15-minute expiration |
 | FR-AUTH-004 | Token Refresh | System shall support refresh token rotation with 7-day expiration |
 | FR-AUTH-005 | Multi-Session Support | System shall allow users to maintain multiple active sessions |
 | FR-AUTH-006 | Session Revocation | System shall allow users to logout from individual or all devices |
-| FR-AUTH-007 | Password Reset | System shall support password reset via email token |
+| FR-AUTH-007 | Password Reset | System shall support password reset via single-use token |
 | FR-AUTH-008 | Account Lockout | System shall temporarily lock accounts after 5 failed login attempts |
+| FR-AUTH-009 | Privacy Versioning | System shall record acceptance of the current privacy policy version on registration |
 
 #### 3.1.2 Calendar Management
 
@@ -114,8 +115,10 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-FIL-003 | File Streaming | System shall support streaming large files |
 | FR-FIL-004 | File Organization | Users shall be able to organize files into folders |
 | FR-FIL-005 | File Sharing | Users shall be able to generate shareable links for files |
-| FR-FIL-006 | File Preview | System shall support preview for common file types |
-| FR-FIL-007 | File Deletion | Users shall be able to delete files and folders |
+| FR-FIL-006 | File Preview | System shall support preview for common file types (incl. PDF via react-pdf) |
+| FR-FIL-007 | File Deletion | Users shall be able to delete files and folders (with trash/restore) |
+| FR-FIL-008 | Rich-Text Documents | Users shall be able to create and edit rich-text documents using the TipTap editor |
+| FR-FIL-009 | Document Versioning | System shall maintain version history for rich-text documents |
 
 #### 3.1.5 Wiki System
 
@@ -179,6 +182,45 @@ End users are individuals seeking a personal productivity platform with the foll
 |----|-------------|-------------|
 | FR-SOC-001 | User Following | Users shall be able to follow other users |
 | FR-SOC-002 | Follow Notifications | Users shall receive notifications about followed user activity |
+
+#### 3.1.11 Music Library
+
+| ID | Requirement | Description |
+|----|-------------|-------------|
+| FR-MUS-001 | Music Upload | Users shall be able to upload audio files with metadata (title, artist) |
+| FR-MUS-002 | Playback | System shall provide audio playback via a floating player visible on all pages |
+| FR-MUS-003 | Playlists | Users shall be able to create, manage, and play playlists |
+| FR-MUS-004 | Shuffle/Loop | System shall support shuffle and loop playback modes |
+| FR-MUS-005 | Public/Private Visibility | Users shall be able to mark songs public (discoverable) or private |
+| FR-MUS-006 | Discover Feed | System shall expose a public discovery feed of public songs |
+| FR-MUS-007 | Ownership Transfer | Users shall be able to transfer song ownership to another user by email |
+| FR-MUS-008 | Metadata Editing | Users shall be able to edit song title and artist after upload |
+
+#### 3.1.12 Radiation Monitor
+
+| ID | Requirement | Description |
+|----|-------------|-------------|
+| FR-RAD-001 | Measurement Logging | Users shall be able to log radiation measurements (date, time window, location, avg/peak level, notes, tags, status) |
+| FR-RAD-002 | Locations | Users shall be able to manage named locations with optional GPS coordinates |
+| FR-RAD-003 | Unit Conversion | System shall store all levels in µSv/h and convert client-side to the user's preferred unit (µSv/h, mSv/h, nSv/h, µGy/h, mGy/h, mR/h, CPM) |
+| FR-RAD-004 | CPM Configuration | Users shall be able to configure the CPM conversion factor (default 151 for SBM-20) |
+| FR-RAD-005 | Status Workflow | System shall support Draft / Verified / Flagged / Archived statuses |
+| FR-RAD-006 | Public Sharing | Users shall be able to mark individual measurements public; a public feed shall be exposed |
+| FR-RAD-007 | Soft Delete & Restore | System shall support soft delete with audit trail, hard delete, and restore |
+| FR-RAD-008 | Analytics | System shall provide time-series, per-location bar chart, and heatmap calendar analytics |
+
+#### 3.1.13 Graphing Calculator
+
+| ID | Requirement | Description |
+|----|-------------|-------------|
+| FR-CALC-001 | Graphing | System shall provide an in-app graphing calculator (custom implementation, no external GeoGebra code) |
+
+#### 3.1.14 Home Dashboard
+
+| ID | Requirement | Description |
+|----|-------------|-------------|
+| FR-HOME-001 | Personalized Home | System shall present a personalized dashboard with daily tracker, today's events, and quick access tiles |
+| FR-HOME-002 | Layout Editor | Users shall be able to customize Home dashboard layout (Home Layout Editor) |
 
 ---
 
@@ -249,6 +291,8 @@ End users are individuals seeking a personal productivity platform with the foll
 | Model | Description |
 |-------|-------------|
 | User | User accounts with authentication data |
+| RefreshToken | Refresh token records for multi-session support |
+| Settings | Per-user preferences (display, calendar, notifications, privacy, radiation) |
 | Event | Calendar events |
 | Category | Event categories |
 | Password | Encrypted password entries |
@@ -256,17 +300,25 @@ End users are individuals seeking a personal productivity platform with the foll
 | PaymentCard | Encrypted payment card data |
 | File | Uploaded file metadata |
 | FileFolder | File organization folders |
+| DocumentVersion | Rich-text document version history |
 | Wiki | Wiki spaces |
 | WikiPage | Wiki page content |
 | WikiVersion | Page version history |
 | WikiPermission | Wiki access control |
+| WikiCategory | Wiki page categories |
+| WikiWatch | Page watch subscriptions |
 | Wishlist | User wishlists |
 | WishlistItem | Wishlist items |
+| WishlistCategory | Wishlist item categories |
 | WishlistReservation | Item reservations |
 | TrackerTask | Daily tracker tasks |
 | TrackerQuestion | Daily questions |
 | TrackerResponse | Question responses |
 | UserFollow | Social follow relationships |
+| Music | Uploaded audio tracks with metadata and visibility |
+| Playlist | User-managed playlists referencing Music tracks |
+| RadiationLocation | Named radiation measurement locations |
+| RadiationMeasurement | Radiation measurement records (incl. soft-delete audit) |
 
 ---
 
@@ -309,6 +361,7 @@ End users are individuals seeking a personal productivity platform with the foll
 | Revision | Date | Author | Description |
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SRS creation |
+| 1.1 | May 26, 2026 | System | Added Music, Radiation, Graphing Calculator, Home dashboard, Document versioning; expanded data model list; corrected password policy |
 
 ---
 

@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SUM-001  
-**Revision**: 1.0  
-**Date**: May 10, 2026  
+**Revision**: 1.1  
+**Date**: May 26, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -50,10 +50,11 @@ The purpose of this manual is to provide end users with instructions for operati
 
 1. Click **"Register"** on the login page
 2. Enter your email address
-3. Create a password (minimum 6 characters)
+3. Create a password (12-128 characters)
 4. Enter your display name
-5. Click **"Create Account"**
-6. You will be automatically logged in
+5. Accept the current Privacy Policy
+6. Click **"Create Account"**
+7. You will be automatically logged in
 
 ### 3.4 Logging In
 
@@ -93,13 +94,15 @@ The Apps menu (accessed via the AL icon in the Header) provides access to all mo
 |------|---------|-------------|
 | 🏠 | Home | Dashboard with overview and quick actions |
 | 📅 | Calendar | Event management and scheduling |
-| 🔑 | Password Manager | Secure password storage |
+| 🔑 | Password Manager | Secure password and payment-card storage |
 | 🎁 | Wishlist | Gift wishlists and reservations |
-| 📁 | Files | File storage and management |
+| 📁 | Files | File storage, rich-text documents, and sharing |
 | 🧮 | Calculator | Graphing Calculator (custom implementation) |
 | 👥 | Following | Social connections and user following |
 | ✅ | Daily Tracker | Habit tracking and daily check-ins |
 | 📚 | Wiki | Knowledge base and documentation |
+| 🎵 | Music | Music library, playlists, and floating player |
+| ☢️ | Radiation | Radiation measurement logging and analytics |
 
 ### 4.3 User Menu
 
@@ -253,6 +256,14 @@ To create a recurring event:
 3. Copy the generated link
 4. Share link with others
 
+#### Rich-Text Documents
+
+The File Manager supports creating and editing rich-text documents using the TipTap editor.
+
+1. From the Files page, choose **"New Document"**
+2. The Document Editor opens with formatting tools (headings, bold/italic/underline, lists, tables, links, images, colors, highlights, text alignment)
+3. Saving the document creates a new version; previous versions can be viewed and restored from the Document Viewer history
+
 ### 5.5 Wiki System
 
 #### Creating a Wiki
@@ -347,7 +358,81 @@ When someone reserves an item:
    - Activity heatmap
    - Category breakdowns
 
-### 5.8 Settings
+### 5.8 Music
+
+#### Uploading Music
+
+1. Navigate to **Music → Upload** (or `/music/upload`)
+2. Select an audio file
+3. Enter Song Name, Artist, and optionally add to a playlist
+4. Check **"Make this song public"** to share it on the Discover feed (default is private)
+
+#### Library and Playback
+
+- **My Library** lists all your songs with 🔓 Public / 🔒 Private badges
+- Click any song to play; the **Floating Player** appears at the bottom-right and stays visible on every page
+- Use ⏮/⏭ to skip, ⇌ for shuffle, ↻ for single-track loop
+- Playlists auto-advance and loop back to the first track at the end
+
+#### Playlists
+
+1. Click **"New Playlist"** to create one (name + description)
+2. Click **"Add to Playlist"** on any song to add it
+3. Click **"Play All"** to play a playlist from the start
+4. Click a track in the playlist to start from that song
+
+#### Song Management
+
+- ✏️ Edit song title or artist
+- 🔒/🔓 Toggle public/private visibility
+- ↪️ Transfer ownership to another user (by email)
+- 🗑 Delete a song (confirmation required)
+
+#### Discover
+
+- Navigate to **Music → Discover** to browse songs other users have made public
+- Public songs may be added to your playlists; only the owner can delete them
+
+---
+
+### 5.9 Radiation Monitor
+
+#### Logging a Measurement
+
+1. Navigate to **Radiation** → **Measurements**
+2. Click **"+ New Measurement"**
+3. Enter date, optional time start/end, location, average level, and optional peak level
+4. Add comments, notes, tags, and a status (Draft / Verified / Flagged / Archived)
+5. Click **"Save"**
+
+#### Managing Locations
+
+1. Open the **Locations** tab
+2. Add named locations with optional GPS coordinates (lat/lng)
+3. Edit or delete existing locations
+
+#### Unit Preferences
+
+1. Open the **Settings** tab inside Radiation
+2. Select your preferred display unit (µSv/h, mSv/h, nSv/h, µGy/h, mGy/h, mR/h, or CPM)
+3. If using CPM, set the CPM conversion factor (default 151 for SBM-20)
+4. All values are stored internally as µSv/h and displayed converted
+
+#### Analytics
+
+Open the **Analytics** tab to view:
+- **Time-series** chart of average and peak levels
+- **Per-location** bar chart
+- **Heatmap calendar** (GitHub-style daily grid)
+
+#### Public Feed and Trash
+
+- Toggle a measurement public to expose it on the **Public** tab
+- Soft-deleted measurements appear in **Trash** and can be restored or hard-deleted
+
+---
+
+### 5.10 Settings
 
 #### Profile Settings
 
@@ -425,6 +510,8 @@ Under the **"Account"** tab:
 | Files not uploading | Check file size (max 500MB) |
 | Calendar events not showing | Check date range filter |
 | Wiki pages not loading | Refresh the page |
+| Music doesn't play | Check browser audio permissions; verify the file is a supported audio format |
+| Radiation values look wrong | Verify the preferred unit and CPM factor in Radiation → Settings |
 
 ### 7.2 Getting Help
 
@@ -458,6 +545,7 @@ Under the **"Account"** tab:
 | Revision | Date | Author | Description |
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SUM creation |
+| 1.1 | May 26, 2026 | System | Added Music, Radiation, and Rich-Text Document sections; corrected password length to 12-128 chars; added Music/Radiation entries to the Apps menu |
 
 ---
 

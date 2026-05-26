@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SDP-001  
-**Revision**: 1.0  
-**Date**: May 10, 2026  
+**Revision**: 1.1  
+**Date**: May 26, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -37,12 +37,18 @@ The purpose of this plan is to describe the software development approach, sched
 |-----------|------|---------|
 | Frontend Framework | React | 19.2.4 |
 | Frontend Build | Create React App | 5.x |
-| Styling | Tailwind CSS | 3.x |
+| Styling | Tailwind CSS | 3.4.x |
+| Rich-Text Editor | TipTap | 3.23.x |
+| Routing | react-router-dom | 7.x |
+| HTTP Client | Axios | 1.13.x |
 | Backend Runtime | Node.js | 18+ |
-| Backend Framework | Express.js | 4.x |
+| Backend Framework | Express.js | 4.18.x |
 | Database | MongoDB | 5.0+ |
-| ODM | Mongoose | 7.x |
+| ODM | Mongoose | 8.x |
 | Authentication | JWT (jsonwebtoken) | 9.x |
+| File Upload | Multer | 2.x |
+| Scheduling | node-cron | 4.x |
+| Logging | Winston / Morgan | 3.x / 1.x |
 | IDE | VS Code / Windsurf | Latest |
 
 ### 3.2 Development Infrastructure
@@ -82,6 +88,9 @@ The project uses an **iterative development model** with continuous deployment c
 | Phase 7 | Daily tracker | Complete |
 | Phase 8 | GDPR compliance | Complete |
 | Phase 9 | Payment card management | Complete |
+| Phase 10 | Rich-text document editor with versioning | Complete |
+| Phase 11 | Music library and floating player | Complete |
+| Phase 12 | Radiation monitor with analytics | Complete |
 
 ---
 
@@ -102,7 +111,10 @@ The project uses an **iterative development model** with continuous deployment c
 | M9 | Daily tracker | Q1 2025 |
 | M10 | GDPR/User rights | Q1 2025 |
 | M11 | Payment cards | Q2 2025 |
-| M12 | Current release | May 2026 |
+| M12 | Music library | Q3 2025 |
+| M13 | Rich-text document editor (TipTap) | Q4 2025 |
+| M14 | Radiation monitor | Q1 2026 |
+| M15 | Current release | May 2026 |
 
 ### 5.2 Current Status
 
@@ -202,6 +214,7 @@ The project is in **maintenance and enhancement phase** with regular updates and
 | Revision | Date | Author | Description |
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SDP creation |
+| 1.1 | May 26, 2026 | System | Added Music, Radiation, TipTap editor phases and milestones; updated dependency versions (Mongoose 8.x, etc.) |
 
 ---
 

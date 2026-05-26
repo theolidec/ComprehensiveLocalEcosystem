@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: OCD-001  
-**Revision**: 1.0  
-**Date**: May 10, 2026  
+**Revision**: 1.1  
+**Date**: May 26, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -99,6 +99,22 @@ The Comprehensive Local Ecosystem was developed to provide individuals with a un
 4. Friends view wishlist and reserve items
 5. User sees reservation status on items
 
+#### 3.4.6 Music Library and Playback
+
+1. User uploads audio file and enters title/artist
+2. User marks song public or keeps it private
+3. User creates playlists and adds songs
+4. User plays music; the floating player remains visible across all pages
+5. User can shuffle, loop, transfer ownership, edit metadata, or browse the Discover feed for public songs
+
+#### 3.4.7 Radiation Measurement Logging
+
+1. User creates named locations (with optional GPS coordinates)
+2. User logs measurements (date, time window, average/peak level, status, tags)
+3. System stores values in µSv/h and converts to the user's preferred unit on display
+4. User reviews analytics (time-series, per-location bar chart, heatmap calendar)
+5. User can mark measurements public, soft-delete with audit trail, and restore later
+
 ---
 
 ## 4. User Classes and Characteristics
@@ -112,13 +128,13 @@ The Comprehensive Local Ecosystem was developed to provide individuals with a un
 | **Authentication** | Email/password with JWT |
 | **Session Management** | Multiple concurrent sessions |
 
-### 4.2 Secondary User Class: Guest (Wiki)
+### 4.2 Secondary User Class: Guest (Public Resources)
 
 | Characteristic | Description |
 |----------------|-------------|
-| **Role** | Wiki viewer/editor (when shared) |
-| **Privileges** | Limited to shared wiki access |
-| **Authentication** | Via shared wiki permissions |
+| **Role** | Read-only consumer of public resources (shared wishlists, public files via share token, public music feed, public radiation feed) |
+| **Privileges** | Limited to the specific shared resource |
+| **Authentication** | None required for public share links; wiki access uses wiki permissions |
 
 ---
 
@@ -168,6 +184,7 @@ The Comprehensive Local Ecosystem was developed to provide individuals with a un
 | Revision | Date | Author | Description |
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial OCD creation |
+| 1.1 | May 26, 2026 | System | Added Music and Radiation scenarios; clarified guest user class |
 
 ---
 
