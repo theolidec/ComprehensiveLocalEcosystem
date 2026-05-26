@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -12,7 +10,7 @@ const handleApiError = (error) => {
 export const wishlistsAPI = {
   getAll: async () => {
     try {
-      const response = await axios.get(API_URLS.WISHLISTS);
+      const response = await api.get(API_URLS.WISHLISTS);
       return response.data.wishlists;
     } catch (error) {
       handleApiError(error);
@@ -21,7 +19,7 @@ export const wishlistsAPI = {
 
   getTemplates: async () => {
     try {
-      const response = await axios.get(`${API_URLS.WISHLISTS}/templates`);
+      const response = await api.get(`${API_URLS.WISHLISTS}/templates`);
       return response.data.templates;
     } catch (error) {
       handleApiError(error);
@@ -30,7 +28,7 @@ export const wishlistsAPI = {
 
   createFromTemplate: async (template, name) => {
     try {
-      const response = await axios.post(`${API_URLS.WISHLISTS}/from-template`, { template, name });
+      const response = await api.post(`${API_URLS.WISHLISTS}/from-template`, { template, name });
       return response.data.wishlist;
     } catch (error) {
       handleApiError(error);
@@ -39,7 +37,7 @@ export const wishlistsAPI = {
 
   getById: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.WISHLISTS}/${id}`);
+      const response = await api.get(`${API_URLS.WISHLISTS}/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -48,7 +46,7 @@ export const wishlistsAPI = {
 
   create: async (data) => {
     try {
-      const response = await axios.post(API_URLS.WISHLISTS, data);
+      const response = await api.post(API_URLS.WISHLISTS, data);
       return response.data.wishlist;
     } catch (error) {
       handleApiError(error);
@@ -57,7 +55,7 @@ export const wishlistsAPI = {
 
   update: async (id, data) => {
     try {
-      const response = await axios.put(`${API_URLS.WISHLISTS}/${id}`, data);
+      const response = await api.put(`${API_URLS.WISHLISTS}/${id}`, data);
       return response.data.wishlist;
     } catch (error) {
       handleApiError(error);
@@ -66,7 +64,7 @@ export const wishlistsAPI = {
 
   delete: async (id) => {
     try {
-      await axios.delete(`${API_URLS.WISHLISTS}/${id}`);
+      await api.delete(`${API_URLS.WISHLISTS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -89,7 +87,7 @@ export const wishlistAPI = {
       queryParams.append('limit', limit);
 
       const url = `${API_URLS.WISHLIST_ITEMS}?${queryParams.toString()}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -99,7 +97,7 @@ export const wishlistAPI = {
   // Get wishlist stats
   getStats: async () => {
     try {
-      const response = await axios.get(API_URLS.WISHLIST_STATS);
+      const response = await api.get(API_URLS.WISHLIST_STATS);
       return response.data.stats;
     } catch (error) {
       handleApiError(error);
@@ -109,7 +107,7 @@ export const wishlistAPI = {
   // Get wishlist analytics for charts
   getAnalytics: async () => {
     try {
-      const response = await axios.get(API_URLS.WISHLIST_ANALYTICS);
+      const response = await api.get(API_URLS.WISHLIST_ANALYTICS);
       return response.data.analytics;
     } catch (error) {
       handleApiError(error);
@@ -119,7 +117,7 @@ export const wishlistAPI = {
   // Get a single wishlist item by ID
   getItemById: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.WISHLIST_ITEMS}/${id}`);
+      const response = await api.get(`${API_URLS.WISHLIST_ITEMS}/${id}`);
       return response.data.item;
     } catch (error) {
       handleApiError(error);
@@ -129,7 +127,7 @@ export const wishlistAPI = {
   // Create a new wishlist item
   createItem: async (itemData) => {
     try {
-      const response = await axios.post(API_URLS.WISHLIST_ITEMS, {
+      const response = await api.post(API_URLS.WISHLIST_ITEMS, {
         title: itemData.title,
         description: itemData.description,
         url: itemData.url,
@@ -149,7 +147,7 @@ export const wishlistAPI = {
   // Update a wishlist item
   updateItem: async (id, itemData) => {
     try {
-      const response = await axios.put(`${API_URLS.WISHLIST_ITEMS}/${id}`, itemData);
+      const response = await api.put(`${API_URLS.WISHLIST_ITEMS}/${id}`, itemData);
       return response.data.item;
     } catch (error) {
       handleApiError(error);
@@ -159,7 +157,7 @@ export const wishlistAPI = {
   // Delete a wishlist item
   deleteItem: async (id) => {
     try {
-      await axios.delete(`${API_URLS.WISHLIST_ITEMS}/${id}`);
+      await api.delete(`${API_URLS.WISHLIST_ITEMS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -169,7 +167,7 @@ export const wishlistAPI = {
   // Share/unshare wishlist item
   toggleShare: async (id) => {
     try {
-      const response = await axios.post(`${API_URLS.WISHLIST_ITEMS}/${id}/share`);
+      const response = await api.post(`${API_URLS.WISHLIST_ITEMS}/${id}/share`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -179,7 +177,7 @@ export const wishlistAPI = {
   // Get reservations for an item
   getReservations: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.WISHLIST_ITEMS}/${id}/reservations`);
+      const response = await api.get(`${API_URLS.WISHLIST_ITEMS}/${id}/reservations`);
       return response.data.reservations;
     } catch (error) {
       handleApiError(error);
@@ -189,7 +187,7 @@ export const wishlistAPI = {
   // Create a reservation for an item (public)
   createReservation: async (id, reservationData) => {
     try {
-      const response = await axios.post(`${API_URLS.WISHLIST_ITEMS}/${id}/reserve`, {
+      const response = await api.post(`${API_URLS.WISHLIST_ITEMS}/${id}/reserve`, {
         name: reservationData.name,
         email: reservationData.email,
         message: reservationData.message,
@@ -204,7 +202,7 @@ export const wishlistAPI = {
   // Cancel a reservation
   cancelReservation: async (reservationId) => {
     try {
-      await axios.delete(`${API_URLS.WISHLIST_ITEMS}/reservations/${reservationId}`);
+      await api.delete(`${API_URLS.WISHLIST_ITEMS}/reservations/${reservationId}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -214,7 +212,7 @@ export const wishlistAPI = {
   // Get public wishlist item by share token
   getPublicItem: async (token) => {
     try {
-      const response = await axios.get(`${API_URLS.WISHLIST_PUBLIC}/${token}`);
+      const response = await api.get(`${API_URLS.WISHLIST_PUBLIC}/${token}`);
       return response.data.item;
     } catch (error) {
       handleApiError(error);
@@ -237,7 +235,7 @@ export const wishlistAPI = {
       }
 
       const url = `${API_URLS.WISHLIST_EXPORT_PDF}?${queryParams.toString()}`;
-      const response = await axios.get(url, { responseType: 'blob' });
+      const response = await api.get(url, { responseType: 'blob' });
 
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -256,7 +254,7 @@ export const wishlistAPI = {
   // Import wishlist from CSV
   importCSV: async (csv) => {
     try {
-      const response = await axios.post(API_URLS.WISHLIST_IMPORT_CSV, { csv });
+      const response = await api.post(API_URLS.WISHLIST_IMPORT_CSV, { csv });
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -267,7 +265,7 @@ export const wishlistAPI = {
 export const followAPI = {
   searchUsers: async (query, page = 1, limit = 20) => {
     try {
-      const response = await axios.get(`${API_URLS.FOLLOW}/search`, { params: { q: query, page, limit } });
+      const response = await api.get(`${API_URLS.FOLLOW}/search`, { params: { q: query, page, limit } });
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -276,7 +274,7 @@ export const followAPI = {
 
   getFollowers: async (userId, page = 1, limit = 20) => {
     try {
-      const response = await axios.get(`${API_URLS.FOLLOW}/${userId}/followers`, { params: { page, limit } });
+      const response = await api.get(`${API_URLS.FOLLOW}/${userId}/followers`, { params: { page, limit } });
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -285,7 +283,7 @@ export const followAPI = {
 
   getFollowing: async (userId, page = 1, limit = 20) => {
     try {
-      const response = await axios.get(`${API_URLS.FOLLOW}/${userId}/following`, { params: { page, limit } });
+      const response = await api.get(`${API_URLS.FOLLOW}/${userId}/following`, { params: { page, limit } });
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -294,7 +292,7 @@ export const followAPI = {
 
   follow: async (userId) => {
     try {
-      const response = await axios.post(`${API_URLS.FOLLOW}/follow/${userId}`);
+      const response = await api.post(`${API_URLS.FOLLOW}/follow/${userId}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -303,7 +301,7 @@ export const followAPI = {
 
   unfollow: async (userId) => {
     try {
-      const response = await axios.delete(`${API_URLS.FOLLOW}/follow/${userId}`);
+      const response = await api.delete(`${API_URLS.FOLLOW}/follow/${userId}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -312,7 +310,7 @@ export const followAPI = {
 
   isFollowing: async (userId) => {
     try {
-      const response = await axios.get(`${API_URLS.FOLLOW}/following/${userId}`);
+      const response = await api.get(`${API_URLS.FOLLOW}/following/${userId}`);
       return response.data.isFollowing;
     } catch (error) {
       handleApiError(error);
@@ -321,7 +319,7 @@ export const followAPI = {
 
   getPublicProfile: async (userId) => {
     try {
-      const response = await axios.get(`${API_URLS.FOLLOW}/public/${userId}`);
+      const response = await api.get(`${API_URLS.FOLLOW}/public/${userId}`);
       return response.data;
     } catch (error) {
       handleApiError(error);

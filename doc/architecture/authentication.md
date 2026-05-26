@@ -331,12 +331,14 @@ function MyComponent() {
 }
 ```
 
-### Axios Configuration
+### fetchClient Configuration
+
+`src/utils/fetchClient.js` is the custom HTTP client used by all service files and components. It wraps the native `fetch` API with:
+- `credentials: 'include'` on every request (equivalent to `withCredentials: true`)
+- Automatic token-refresh on `403 TOKEN_EXPIRED` responses with request queuing
+- Axios-compatible response shape (`{ data }`) and error shape (`err.response = { data, status }`)
 
 ```javascript
-// Automatic cookie handling
-axios.defaults.withCredentials = true;
-
 // Protected route wrapper
 <ProtectedRoute>
   <MyComponent />

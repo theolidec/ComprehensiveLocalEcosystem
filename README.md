@@ -54,25 +54,25 @@ SUM/SIOM (User Manuals)
 
 ### For Everyone
 - **[README.md](README.md)** - This file: Project overview and quick start
-- **[doc/api-overview.md](doc/api-overview.md)** - Complete API reference
+- **[doc/architecture/api-overview.md](doc/architecture/api-overview.md)** - Complete API reference
 
 ### For Developers
 - **[doc/README.md](doc/README.md)** - Documentation index
-- **[doc/development.md](doc/development.md)** - Development setup and workflows
-- **[doc/backend-architecture.md](doc/backend-architecture.md)** - Backend structure and patterns
-- **[doc/frontend-architecture.md](doc/frontend-architecture.md)** - Frontend structure and patterns
-- **[doc/database-models.md](doc/database-models.md)** - All MongoDB schemas
+- **[doc/ops/development.md](doc/ops/development.md)** - Development setup and workflows
+- **[doc/architecture/backend.md](doc/architecture/backend.md)** - Backend structure and patterns
+- **[doc/architecture/frontend.md](doc/architecture/frontend.md)** - Frontend structure and patterns
+- **[doc/architecture/database.md](doc/architecture/database.md)** - All MongoDB schemas
 
 ### For API Consumers
-- **[doc/api-overview.md](doc/api-overview.md)** - Complete API reference
-- **[doc/authentication.md](doc/authentication.md)** - Authentication flow
+- **[doc/architecture/api-overview.md](doc/architecture/api-overview.md)** - Complete API reference
+- **[doc/architecture/authentication.md](doc/architecture/authentication.md)** - Authentication flow
 
 ### For Security Review
 - **[SECURITY.md](SECURITY.md)** - Security policy
-- **[doc/security.md](doc/security.md)** - Security implementation details
+- **[doc/ops/security.md](doc/ops/security.md)** - Security implementation details
 
 ### For Operations
-- **[doc/deployment.md](doc/deployment.md)** - Production deployment guide
+- **[doc/ops/deployment.md](doc/ops/deployment.md)** - Production deployment guide
 - **[GITHUB_WORKFLOW.md](GITHUB_WORKFLOW.md)** - CI/CD workflow
 
 ## Key Features
@@ -119,7 +119,10 @@ SUM/SIOM (User Manuals)
 
 ### File Manager
 - **Complete File Management**: Upload, download, organize files with folder structure
+- **Rich Document Editor**: TipTap WYSIWYG editor with active toolbar state (heading/font/size reflect current selection), blockquote, inline code, word count status bar, and working download dropdown
 - **Document Viewer**: Built-in text and markdown file editor with live preview
+- **Audio Player**: Native HTML5 audio player for audio files (MP3, WAV, OGG, etc.)
+- **Responsive PDF Viewer**: PDF page width adapts to container via ResizeObserver
 - **File Organization**: Create folders, move files, favorite files
 - **File Types Supported**: Images, documents (PDF, Word, Excel, PowerPoint), spreadsheets, code files, archives, audio, video
 - **Trash System**: Soft delete with restore functionality
@@ -326,7 +329,7 @@ cd frontend && npm start     # Frontend on http://localhost:3000
 
 ## API Endpoints
 
-For detailed API documentation including request/response examples, see [doc/api-overview.md](doc/api-overview.md).
+For detailed API documentation including request/response examples, see [doc/architecture/api-overview.md](doc/architecture/api-overview.md).
 
 **Quick API Reference:**
 - Authentication: `/api/auth/*` - Register, login, logout, password reset
@@ -363,7 +366,7 @@ For detailed application flow and usage instructions, see [doc/README.md](doc/RE
 
 ## Security
 
-For detailed security implementation, see [SECURITY.md](SECURITY.md) and [doc/security.md](doc/security.md).
+For detailed security implementation, see [SECURITY.md](SECURITY.md) and [doc/ops/security.md](doc/ops/security.md).
 
 **Key Security Features:**
 - JWT-based authentication with HttpOnly cookies
@@ -374,7 +377,7 @@ For detailed security implementation, see [SECURITY.md](SECURITY.md) and [doc/se
 
 ## Project Structure
 
-For detailed project structure and architecture documentation, see [doc/backend-architecture.md](doc/backend-architecture.md) and [doc/frontend-architecture.md](doc/frontend-architecture.md).
+For detailed project structure and architecture documentation, see [doc/architecture/backend.md](doc/architecture/backend.md) and [doc/architecture/frontend.md](doc/architecture/frontend.md).
 
 **High-Level Structure:**
 ```
@@ -537,10 +540,10 @@ curl http://localhost:3001/health
 
 ### Technical & Development
 - **Documentation Index:** [doc/README.md](./doc/README.md)
-- **Backend Architecture:** [doc/backend-architecture.md](./doc/backend-architecture.md)
-- **Frontend Architecture:** [doc/frontend-architecture.md](./doc/frontend-architecture.md)
-- **Database Models:** [doc/database-models.md](./doc/database-models.md)
-- **API Overview:** [doc/api-overview.md](./doc/api-overview.md)
+- **Backend Architecture:** [doc/architecture/backend.md](./doc/architecture/backend.md)
+- **Frontend Architecture:** [doc/architecture/frontend.md](./doc/architecture/frontend.md)
+- **Database Models:** [doc/architecture/database.md](./doc/architecture/database.md)
+- **API Overview:** [doc/architecture/api-overview.md](./doc/architecture/api-overview.md)
 
 ### MIL-STD-498 Documentation
 - **MIL-STD-498 Overview:** [doc/MIL-STD-498/MIL-STD-498.md](./doc/MIL-STD-498/MIL-STD-498.md)
@@ -551,7 +554,7 @@ curl http://localhost:3001/health
 
 ### Security & Legal
 - **Security Policy:** [SECURITY.md](./SECURITY.md)
-- **Security Implementation:** [doc/security.md](./doc/security.md)
+- **Security Implementation:** [doc/ops/security.md](./doc/ops/security.md)
 - **Privacy Policy:** [PRIVACY.md](./PRIVACY.md)
 - **Terms of Service:** [TERMS.md](./TERMS.md)
 - **Cookie Policy:** [COOKIE_POLICY.md](./COOKIE_POLICY.md)
@@ -571,7 +574,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.7.1
-**Last Updated**: 2026-05-21
+**Version**: 2.8.0
+**Last Updated**: 2026-05-26
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -23,7 +21,7 @@ export const trackerAPI = {
       if (sort) queryParams.append('sort', sort);
       queryParams.append('page', page);
       queryParams.append('limit', limit);
-      const response = await axios.get(`${API_URLS.TRACKER_TASKS}?${queryParams.toString()}`);
+      const response = await api.get(`${API_URLS.TRACKER_TASKS}?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -32,7 +30,7 @@ export const trackerAPI = {
 
   getTodayTasks: async () => {
     try {
-      const response = await axios.get(API_URLS.TRACKER_TASKS_TODAY);
+      const response = await api.get(API_URLS.TRACKER_TASKS_TODAY);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -41,7 +39,7 @@ export const trackerAPI = {
 
   createTask: async (taskData) => {
     try {
-      const response = await axios.post(API_URLS.TRACKER_TASKS, taskData);
+      const response = await api.post(API_URLS.TRACKER_TASKS, taskData);
       return response.data.task;
     } catch (error) {
       handleApiError(error);
@@ -50,7 +48,7 @@ export const trackerAPI = {
 
   updateTask: async (id, taskData) => {
     try {
-      const response = await axios.put(`${API_URLS.TRACKER_TASKS}/${id}`, taskData);
+      const response = await api.put(`${API_URLS.TRACKER_TASKS}/${id}`, taskData);
       return response.data.task;
     } catch (error) {
       handleApiError(error);
@@ -59,7 +57,7 @@ export const trackerAPI = {
 
   deleteTask: async (id) => {
     try {
-      await axios.delete(`${API_URLS.TRACKER_TASKS}/${id}`);
+      await api.delete(`${API_URLS.TRACKER_TASKS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -73,7 +71,7 @@ export const trackerAPI = {
       if (params.category) queryParams.append('category', params.category);
       if (params.isActive !== undefined) queryParams.append('isActive', params.isActive);
       const url = `${API_URLS.TRACKER_QUESTIONS}${queryParams.toString() ? '?' + queryParams.toString() : ''}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data.questions;
     } catch (error) {
       handleApiError(error);
@@ -82,7 +80,7 @@ export const trackerAPI = {
 
   createQuestion: async (questionData) => {
     try {
-      const response = await axios.post(API_URLS.TRACKER_QUESTIONS, questionData);
+      const response = await api.post(API_URLS.TRACKER_QUESTIONS, questionData);
       return response.data.question;
     } catch (error) {
       handleApiError(error);
@@ -91,7 +89,7 @@ export const trackerAPI = {
 
   updateQuestion: async (id, questionData) => {
     try {
-      const response = await axios.put(`${API_URLS.TRACKER_QUESTIONS}/${id}`, questionData);
+      const response = await api.put(`${API_URLS.TRACKER_QUESTIONS}/${id}`, questionData);
       return response.data.question;
     } catch (error) {
       handleApiError(error);
@@ -100,7 +98,7 @@ export const trackerAPI = {
 
   deleteQuestion: async (id) => {
     try {
-      await axios.delete(`${API_URLS.TRACKER_QUESTIONS}/${id}`);
+      await api.delete(`${API_URLS.TRACKER_QUESTIONS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -116,7 +114,7 @@ export const trackerAPI = {
       if (endDate) queryParams.append('endDate', endDate);
       queryParams.append('page', page);
       queryParams.append('limit', limit);
-      const response = await axios.get(`${API_URLS.TRACKER_RESPONSES}?${queryParams.toString()}`);
+      const response = await api.get(`${API_URLS.TRACKER_RESPONSES}?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -125,7 +123,7 @@ export const trackerAPI = {
 
   getTodayResponse: async () => {
     try {
-      const response = await axios.get(API_URLS.TRACKER_RESPONSES_TODAY);
+      const response = await api.get(API_URLS.TRACKER_RESPONSES_TODAY);
       return response.data.response;
     } catch (error) {
       handleApiError(error);
@@ -134,7 +132,7 @@ export const trackerAPI = {
 
   saveResponse: async (responseData) => {
     try {
-      const response = await axios.post(API_URLS.TRACKER_RESPONSES, responseData);
+      const response = await api.post(API_URLS.TRACKER_RESPONSES, responseData);
       return response.data.response;
     } catch (error) {
       handleApiError(error);
@@ -144,7 +142,7 @@ export const trackerAPI = {
   // ===== STATS & ANALYTICS =====
   getStats: async () => {
     try {
-      const response = await axios.get(API_URLS.TRACKER_STATS);
+      const response = await api.get(API_URLS.TRACKER_STATS);
       return response.data.stats;
     } catch (error) {
       handleApiError(error);
@@ -153,7 +151,7 @@ export const trackerAPI = {
 
   getAnalytics: async () => {
     try {
-      const response = await axios.get(API_URLS.TRACKER_ANALYTICS);
+      const response = await api.get(API_URLS.TRACKER_ANALYTICS);
       return response.data.analytics;
     } catch (error) {
       handleApiError(error);
@@ -164,7 +162,7 @@ export const trackerAPI = {
     try {
       const queryParams = new URLSearchParams();
       if (year) queryParams.append('year', year);
-      const response = await axios.get(`${API_URLS.TRACKER_HEATMAP}?${queryParams.toString()}`);
+      const response = await api.get(`${API_URLS.TRACKER_HEATMAP}?${queryParams.toString()}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -174,7 +172,7 @@ export const trackerAPI = {
   // ===== EXPORT / IMPORT =====
   exportData: async () => {
     try {
-      const response = await axios.get(API_URLS.TRACKER_EXPORT);
+      const response = await api.get(API_URLS.TRACKER_EXPORT);
       return response.data.export;
     } catch (error) {
       handleApiError(error);
@@ -183,7 +181,7 @@ export const trackerAPI = {
 
   importData: async (data) => {
     try {
-      const response = await axios.post(API_URLS.TRACKER_IMPORT, data);
+      const response = await api.post(API_URLS.TRACKER_IMPORT, data);
       return response.data;
     } catch (error) {
       handleApiError(error);

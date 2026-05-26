@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { 
   Upload, Folder, FolderPlus, File, FileText, Image, Film, 
   Music, Archive, Download, Trash2, Share2, 

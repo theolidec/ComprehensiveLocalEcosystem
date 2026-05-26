@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -20,7 +18,7 @@ export const passwordAPI = {
       if (search) queryParams.append('search', search);
 
       const url = `${API_URLS.PASSWORDS}?${queryParams.toString()}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -29,7 +27,7 @@ export const passwordAPI = {
 
   getPasswordById: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.PASSWORDS}/${id}`);
+      const response = await api.get(`${API_URLS.PASSWORDS}/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -38,7 +36,7 @@ export const passwordAPI = {
 
   createPassword: async (passwordData) => {
     try {
-      const response = await axios.post(API_URLS.PASSWORDS, {
+      const response = await api.post(API_URLS.PASSWORDS, {
         title: passwordData.title,
         username: passwordData.username,
         email: passwordData.email,
@@ -56,7 +54,7 @@ export const passwordAPI = {
 
   updatePassword: async (id, passwordData) => {
     try {
-      const response = await axios.put(`${API_URLS.PASSWORDS}/${id}`, {
+      const response = await api.put(`${API_URLS.PASSWORDS}/${id}`, {
         title: passwordData.title,
         username: passwordData.username,
         email: passwordData.email,
@@ -74,7 +72,7 @@ export const passwordAPI = {
 
   deletePassword: async (id) => {
     try {
-      await axios.delete(`${API_URLS.PASSWORDS}/${id}`);
+      await api.delete(`${API_URLS.PASSWORDS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -83,7 +81,7 @@ export const passwordAPI = {
 
   decryptPassword: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.PASSWORDS}/${id}/decrypt`);
+      const response = await api.get(`${API_URLS.PASSWORDS}/${id}/decrypt`);
       return response.data.password;
     } catch (error) {
       handleApiError(error);
@@ -92,7 +90,7 @@ export const passwordAPI = {
 
   toggleFavorite: async (id) => {
     try {
-      const response = await axios.post(`${API_URLS.PASSWORDS}/${id}/favorite`);
+      const response = await api.post(`${API_URLS.PASSWORDS}/${id}/favorite`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -101,7 +99,7 @@ export const passwordAPI = {
 
   exportPasswords: async () => {
     try {
-      const response = await axios.get(`${API_URLS.PASSWORDS}/export`, {
+      const response = await api.get(`${API_URLS.PASSWORDS}/export`, {
         responseType: 'blob'
       });
       const url = window.URL.createObjectURL(new Blob([JSON.stringify(response.data, null, 2)]));
@@ -119,7 +117,7 @@ export const passwordAPI = {
 
   exportPasswordsCSV: async () => {
     try {
-      const response = await axios.get(`${API_URLS.PASSWORDS}/export/csv`, {
+      const response = await api.get(`${API_URLS.PASSWORDS}/export/csv`, {
         responseType: 'blob'
       });
       const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -138,7 +136,7 @@ export const passwordAPI = {
 
   importPasswords: async (data) => {
     try {
-      const response = await axios.post(`${API_URLS.PASSWORDS}/import`, data);
+      const response = await api.post(`${API_URLS.PASSWORDS}/import`, data);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -147,7 +145,7 @@ export const passwordAPI = {
 
   importPasswordsCSV: async (csvData) => {
     try {
-      const response = await axios.post(`${API_URLS.PASSWORDS}/import/csv`, { csvData });
+      const response = await api.post(`${API_URLS.PASSWORDS}/import/csv`, { csvData });
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -156,7 +154,7 @@ export const passwordAPI = {
 
   getCategories: async () => {
     try {
-      const response = await axios.get(API_URLS.PASSWORD_CATEGORIES);
+      const response = await api.get(API_URLS.PASSWORD_CATEGORIES);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -165,7 +163,7 @@ export const passwordAPI = {
 
   createCategory: async (data) => {
     try {
-      const response = await axios.post(API_URLS.PASSWORD_CATEGORIES, data);
+      const response = await api.post(API_URLS.PASSWORD_CATEGORIES, data);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -174,7 +172,7 @@ export const passwordAPI = {
 
   updateCategory: async (id, data) => {
     try {
-      const response = await axios.put(`${API_URLS.PASSWORD_CATEGORIES}/${id}`, data);
+      const response = await api.put(`${API_URLS.PASSWORD_CATEGORIES}/${id}`, data);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -183,7 +181,7 @@ export const passwordAPI = {
 
   deleteCategory: async (id) => {
     try {
-      const response = await axios.delete(`${API_URLS.PASSWORD_CATEGORIES}/${id}`);
+      const response = await api.delete(`${API_URLS.PASSWORD_CATEGORIES}/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);

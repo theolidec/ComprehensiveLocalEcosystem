@@ -12,7 +12,7 @@
 - Floating player visible on all pages (appears when a song is selected)
 
 ## Backend
-- Endpoints: `/api/music` (see `doc/api-overview.md`)
+- Endpoints: `/api/music` (see `doc/architecture/api-overview.md`)
 - Models: `Music`, `Playlist`
 - Controller: `musicController.js`
 - Route: `routes/music.js`
@@ -56,4 +56,4 @@
 - When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
 
 ## Architecture References
-- See also: `doc/backend-architecture.md`, `doc/frontend-architecture.md`, `doc/api-overview.md`
+- See also: `doc/architecture/backend.md`, `doc/architecture/frontend.md`, `doc/architecture/api-overview.md`

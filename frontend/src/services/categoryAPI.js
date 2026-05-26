@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -12,7 +10,7 @@ const handleApiError = (error) => {
 export const categoryAPI = {
   getCategories: async () => {
     try {
-      const response = await axios.get(`${API_URLS.CATEGORIES}`);
+      const response = await api.get(`${API_URLS.CATEGORIES}`);
       return response.data.categories;
     } catch (error) {
       handleApiError(error);
@@ -21,7 +19,7 @@ export const categoryAPI = {
 
   createCategory: async (categoryData) => {
     try {
-      const response = await axios.post(`${API_URLS.CATEGORIES}`, {
+      const response = await api.post(`${API_URLS.CATEGORIES}`, {
         name: categoryData.name,
         color: categoryData.color || '#3B82F6',
         icon: categoryData.icon || '📅'
@@ -34,7 +32,7 @@ export const categoryAPI = {
 
   updateCategory: async (id, categoryData) => {
     try {
-      const response = await axios.put(`${API_URLS.CATEGORIES}/${id}`, categoryData);
+      const response = await api.put(`${API_URLS.CATEGORIES}/${id}`, categoryData);
       return response.data.category;
     } catch (error) {
       handleApiError(error);
@@ -43,7 +41,7 @@ export const categoryAPI = {
 
   deleteCategory: async (id) => {
     try {
-      await axios.delete(`${API_URLS.CATEGORIES}/${id}`);
+      await api.delete(`${API_URLS.CATEGORIES}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);

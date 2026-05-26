@@ -9,42 +9,42 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | Document | Description | Audience |
 |----------|-------------|----------|
 | [`../README.md`](../README.md) | Project overview and quick start | Everyone |
-| [`development.md`](development.md) | Development setup and workflows | Developers |
-| [`deployment.md`](deployment.md) | Production deployment guide | DevOps |
+| [`ops/development.md`](ops/development.md) | Development setup and workflows | Developers |
+| [`ops/deployment.md`](ops/deployment.md) | Production deployment guide | DevOps |
 
 ### Architecture & Technical Documentation
 
 | Document | Description | Key Topics |
 |----------|-------------|------------|
-| [`backend-architecture.md`](backend-architecture.md) | Backend structure and patterns | Express, middleware, controllers, services |
-| [`frontend-architecture.md`](frontend-architecture.md) | Frontend structure and patterns | React, contexts, components, hooks |
-| [`database-models.md`](database-models.md) | All MongoDB schemas | Models, indexes, relationships |
-| [`authentication.md`](authentication.md) | Auth system deep dive | JWT, sessions, security |
+| [`architecture/backend.md`](architecture/backend.md) | Backend structure and patterns | Express, middleware, controllers, services |
+| [`architecture/frontend.md`](architecture/frontend.md) | Frontend structure and patterns | React, contexts, components, hooks |
+| [`architecture/database.md`](architecture/database.md) | All MongoDB schemas | Models, indexes, relationships |
+| [`architecture/authentication.md`](architecture/authentication.md) | Auth system deep dive | JWT, sessions, security |
 
 ### API & Module Documentation
 
 | Document | Description | Endpoints |
 |----------|-------------|-----------|
-| [`api-overview.md`](api-overview.md) | Complete API reference | All endpoints |
-| [`calendar.md`](calendar.md) | Calendar module | `/api/calendar/*` |
-| [`categories.md`](categories.md) | Category management | `/api/categories/*` |
-| [`files.md`](files.md) | File management | `/api/files/*`, `/api/file-folders/*` |
-| [`passwords.md`](passwords.md) | Password manager | `/api/passwords/*` |
-| [`settings.md`](settings.md) | User settings & GDPR rights | `/api/settings/*`, `/api/user/*` |
-| [`wishlist.md`](wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
-| [`wiki.md`](wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
-| [`user-following.md`](user-following.md) | Social features | `/api/follow/*` |
-| [`geogebra-calculator.md`](geogebra-calculator.md) | Graphing Calculator (filename kept for backward compatibility — no GeoGebra code is used) | Frontend component |
-| [`daily-tracker.md`](daily-tracker.md) | Daily tracker | `/api/tracker/*` |
-| [`MUSIC_MODULE.md`](MUSIC_MODULE.md) | Music system | `/api/music/*` |
-| [`radiation.md`](radiation.md) | Radiation monitor | `/api/radiation/*` |
+| [`architecture/api-overview.md`](architecture/api-overview.md) | Complete API reference | All endpoints |
+| [`modules/calendar.md`](modules/calendar.md) | Calendar module | `/api/calendar/*` |
+| [`modules/categories.md`](modules/categories.md) | Category management | `/api/categories/*` |
+| [`modules/files.md`](modules/files.md) | File management | `/api/files/*`, `/api/file-folders/*` |
+| [`modules/passwords.md`](modules/passwords.md) | Password manager | `/api/passwords/*` |
+| [`modules/settings.md`](modules/settings.md) | User settings & GDPR rights | `/api/settings/*`, `/api/user/*` |
+| [`modules/wishlist.md`](modules/wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
+| [`modules/wiki.md`](modules/wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
+| [`modules/user-following.md`](modules/user-following.md) | Social features | `/api/follow/*` |
+| [`modules/calculator.md`](modules/calculator.md) | Graphing Calculator | Frontend component |
+| [`modules/daily-tracker.md`](modules/daily-tracker.md) | Daily tracker | `/api/tracker/*` |
+| [`modules/music.md`](modules/music.md) | Music system | `/api/music/*` |
+| [`modules/radiation.md`](modules/radiation.md) | Radiation monitor | `/api/radiation/*` |
 
 ### Security & Operations
 
 | Document | Description | Topics |
 |----------|-------------|--------|
-| [`security.md`](security.md) | Security implementation | JWT, encryption, headers, CORS |
-| [`deployment.md`](deployment.md) | Deployment guide | Docker, Nginx, SSL |
+| [`ops/security.md`](ops/security.md) | Security implementation | JWT, encryption, headers, CORS |
+| [`ops/deployment.md`](ops/deployment.md) | Deployment guide | Docker, Nginx, SSL |
 
 ### MIL-STD-498 Compliance
 
@@ -64,55 +64,55 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 
 Start here if you're contributing code:
 
-1. [`development.md`](development.md) - Setup your environment
-2. [`backend-architecture.md`](backend-architecture.md) - Understand backend patterns
-3. [`frontend-architecture.md`](frontend-architecture.md) - Understand frontend patterns
-4. [`database-models.md`](database-models.md) - Review data structures
-5. [`api-overview.md`](api-overview.md) - API reference
+1. [`ops/development.md`](ops/development.md) - Setup your environment
+2. [`architecture/backend.md`](architecture/backend.md) - Understand backend patterns
+3. [`architecture/frontend.md`](architecture/frontend.md) - Understand frontend patterns
+4. [`architecture/database.md`](architecture/database.md) - Review data structures
+5. [`architecture/api-overview.md`](architecture/api-overview.md) - API reference
 
 ### For DevOps/SRE
 
 Start here if you're deploying or maintaining:
 
-1. [`deployment.md`](deployment.md) - Deployment options
-2. [`security.md`](security.md) - Security configuration
-3. [`backend-architecture.md`](backend-architecture.md) - Server structure
+1. [`ops/deployment.md`](ops/deployment.md) - Deployment options
+2. [`ops/security.md`](ops/security.md) - Security configuration
+3. [`architecture/backend.md`](architecture/backend.md) - Server structure
 
 ### For API Consumers
 
 Start here if you're integrating with the API:
 
-1. [`api-overview.md`](api-overview.md) - Complete API reference
-2. [`authentication.md`](authentication.md) - Authentication flow
+1. [`architecture/api-overview.md`](architecture/api-overview.md) - Complete API reference
+2. [`architecture/authentication.md`](architecture/authentication.md) - Authentication flow
 
 ### For Security Review
 
-1. [`security.md`](security.md) - Security measures
-2. [`authentication.md`](authentication.md) - Auth implementation
-3. [`backend-architecture.md`](backend-architecture.md) - Middleware and validation
+1. [`ops/security.md`](ops/security.md) - Security measures
+2. [`architecture/authentication.md`](architecture/authentication.md) - Auth implementation
+3. [`architecture/backend.md`](architecture/backend.md) - Middleware and validation
 
 ## Module Quick Reference
 
 ### Authentication & Users
-- [`authentication.md`](authentication.md) - JWT, sessions, cookies
-- [`settings.md`](settings.md) - User preferences, GDPR user rights (view/export/correct/delete data)
-- [`user-following.md`](user-following.md) - Social features
+- [`architecture/authentication.md`](architecture/authentication.md) - JWT, sessions, cookies
+- [`modules/settings.md`](modules/settings.md) - User preferences, GDPR user rights (view/export/correct/delete data)
+- [`modules/user-following.md`](modules/user-following.md) - Social features
 
 ### Content Management
-- [`calendar.md`](calendar.md) - Events and scheduling
-- [`files.md`](files.md) - File storage and management
-- [`wiki.md`](wiki.md) - Knowledge base
+- [`modules/calendar.md`](modules/calendar.md) - Events and scheduling
+- [`modules/files.md`](modules/files.md) - File storage and management
+- [`modules/wiki.md`](modules/wiki.md) - Knowledge base
 
 ### Personal Tools
-- [`passwords.md`](passwords.md) - Password vault
-- [`wishlist.md`](wishlist.md) - Gift registry
-- [`geogebra-calculator.md`](geogebra-calculator.md) - Graphing Calculator (custom implementation)
-- [`daily-tracker.md`](daily-tracker.md) - Habit & task tracker
-- [`MUSIC_MODULE.md`](MUSIC_MODULE.md) - Music library and playlist player
-- [`radiation.md`](radiation.md) - Radiation monitor
+- [`modules/passwords.md`](modules/passwords.md) - Password vault
+- [`modules/wishlist.md`](modules/wishlist.md) - Gift registry
+- [`modules/calculator.md`](modules/calculator.md) - Graphing Calculator (custom implementation)
+- [`modules/daily-tracker.md`](modules/daily-tracker.md) - Habit & task tracker
+- [`modules/music.md`](modules/music.md) - Music library and playlist player
+- [`modules/radiation.md`](modules/radiation.md) - Radiation monitor
 
 ### Organization
-- [`categories.md`](categories.md) - Event categories
+- [`modules/categories.md`](modules/categories.md) - Event categories
 
 ## Search Tips
 
@@ -125,10 +125,10 @@ Start here if you're integrating with the API:
 
 When adding features:
 
-1. Update relevant module docs (e.g., `calendar.md`)
-2. Update `api-overview.md` if adding endpoints
-3. Update `database-models.md` if adding models
-4. Add architecture notes to `backend-architecture.md` or `frontend-architecture.md`
+1. Update relevant module docs (e.g., `modules/calendar.md`)
+2. Update `architecture/api-overview.md` if adding endpoints
+3. Update `architecture/database.md` if adding models
+4. Add architecture notes to `architecture/backend.md` or `architecture/frontend.md`
 
 ## Documentation Standards
 
@@ -149,14 +149,46 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 22, 2026  
-**Version**: 2.7.2
+**Last Updated**: May 26, 2026  
+**Version**: 2.8.0
 
 ## Recent Changes
 
+### Dependency Pruning + fetchClient Migration (v2.8.0, 2026-05-26)
+
+**Backend — zero new external runtime deps added:**
+- **`server.js`**: Replaced `dotenv` with inline `.env` loader (does not overwrite env vars already set by the shell); replaced `cookie-parser` with inline cookie middleware; replaced `morgan` with a custom combined-format request logger piped to Winston; replaced `node-cron` with a `setTimeout`-based recursive daily scheduler (`scheduleDailyCleanup`) that fires at 03:15 server time.
+- **`backend/package.json`**: Removed `cookie-parser`, `dotenv`, `morgan`, `node-cron`, `socket.io`, `socket.io-client`, `moment-timezone` (and their `@types/` entries).
+- **`services/recurringEventService.js`**: Removed unused `moment-timezone` import.
+- **`models/UserFollow.js`**: `getFollowers`/`getFollowing` statics now detect and lazily remove orphaned follow records (user was deleted but follow row persists); returns only valid populated users and adjusts pagination totals accordingly.
+
+**Frontend — axios replaced with `fetchClient`:**
+- **`src/utils/fetchClient.js`** (new): Thin native-`fetch` wrapper (`get/post/put/delete`) with `credentials: 'include'`, automatic `TOKEN_EXPIRED` → refresh → retry logic (queue-based for concurrent requests), blob response support, and `params` query-string helper.
+- **`src/contexts/AuthContext.js`**: Removed axios import, axios defaults, and axios response interceptors; now uses `fetchClient`.
+- **`src/services/*.js`** (all 11 service files): Replaced every `axios.*` call with `api.*` from `fetchClient`.
+- **`src/components/Pages/DocumentViewer.js`**: Migrated to `fetchClient`.
+- **`src/components/music/MusicUpload.js`**, **`Playlist.js`**: Migrated to `fetchClient`.
+- **`frontend/package.json`**: Removed `axios`, `socket.io-client`, `web-vitals`.
+- **`src/index.js`**: Removed `reportWebVitals` import and call.
+
+**Frontend — component improvements:**
+- **`DocumentEditor.js`** (TipTap rich-text editor):
+  - Toolbar heading/font/size buttons now reflect the current editor selection (`getHeadingLabel()`, `getCurrentFontName()`, `getCurrentFontSize()`).
+  - Download button is a dropdown (HTML / TXT) instead of two inline text buttons; `showDownloadMenu` state, toggled by the Download icon.
+  - Added **Blockquote** and **Inline Code** toolbar buttons.
+- **`DocumentViewer.js`** (file preview):
+  - Added native HTML5 `<audio>` player for audio MIME types (MP3, WAV, OGG, etc.).
+  - PDF page width now adapts to the container via `ResizeObserver` (`pdfWidth` state, `pdfContainerRef`).
+
+**Documentation restructuring:**
+- `doc/` flat files moved to subdirectories: `doc/architecture/` (api-overview, authentication, backend, database, frontend), `doc/modules/` (all module docs), `doc/ops/` (deployment, development, security).
+- `README.md`, `doc/README.md`, `doc/MIL-STD-498/SDP.md`: All internal links updated to new paths.
+- `THIRD_PARTY_NOTICES.md`: Removed entries for pruned dependencies; last-reviewed date updated to 2026-05-26.
+- **`doc/architecture/frontend.md`**: Fixed stale `axios` in code examples (File Upload Pattern, Error Handling) to use `api` from `fetchClient`; removed `onUploadProgress` (axios-specific, not in `fetchClient`).
+
 ### Bug Fix: Mobile Header Radiation Link (v2.7.2, 2026-05-22)
 - **`Header.js`**: Added missing Radiation Monitor entry to the mobile hamburger menu apps list. The desktop dropdown already had it; the mobile list was not updated when the module was added.
-- **Documentation**: Updated `doc/settings.md` (radiation schema block, quickActions default, `PUT /radiation` endpoint, `updateRadiationSettings` controller method); `doc/database-models.md` (Settings model radiation sub-document); `doc/frontend-architecture.md` (SettingsContext methods).
+- **Documentation**: Updated `doc/modules/settings.md` (radiation schema block, quickActions default, `PUT /radiation` endpoint, `updateRadiationSettings` controller method); `doc/architecture/database.md` (Settings model radiation sub-document); `doc/architecture/frontend.md` (SettingsContext methods).
 
 ### Mobile Compliance (v2.7.1, 2026-05-21)
 - **`Row.js`**: Removed inline `flexDirection: 'row'` style; direction now managed exclusively by `.layout-row` CSS so media queries can override it.
@@ -164,7 +196,7 @@ If you find gaps in documentation:
 - **`Sidebar.css`**: `.sidebar-inline` hidden via `display: none` on ≤768px (media query placed after base rule for correct cascade).
 - **`Header.js`**: Mobile hamburger menu now exposes full navigation: Calendar actions, current page's sidebar actions (from `PageActionsContext`), all app links, and account section. Home-page welcome greeting hidden on mobile (`hidden sm:block`).
 - **`FloatingMusicPlayer.js`**: Responsive sizing — `w-72` (288px) on mobile vs `w-80` (320px) on desktop, smaller padding and offset on small screens, capped with `max-w-[calc(100vw-1rem)]`.
-- **Documentation**: Added `## Mobile Compliance` section to `doc/frontend-architecture.md`.
+- **Documentation**: Added `## Mobile Compliance` section to `doc/architecture/frontend.md`.
 
 ### Music System (v2.7.0, 2026-05-19)
 - **Backend**: `Music` and `Playlist` models; `musicController.js`; `routes/music.js` mounted at `/api/music`
@@ -176,7 +208,7 @@ If you find gaps in documentation:
   - Floating player visible on all pages (bottom-right)
   - Shuffle, loop, auto-advance, and visual playlist indicators
 - **Config**: `src/config/api.js` expanded with all `MUSIC_*` endpoint constants
-- **Documentation**: Added `doc/MUSIC_MODULE.md`; updated `doc/database-models.md`, `doc/backend-architecture.md`, `doc/frontend-architecture.md`, `doc/api-overview.md`, and root `README.md`
+- **Documentation**: Added `doc/modules/music.md`; updated `doc/architecture/database.md`, `doc/architecture/backend.md`, `doc/architecture/frontend.md`, `doc/architecture/api-overview.md`, and root `README.md`
 
 ### Security Hardening Pass (v2.6.0, 2026-05-13)
 A comprehensive backend security audit and hardening pass:
@@ -202,12 +234,12 @@ A comprehensive backend security audit and hardening pass:
 ### Documentation Audit (2026-05-12)
 A full doc-vs-code audit was performed and the following inconsistencies were corrected:
 - **`README.md`**: Version 2.2.0 → 2.5.0; Last Updated → 2026-05-12.
-- **`DOCUMENTATION.md`**: Removed in favor of modular `doc/` files. All content migrated to `doc/api-overview.md`, `doc/backend-architecture.md`, `doc/frontend-architecture.md`, `doc/security.md`, and `doc/database-models.md`.
-- **`doc/backend-architecture.md`**: Updated dependency versions (Mongoose 7→8.6, bcryptjs 2→3, multer 1→2.1, express-rate-limit 6→7); listed all 17 route mounts in `server.js`; expanded rate limiter list from 5 to 8; documented `pdfkit` and `moment-timezone` actual usage, and noted `socket.io`/`socket.io-client`/`node-cron` as reserved/unused dependencies.
-- **`doc/frontend-architecture.md`**: React Router 6 → 7; added TipTap suite, DOMPurify, react-markdown, remark-gfm, pdfjs-dist, react-pdf to the stack; documented `socket.io-client` as reserved; expanded component tree to include `Tracker/`, `Editor/`, `FileManager/` subfolders and `DocumentEditor_old.js`; replaced services table with current 10-file list.
-- **`doc/database-models.md`**: Fixed `WishlistCategory` schema (it is per-user, not per-wishlist; correct fields are `name`, `color`, `icon`, `user`, `isDefault`); added `wishlist.saveItemsPerPageCookie` to Settings.
+- **`DOCUMENTATION.md`**: Removed in favor of modular `doc/` files. All content migrated to `doc/architecture/api-overview.md`, `doc/architecture/backend.md`, `doc/architecture/frontend.md`, `doc/ops/security.md`, and `doc/architecture/database.md`.
+- **`doc/architecture/backend.md`**: Updated dependency versions (Mongoose 7→8.6, bcryptjs 2→3, multer 1→2.1, express-rate-limit 6→7); listed all 17 route mounts in `server.js`; expanded rate limiter list from 5 to 8; documented `pdfkit` and `moment-timezone` actual usage, and noted `socket.io`/`socket.io-client`/`node-cron` as reserved/unused dependencies.
+- **`doc/architecture/frontend.md`**: React Router 6 → 7; added TipTap suite, DOMPurify, react-markdown, remark-gfm, pdfjs-dist, react-pdf to the stack; documented `socket.io-client` as reserved; expanded component tree to include `Tracker/`, `Editor/`, `FileManager/` subfolders and `DocumentEditor_old.js`; replaced services table with current 10-file list.
+- **`doc/architecture/database.md`**: Fixed `WishlistCategory` schema (it is per-user, not per-wishlist; correct fields are `name`, `color`, `icon`, `user`, `isDefault`); added `wishlist.saveItemsPerPageCookie` to Settings.
 - **`SECURITY.md`**: Added v2.4.0 (GDPR User Rights) and v2.5.0 (Payment Cards) to changelog.
-- **`doc/security.md`**: Documented that `/api/auth/forgot-password` currently only **logs** the reset token; email delivery is a TODO.
+- **`doc/ops/security.md`**: Documented that `/api/auth/forgot-password` currently only **logs** the reset token; email delivery is a TODO.
 
 ### User Rights / GDPR Implementation (v2.4.0)
 - **Backend**: Added `/api/user/*` endpoints for GDPR compliance
@@ -254,7 +286,7 @@ A full doc-vs-code audit was performed and the following inconsistencies were co
 - **Frontend**: Analytics charts built with pure SVG/Tailwind (no extra dependencies): time-series line chart, per-location bar chart, heatmap calendar
 - **Frontend**: Wired into `App.js`, Header apps dropdown, `Home.js` quickActions, `HomeLayoutEditor.js`
 - **Frontend**: `SettingsContext` extended with `updateRadiationSettings`
-- **Documentation**: `doc/radiation.md` created; `doc/database-models.md`, `doc/api-overview.md`, `doc/README.md` updated
+- **Documentation**: `doc/modules/radiation.md` created; `doc/architecture/database.md`, `doc/architecture/api-overview.md`, `doc/README.md` updated
 
 ### Wiki System Updates (v2.3.1)
 - **WikiContext**: Added `permissions` state for role-based UI controls

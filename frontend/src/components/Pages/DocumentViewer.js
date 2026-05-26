@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/fetchClient';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import DOMPurify from 'dompurify';
@@ -74,6 +74,8 @@ const DocumentViewer = () => {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const [showRawMarkdown, setShowRawMarkdown] = useState(false);
+  const [pdfWidth, setPdfWidth] = useState(800);
+  const pdfContainerRef = useRef(null);
 
   // Check if file type is editable
   const checkEditable = useCallback((mimeType) => {
@@ -98,7 +100,7 @@ const DocumentViewer = () => {
     
     try {
       // Get file metadata
-      const infoResponse = await axios.get(`${API_URL}/api/files/${fileId}`, {
+      const infoResponse = await api.get(`${API_URL}/api/files/${fileId}`, {
         withCredentials: true
       });
       const fileData = infoResponse.data;
@@ -137,6 +139,20 @@ const DocumentViewer = () => {
     setNumPages(null);
   }, [fileId]);
 
+  // Measure PDF container width responsively
+  useEffect(() => {
+    if (!pdfContainerRef.current) return;
+    const measure = () => {
+      if (pdfContainerRef.current) {
+        setPdfWidth(pdfContainerRef.current.clientWidth - 32);
+      }
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(pdfContainerRef.current);
+    return () => observer.disconnect();
+  }, [fileInfo]);
+
   // Track changes
   useEffect(() => {
     setHasChanges(content !== originalContent);
@@ -148,7 +164,7 @@ const DocumentViewer = () => {
 
   const handleDownload = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/files/${fileId}/download`, {
+      const response = await api.get(`${API_URL}/api/files/${fileId}/download`, {
         responseType: 'blob',
         withCredentials: true
       });
@@ -468,8 +484,18 @@ const DocumentViewer = () => {
               >
                 Your browser does not support video playback.
               </video>
+            ) : fileInfo?.mimeType?.startsWith('audio/') ? (
+              <div className="text-center">
+                <audio
+                  src={getPreviewUrl()}
+                  controls
+                  className="w-full max-w-lg rounded-lg"
+                />
+                <p className="text-gray-400 mt-3 text-sm">{fileInfo.originalName}</p>
+              </div>
             ) : fileInfo?.mimeType === 'application/pdf' ? (
               <div
+                ref={pdfContainerRef}
                 className="w-full h-full rounded-lg overflow-auto bg-gray-100 dark:bg-gray-800 p-4"
                 onClick={(e) => {
                   const link = e.target.closest('a');
@@ -492,7 +518,7 @@ const DocumentViewer = () => {
                     <Page
                       key={`page_${index + 1}`}
                       pageNumber={index + 1}
-                      width={window.innerWidth * 0.6}
+                      width={pdfWidth}
                       className="mb-4"
                     />
                   ))}

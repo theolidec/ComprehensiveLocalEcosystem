@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../../utils/fetchClient';
 
 const MusicUpload = ({ onUpload }) => {
   const fileInput = useRef();
@@ -15,7 +15,7 @@ const MusicUpload = ({ onUpload }) => {
   const [isPublic, setIsPublic] = useState(false);
 
   useEffect(() => {
-    axios.get('/api/music/playlist/my', { withCredentials: true })
+    api.get('/api/music/playlist/my', { withCredentials: true })
       .then(res => setPlaylists(res.data))
       .catch(() => {});
   }, []);
@@ -45,13 +45,13 @@ const MusicUpload = ({ onUpload }) => {
       formData.append('artist', artist);
       formData.append('isPublic', isPublic);
       
-      const res = await axios.post('/api/music/upload', formData, {
+      const res = await api.post('/api/music/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       });
 
       if (selectedPlaylist) {
-        await axios.post('/api/music/playlist/add', 
+        await api.post('/api/music/playlist/add', 
           { playlistId: selectedPlaylist, musicId: res.data._id },
           { withCredentials: true }
         );

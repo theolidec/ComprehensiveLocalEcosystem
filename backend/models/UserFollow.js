@@ -43,10 +43,18 @@ userFollowSchema.statics.getFollowers = async function(userId, page = 1, limit =
       .limit(limit),
     this.countDocuments({ following: userId })
   ]);
-  
+
+  const orphanedIds = followers.filter(f => !f.follower).map(f => f._id);
+  if (orphanedIds.length > 0) {
+    this.deleteMany({ _id: { $in: orphanedIds } }).catch(() => {});
+  }
+
+  const validUsers = followers.map(f => f.follower).filter(Boolean);
+  const validTotal = total - orphanedIds.length;
+
   return {
-    users: followers.map(f => f.follower),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+    users: validUsers,
+    pagination: { page, limit, total: validTotal, totalPages: Math.ceil(validTotal / limit) }
   };
 };
 
@@ -60,10 +68,18 @@ userFollowSchema.statics.getFollowing = async function(userId, page = 1, limit =
       .limit(limit),
     this.countDocuments({ follower: userId })
   ]);
-  
+
+  const orphanedIds = following.filter(f => !f.following).map(f => f._id);
+  if (orphanedIds.length > 0) {
+    this.deleteMany({ _id: { $in: orphanedIds } }).catch(() => {});
+  }
+
+  const validUsers = following.map(f => f.following).filter(Boolean);
+  const validTotal = total - orphanedIds.length;
+
   return {
-    users: following.map(f => f.following),
-    pagination: { page, limit, total, totalPages: Math.ceil(total / limit) }
+    users: validUsers,
+    pagination: { page, limit, total: validTotal, totalPages: Math.ceil(validTotal / limit) }
   };
 };
 

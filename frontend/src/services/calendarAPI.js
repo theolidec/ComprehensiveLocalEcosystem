@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -21,7 +19,7 @@ export const calendarAPI = {
       if (search) queryParams.append('search', search);
       
       const url = `${API_URLS.CALENDAR_EVENTS}?${queryParams.toString()}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data.events;
     } catch (error) {
       handleApiError(error);
@@ -30,7 +28,7 @@ export const calendarAPI = {
 
   getEventById: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.CALENDAR_EVENTS}/${id}`);
+      const response = await api.get(`${API_URLS.CALENDAR_EVENTS}/${id}`);
       return response.data.event;
     } catch (error) {
       handleApiError(error);
@@ -39,7 +37,7 @@ export const calendarAPI = {
 
   createEvent: async (eventData) => {
     try {
-      const response = await axios.post(API_URLS.CALENDAR_EVENTS, {
+      const response = await api.post(API_URLS.CALENDAR_EVENTS, {
         title: eventData.title,
         description: eventData.description,
         date: eventData.date,
@@ -64,7 +62,7 @@ export const calendarAPI = {
 
   updateEvent: async (id, eventData) => {
     try {
-      const response = await axios.put(`${API_URLS.CALENDAR_EVENTS}/${id}`, eventData);
+      const response = await api.put(`${API_URLS.CALENDAR_EVENTS}/${id}`, eventData);
       return response.data.event;
     } catch (error) {
       handleApiError(error);
@@ -73,7 +71,7 @@ export const calendarAPI = {
 
   deleteEvent: async (id) => {
     try {
-      await axios.delete(`${API_URLS.CALENDAR_EVENTS}/${id}`);
+      await api.delete(`${API_URLS.CALENDAR_EVENTS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -82,7 +80,7 @@ export const calendarAPI = {
 
   getUpcomingEvents: async (limit = 5) => {
     try {
-      const response = await axios.get(`${API_URLS.CALENDAR_UPCOMING}?limit=${limit}`);
+      const response = await api.get(`${API_URLS.CALENDAR_UPCOMING}?limit=${limit}`);
       return response.data.events;
     } catch (error) {
       handleApiError(error);
@@ -96,7 +94,7 @@ export const calendarAPI = {
       if (year !== undefined) queryParams.append('year', year);
       
       const url = `${API_URLS.CALENDAR_STATS}?${queryParams.toString()}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -105,7 +103,7 @@ export const calendarAPI = {
 
   exportEvents: async () => {
     try {
-      const response = await axios.get(API_URLS.CALENDAR_EXPORT, {
+      const response = await api.get(API_URLS.CALENDAR_EXPORT, {
         responseType: 'blob'
       });
       
@@ -130,7 +128,7 @@ export const calendarAPI = {
       const text = await file.text();
       const data = JSON.parse(text);
       
-      const response = await axios.post(API_URLS.CALENDAR_IMPORT, {
+      const response = await api.post(API_URLS.CALENDAR_IMPORT, {
         events: data.events || []
       });
       

@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -22,7 +20,7 @@ export const paymentCardAPI = {
       if (cardType) queryParams.append('cardType', cardType);
 
       const url = `${API_URLS.PAYMENT_CARDS}?${queryParams.toString()}`;
-      const response = await axios.get(url);
+      const response = await api.get(url);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -31,7 +29,7 @@ export const paymentCardAPI = {
 
   getCardById: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.PAYMENT_CARDS}/${id}`);
+      const response = await api.get(`${API_URLS.PAYMENT_CARDS}/${id}`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -40,7 +38,7 @@ export const paymentCardAPI = {
 
   createCard: async (cardData) => {
     try {
-      const response = await axios.post(API_URLS.PAYMENT_CARDS, {
+      const response = await api.post(API_URLS.PAYMENT_CARDS, {
         cardName: cardData.cardName,
         cardholderName: cardData.cardholderName,
         cardNumber: cardData.cardNumber,
@@ -58,7 +56,7 @@ export const paymentCardAPI = {
 
   updateCard: async (id, cardData) => {
     try {
-      const response = await axios.put(`${API_URLS.PAYMENT_CARDS}/${id}`, {
+      const response = await api.put(`${API_URLS.PAYMENT_CARDS}/${id}`, {
         cardName: cardData.cardName,
         cardholderName: cardData.cardholderName,
         cardNumber: cardData.cardNumber,
@@ -76,7 +74,7 @@ export const paymentCardAPI = {
 
   deleteCard: async (id) => {
     try {
-      await axios.delete(`${API_URLS.PAYMENT_CARDS}/${id}`);
+      await api.delete(`${API_URLS.PAYMENT_CARDS}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -85,7 +83,7 @@ export const paymentCardAPI = {
 
   decryptCard: async (id) => {
     try {
-      const response = await axios.get(`${API_URLS.PAYMENT_CARDS}/${id}/decrypt`);
+      const response = await api.get(`${API_URLS.PAYMENT_CARDS}/${id}/decrypt`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -94,7 +92,7 @@ export const paymentCardAPI = {
 
   toggleFavorite: async (id) => {
     try {
-      const response = await axios.post(`${API_URLS.PAYMENT_CARDS}/${id}/favorite`);
+      const response = await api.post(`${API_URLS.PAYMENT_CARDS}/${id}/favorite`);
       return response.data;
     } catch (error) {
       handleApiError(error);
@@ -103,7 +101,7 @@ export const paymentCardAPI = {
 
   setDefaultCard: async (id) => {
     try {
-      const response = await axios.post(`${API_URLS.PAYMENT_CARDS}/${id}/default`);
+      const response = await api.post(`${API_URLS.PAYMENT_CARDS}/${id}/default`);
       return response.data;
     } catch (error) {
       handleApiError(error);

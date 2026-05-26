@@ -42,22 +42,15 @@ No GPL / LGPL / AGPL dependencies are included in production builds.
 | Package | Version | License | Project |
 |---|---|---|---|
 | bcryptjs | ^3.0.3 | MIT | https://github.com/dcodeIO/bcrypt.js |
-| cookie-parser | ^1.4.6 | MIT | https://github.com/expressjs/cookie-parser |
 | cors | ^2.8.5 | MIT | https://github.com/expressjs/cors |
-| dotenv | ^16.3.1 | BSD-2-Clause | https://github.com/motdotla/dotenv |
 | express | ^4.18.2 | MIT | https://github.com/expressjs/express |
 | express-rate-limit | ^7.1.5 | MIT | https://github.com/express-rate-limit/express-rate-limit |
 | express-validator | ^7.3.1 | MIT | https://github.com/express-validator/express-validator |
 | helmet | ^7.1.0 | MIT | https://github.com/helmetjs/helmet |
 | jsonwebtoken | ^9.0.3 | MIT | https://github.com/auth0/node-jsonwebtoken |
-| moment-timezone | ^0.6.1 | MIT | https://github.com/moment/moment-timezone |
 | mongoose | ^8.6.1 | MIT | https://github.com/Automattic/mongoose |
-| morgan | ^1.10.0 | MIT | https://github.com/expressjs/morgan |
 | multer | ^2.1.1 | MIT | https://github.com/expressjs/multer |
-| node-cron | ^4.2.1 | ISC | https://github.com/node-cron/node-cron |
 | pdfkit | ^0.18.0 | MIT | https://github.com/foliojs/pdfkit |
-| socket.io | ^4.8.3 | MIT | https://github.com/socketio/socket.io |
-| socket.io-client | ^4.8.3 | MIT | https://github.com/socketio/socket.io |
 | winston | ^3.15.0 | MIT | https://github.com/winstonjs/winston |
 
 ## Frontend dependencies
@@ -66,7 +59,6 @@ No GPL / LGPL / AGPL dependencies are included in production builds.
 |---|---|---|---|
 | @tailwindcss/typography | ^0.5.19 | MIT | https://github.com/tailwindlabs/tailwindcss-typography |
 | @tiptap/* (all extensions, pm, react, starter-kit) | ^3.23.1 | MIT | https://github.com/ueberdosis/tiptap |
-| axios | ^1.13.6 | MIT | https://github.com/axios/axios |
 | dompurify | ^3.4.2 | Apache-2.0 OR MPL-2.0 | https://github.com/cure53/DOMPurify |
 | lucide-react | ^0.577.0 | ISC | https://github.com/lucide-icons/lucide |
 | pdfjs-dist | ^5.7.284 | Apache-2.0 | https://github.com/mozilla/pdf.js |
@@ -77,8 +69,6 @@ No GPL / LGPL / AGPL dependencies are included in production builds.
 | react-router-dom | ^7.13.1 | MIT | https://github.com/remix-run/react-router |
 | react-scripts | 5.0.1 | MIT | https://github.com/facebook/create-react-app |
 | remark-gfm | ^4.0.1 | MIT | https://github.com/remarkjs/remark-gfm |
-| socket.io-client | ^4.8.3 | MIT | https://github.com/socketio/socket.io |
-| web-vitals | ^2.1.4 | Apache-2.0 | https://github.com/GoogleChrome/web-vitals |
 
 ## Other incorporated assets
 
@@ -106,13 +96,6 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
     https://www.apache.org/licenses/LICENSE-2.0
-```
-
-### `web-vitals` (Apache-2.0)
-
-```
-Copyright Google LLC
-Licensed under the Apache License, Version 2.0 (the "License");
 ```
 
 ### `dompurify` (Apache-2.0 OR MPL-2.0)
@@ -155,4 +138,4 @@ above with the generated output.
 
 ---
 
-_Last reviewed: 2026-05-14. Update whenever `package.json` dependencies change._
+_Last reviewed: 2026-05-26. Update whenever `package.json` dependencies change._

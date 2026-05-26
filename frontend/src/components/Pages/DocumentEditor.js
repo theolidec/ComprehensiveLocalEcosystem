@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../utils/fetchClient';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -25,7 +25,7 @@ import {
   MoreHorizontal, FileText, CheckCircle, RefreshCw,
   Heading1, Heading2, Heading3, Heading4, Heading5, Heading6,
   Table as TableIcon, Palette, Highlighter, Clock,
-  ChevronDown, Trash2, RotateCcw
+  ChevronDown, Trash2, RotateCcw, Quote, Code
 } from 'lucide-react';
 import fileStorageService from '../../services/fileService';
 import FontSize from '../Editor/FontSize';
@@ -92,6 +92,8 @@ const DocumentEditor = () => {
   const [loadingVersions, setLoadingVersions] = useState(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(true);
   const [lastAutoSave, setLastAutoSave] = useState(null);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [wordCount, setWordCount] = useState({ words: 0, chars: 0 });
 
   const isNew = fileId === 'new' || !fileId;
   const folderIdParam = searchParams.get('folderId');
@@ -129,6 +131,9 @@ const DocumentEditor = () => {
       if (autoSaveEnabled && !isNewDocument) {
         triggerAutoSave(editor);
       }
+      const text = editor.getText();
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      setWordCount({ words, chars: text.length });
     },
     editorProps: {
       attributes: {
@@ -175,7 +180,7 @@ const DocumentEditor = () => {
 
     setLoading(true);
     try {
-      const infoResponse = await axios.get(`${API_URL}/api/files/${fileId}`, {
+      const infoResponse = await api.get(`${API_URL}/api/files/${fileId}`, {
         withCredentials: true
       });
       const fileData = infoResponse.data;
@@ -211,7 +216,7 @@ const DocumentEditor = () => {
     if (isNewDocument || !fileId) return;
     setLoadingVersions(true);
     try {
-      const response = await axios.get(`${API_URL}/api/files/${fileId}/versions`, {
+      const response = await api.get(`${API_URL}/api/files/${fileId}/versions`, {
         withCredentials: true
       });
       setVersions(response.data.versions || []);
@@ -316,7 +321,7 @@ const DocumentEditor = () => {
     try {
       const formData = new FormData();
       formData.append('image', file);
-      const response = await axios.post(`${API_URL}/api/files/document-image`, formData, {
+      const response = await api.post(`${API_URL}/api/files/document-image`, formData, {
         withCredentials: true,
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -343,7 +348,7 @@ const DocumentEditor = () => {
   const handleRestoreVersion = async (versionId) => {
     if (!editor || !window.confirm('Restore this version? Current unsaved changes will be replaced.')) return;
     try {
-      const response = await axios.get(`${API_URL}/api/files/${fileId}/versions/${versionId}`, {
+      const response = await api.get(`${API_URL}/api/files/${fileId}/versions/${versionId}`, {
         withCredentials: true
       });
       const content = response.data.content || '';
@@ -367,6 +372,29 @@ const DocumentEditor = () => {
     setShowColorPicker(false);
     setShowHighlightPicker(false);
     setShowInsertMenu(false);
+    setShowDownloadMenu(false);
+  };
+
+  const getHeadingLabel = () => {
+    if (!editor) return 'Normal';
+    for (let i = 1; i <= 6; i++) {
+      if (editor.isActive('heading', { level: i })) return `H${i}`;
+    }
+    return 'Normal';
+  };
+
+  const getCurrentFontName = () => {
+    if (!editor) return 'Font';
+    const fontFamily = editor.getAttributes('textStyle').fontFamily;
+    if (!fontFamily) return 'Font';
+    const found = FONT_FAMILIES.find(f => f.value === fontFamily);
+    return found ? found.name : 'Font';
+  };
+
+  const getCurrentFontSize = () => {
+    if (!editor) return '';
+    const fontSize = editor.getAttributes('textStyle').fontSize;
+    return fontSize ? fontSize.replace('px', '') : '';
   };
 
   if (loading) {
@@ -444,27 +472,29 @@ const DocumentEditor = () => {
           </button>
           <div className="relative">
             <button
-              onClick={(e) => { e.stopPropagation(); }}
+              onClick={(e) => { e.stopPropagation(); setShowDownloadMenu(!showDownloadMenu); }}
               className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
               title="Download"
             >
               <Download className="h-5 w-5" />
             </button>
+            {showDownloadMenu && (
+              <div className="absolute right-0 top-full mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 w-44 z-50">
+                <button
+                  onClick={() => { handleDownloadHTML(); setShowDownloadMenu(false); }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  Download as HTML
+                </button>
+                <button
+                  onClick={() => { handleDownloadText(); setShowDownloadMenu(false); }}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-900 dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+                >
+                  Download as TXT
+                </button>
+              </div>
+            )}
           </div>
-          <button
-            onClick={handleDownloadHTML}
-            className="px-2 py-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-            title="Download as HTML"
-          >
-            HTML
-          </button>
-          <button
-            onClick={handleDownloadText}
-            className="px-2 py-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded transition-colors"
-            title="Download as text"
-          >
-            TXT
-          </button>
           <button
             onClick={handleClose}
             className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
@@ -502,10 +532,10 @@ const DocumentEditor = () => {
           <div className="relative">
             <button
               onClick={() => { closeAllMenus(); setShowHeadingMenu(!showHeadingMenu); }}
-              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm"
+              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm min-w-[4.5rem]"
             >
-              <Heading1 className="h-4 w-4" />
-              <ChevronDown className="h-3 w-3" />
+              <span className="flex-1 text-left text-xs font-medium">{getHeadingLabel()}</span>
+              <ChevronDown className="h-3 w-3 flex-shrink-0" />
             </button>
             {showHeadingMenu && (
               <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 w-40 z-50">
@@ -524,10 +554,11 @@ const DocumentEditor = () => {
           <div className="relative">
             <button
               onClick={() => { closeAllMenus(); setShowFontMenu(!showFontMenu); }}
-              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm"
+              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm max-w-[130px]"
             >
-              <Type className="h-4 w-4" />
-              <span>Font</span>
+              <Type className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate text-xs">{getCurrentFontName()}</span>
+              <ChevronDown className="h-3 w-3 flex-shrink-0" />
             </button>
             {showFontMenu && (
               <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 w-48 z-50 max-h-64 overflow-y-auto">
@@ -556,9 +587,10 @@ const DocumentEditor = () => {
           <div className="relative">
             <button
               onClick={() => { closeAllMenus(); setShowSizeMenu(!showSizeMenu); }}
-              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm"
+              className="flex items-center space-x-1 px-3 py-1.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded text-sm min-w-[3.5rem]"
             >
-              <span className="text-xs">Size</span>
+              <span className="text-xs flex-1 text-center">{getCurrentFontSize() || '—'}</span>
+              <ChevronDown className="h-3 w-3 flex-shrink-0" />
             </button>
             {showSizeMenu && (
               <div className="absolute top-full left-0 mt-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg py-1 w-24 z-50 max-h-64 overflow-y-auto">
@@ -608,6 +640,20 @@ const DocumentEditor = () => {
             title="Strikethrough"
           >
             <Strikethrough className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+            className={`p-2 rounded ${editor?.isActive('blockquote') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+            title="Blockquote"
+          >
+            <Quote className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => editor?.chain().focus().toggleCode().run()}
+            className={`p-2 rounded ${editor?.isActive('code') ? 'bg-gray-200 dark:bg-gray-600 text-blue-600' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+            title="Inline Code"
+          >
+            <Code className="h-4 w-4" />
           </button>
 
           <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
@@ -875,6 +921,12 @@ const DocumentEditor = () => {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Word count status bar */}
+      <div className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-4 py-1.5 flex items-center justify-between text-xs text-gray-400 dark:text-gray-500 flex-shrink-0">
+        <span>{wordCount.words.toLocaleString()} {wordCount.words === 1 ? 'word' : 'words'} · {wordCount.chars.toLocaleString()} characters</span>
+        <span>{autoSaveEnabled ? 'Auto-save on' : 'Auto-save off'}</span>
       </div>
 
       {/* Hidden file input for image upload */}

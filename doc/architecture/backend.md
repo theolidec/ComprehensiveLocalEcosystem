@@ -17,19 +17,18 @@ The backend is built on **Node.js** with **Express.js**, using **MongoDB** with 
 | Rate Limiting | express-rate-limit | 7.1.x |
 | Security | Helmet | 7.1.x |
 | Logging | Winston | 3.15.x |
-| HTTP Logging | Morgan | 1.10.x |
 | Password Hashing | bcryptjs | 3.0.x |
 | File Uploads | Multer | 2.1.x |
 | CORS | cors | 2.8.x |
-| Cookies | cookie-parser | 1.4.x |
 | PDF Generation | pdfkit | 0.18.x (used by `routes/wishlistItems.js` for PDF export) |
-| Time Zones | moment-timezone | 0.6.x (used by `services/recurringEventService.js`) |
-| Env Loading | dotenv | 16.3.x |
 
-**Reserved / not yet wired up**: `socket.io`, `socket.io-client` are present in `package.json` but not currently referenced in source.
+**Custom implementations** (no external dependency):
+- **Env loading** — inline parser in `server.js` (replaces `dotenv`)
+- **Cookie parsing** — inline middleware in `server.js` (replaces `cookie-parser`)
+- **Request logging** — inline combined-format middleware piped to Winston (replaces `morgan`)
+- **Scheduler** — `scheduleDailyCleanup()` in `server.js` using `setTimeout` recursion (replaces `node-cron`); runs at 03:15 daily to clean up expired/revoked refresh tokens
 
 **Active utilities**:
-- `node-cron` — daily 03:15 cleanup of expired/revoked refresh tokens (`server.js`)
 - `backend/utils/regex.js` — `escapeRegex()` helper applied to all user-supplied search inputs before `$regex`/`new RegExp()` (ReDoS defense)
 
 ## Project Structure
@@ -145,9 +144,9 @@ The server initialization follows this sequence:
 // Order matters - applied sequentially
 app.use(helmet());           // Security headers
 app.use(cors());             // CORS handling
-app.use(morgan());           // Request logging
+app.use(requestLogger);      // Request logging (custom)
 app.use(express.json());     // JSON body parsing
-app.use(cookieParser());     // Cookie parsing
+app.use(parseCookies);       // Cookie parsing (custom)
 app.use(generalLimiter);     // Rate limiting
 // ... routes
 app.use(errorHandler);       // Global errors
@@ -606,7 +605,7 @@ Helmet (security headers)
 CORS (origin check)
     │
     ▼
-Morgan (logging)
+Custom request logger (logging)
     │
     ▼
 JSON Parser

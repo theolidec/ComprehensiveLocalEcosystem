@@ -40,15 +40,15 @@ The purpose of this plan is to describe the software development approach, sched
 | Styling | Tailwind CSS | 3.4.x |
 | Rich-Text Editor | TipTap | 3.23.x |
 | Routing | react-router-dom | 7.x |
-| HTTP Client | Axios | 1.13.x |
+| HTTP Client | Custom `fetchClient` (native `fetch`) | `src/utils/fetchClient.js` |
 | Backend Runtime | Node.js | 18+ |
 | Backend Framework | Express.js | 4.18.x |
 | Database | MongoDB | 5.0+ |
 | ODM | Mongoose | 8.x |
 | Authentication | JWT (jsonwebtoken) | 9.x |
 | File Upload | Multer | 2.x |
-| Scheduling | node-cron | 4.x |
-| Logging | Winston / Morgan | 3.x / 1.x |
+| Scheduling | Custom `setTimeout` scheduler | `server.js` |
+| Logging | Winston + custom request-logger | 3.x |
 | IDE | VS Code / Windsurf | Latest |
 
 ### 3.2 Development Infrastructure

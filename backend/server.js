@@ -1,12 +1,30 @@
-require('dotenv').config();
 const fs = require('fs');
+const path = require('path');
+
+// Load .env file without dotenv — does not overwrite variables already set in the environment
+(function loadEnv() {
+  const envPath = path.resolve(__dirname, '.env');
+  if (!fs.existsSync(envPath)) return;
+  const lines = fs.readFileSync(envPath, 'utf8').split('\n');
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line || line.startsWith('#')) continue;
+    const idx = line.indexOf('=');
+    if (idx === -1) continue;
+    const key = line.slice(0, idx).trim();
+    let val = line.slice(idx + 1).trim();
+    if ((val.startsWith('"') && val.endsWith('"')) ||
+        (val.startsWith("'") && val.endsWith("'"))) {
+      val = val.slice(1, -1);
+    }
+    if (!(key in process.env)) process.env[key] = val;
+  }
+})();
+
 const https = require('https');
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const morgan = require('morgan');
-const cookieParser = require('cookie-parser');
-const cron = require('node-cron');
 const connectDB = require('./config/database');
 const logger = require('./config/logger');
 const { generalLimiter } = require('./config/rateLimiter');
@@ -36,9 +54,9 @@ const PORT = process.env.PORT || 3001;
 const HTTPS_PORT = process.env.HTTPS_PORT || 3443;
 const USE_HTTPS = process.env.USE_HTTPS === 'true';
 const SSL_CERT_PATH = process.env.SSL_CERT_PATH ? 
-  require('path').resolve(__dirname, process.env.SSL_CERT_PATH) : undefined;
+  path.resolve(__dirname, process.env.SSL_CERT_PATH) : undefined;
 const SSL_KEY_PATH = process.env.SSL_KEY_PATH ? 
-  require('path').resolve(__dirname, process.env.SSL_KEY_PATH) : undefined;
+  path.resolve(__dirname, process.env.SSL_KEY_PATH) : undefined;
 
 logger.info(`__dirname: ${__dirname}`);
 logger.info(`CWD: ${process.cwd()}`);
@@ -119,19 +137,40 @@ app.use(cors({
   allowedHeaders: ['Content-Type'],
 }));
 
-// Logging middleware
-app.use(morgan('combined', {
-  stream: {
-    write: (message) => logger.info(message.trim())
-  }
-}));
+// Logging middleware — combined log format without morgan
+app.use((req, res, next) => {
+  const start = Date.now();
+  const { method, url, ip, httpVersion } = req;
+  const ua = req.get('User-Agent') || '-';
+  const ref = req.get('Referer') || '-';
+  res.on('finish', () => {
+    const ms = Date.now() - start;
+    const size = res.get('Content-Length') || '-';
+    logger.info(`${ip} - "${method} ${url} HTTP/${httpVersion}" ${res.statusCode} ${size} "${ref}" "${ua}" +${ms}ms`);
+  });
+  next();
+});
 
 // Body parsing middleware
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Cookie parsing middleware
-app.use(cookieParser());
+// Cookie parsing middleware — custom replacement for cookie-parser
+app.use((req, _res, next) => {
+  const header = req.headers.cookie || '';
+  req.cookies = Object.fromEntries(
+    header.split(';')
+      .map(c => c.trim())
+      .filter(Boolean)
+      .map(c => {
+        const i = c.indexOf('=');
+        const k = c.slice(0, i).trim();
+        const v = c.slice(i + 1);
+        try { return [k, decodeURIComponent(v)]; } catch { return [k, v]; }
+      })
+  );
+  next();
+});
 
 // Rate limiting middleware
 app.use(generalLimiter);
@@ -205,16 +244,26 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Schedule a daily cleanup of expired/revoked refresh tokens. The TTL index on
-// expiresAt removes naturally-expired rows, but rows with isRevoked: true and a
-// future expiresAt would otherwise persist until expiry. Run at 03:15 server time.
-cron.schedule('15 3 * * *', async () => {
-  try {
-    await RefreshToken.cleanupExpiredTokens();
-  } catch (error) {
-    logger.error('Scheduled refresh-token cleanup failed:', error);
-  }
-});
+// Schedule a daily cleanup of expired/revoked refresh tokens at 03:15 server time.
+// Custom scheduler — no dependency on node-cron.
+(function scheduleDailyCleanup() {
+  const msUntilNext = () => {
+    const now = new Date();
+    const next = new Date();
+    next.setHours(3, 15, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    return next - now;
+  };
+  const run = async () => {
+    try {
+      await RefreshToken.cleanupExpiredTokens();
+    } catch (error) {
+      logger.error('Scheduled refresh-token cleanup failed:', error);
+    }
+    setTimeout(run, msUntilNext());
+  };
+  setTimeout(run, msUntilNext());
+})();
 
 // Graceful shutdown
 process.on('SIGTERM', () => {

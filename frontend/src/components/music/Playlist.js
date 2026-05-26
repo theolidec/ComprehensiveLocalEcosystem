@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import axios from 'axios';
+import api from '../../utils/fetchClient';
 import { useMusic } from '../../context/MusicContext';
 
 const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false, showArtistsOnly = false }, ref) => {
@@ -29,7 +29,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
   const [editArtist, setEditArtist] = useState('');
 
   const fetchData = () => {
-    axios.get('/api/music/playlist/my', { withCredentials: true })
+    api.get('/api/music/playlist/my', { withCredentials: true })
       .then(res => {
         setPlaylists(res.data);
         if (selectedPlaylist) {
@@ -38,10 +38,10 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
         }
       })
       .catch(() => setError('Failed to load playlists'));
-    axios.get('/api/music/my', { withCredentials: true })
+    api.get('/api/music/my', { withCredentials: true })
       .then(res => setMusic(res.data))
       .catch(() => setError('Failed to load music'));
-    axios.get('/api/music/public', { withCredentials: true })
+    api.get('/api/music/public', { withCredentials: true })
       .then(res => setPublicMusic(res.data))
       .catch(() => {});
   };
@@ -58,7 +58,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
 
   const handleToggleVisibility = async (musicId) => {
     try {
-      await axios.put(`/api/music/${musicId}/visibility`, {}, { withCredentials: true });
+      await api.put(`/api/music/${musicId}/visibility`, {}, { withCredentials: true });
       fetchData();
     } catch (err) {
       setError('Failed to toggle visibility');
@@ -83,7 +83,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     const timer = setTimeout(() => {
       if (userSearchQuery.length >= 2) {
         setUserSearchLoading(true);
-        axios.get('/api/follow/search', { params: { q: userSearchQuery }, withCredentials: true })
+        api.get('/api/follow/search', { params: { q: userSearchQuery }, withCredentials: true })
           .then(res => setUserSearchResults(res.data.users || []))
           .catch(() => setUserSearchResults([]))
           .finally(() => setUserSearchLoading(false));
@@ -98,7 +98,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     e.preventDefault();
     if (!newPlaylistName.trim()) return;
     try {
-      await axios.post('/api/music/playlist', {
+      await api.post('/api/music/playlist', {
         name: newPlaylistName.trim(),
         description: newPlaylistDescription.trim()
       }, { withCredentials: true });
@@ -114,7 +114,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
   const handleDeletePlaylist = async (playlistId) => {
     if (!window.confirm('Delete this playlist?')) return;
     try {
-      await axios.delete(`/api/music/playlist/${playlistId}`, { withCredentials: true });
+      await api.delete(`/api/music/playlist/${playlistId}`, { withCredentials: true });
       if (selectedPlaylist?._id === playlistId) setSelectedPlaylist(null);
       fetchData();
     } catch (err) {
@@ -126,7 +126,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     const trackId = showAddToPlaylistModal;
     if (!trackId || !playlistId) return;
     try {
-      await axios.post('/api/music/playlist/add', { playlistId, musicId: trackId }, { withCredentials: true });
+      await api.post('/api/music/playlist/add', { playlistId, musicId: trackId }, { withCredentials: true });
       setShowAddToPlaylistModal(null);
       fetchData();
     } catch (err) {
@@ -136,7 +136,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
 
   const handleRemoveFromPlaylist = async (playlistId, musicId) => {
     try {
-      await axios.post('/api/music/playlist/remove', { playlistId, musicId }, { withCredentials: true });
+      await api.post('/api/music/playlist/remove', { playlistId, musicId }, { withCredentials: true });
       fetchData();
       if (selectedPlaylist?._id === playlistId) {
         const updated = playlists.find(p => p._id === playlistId);
@@ -150,7 +150,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
   const handleDeleteMusic = async (musicId) => {
     if (!window.confirm('Are you sure you want to delete this song?')) return;
     try {
-      await axios.delete(`/api/music/${musicId}`, { withCredentials: true });
+      await api.delete(`/api/music/${musicId}`, { withCredentials: true });
       fetchData();
     } catch (err) {
       setError('Failed to delete song');
@@ -161,7 +161,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     e.preventDefault();
     if (!editingTrack) return;
     try {
-      await axios.put(`/api/music/${editingTrack._id}`, {
+      await api.put(`/api/music/${editingTrack._id}`, {
         title: editTitle,
         artist: editArtist
       }, { withCredentials: true });
@@ -184,7 +184,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     try {
       const songIds = Array.from(selectedSongs);
       for (const id of songIds) {
-        await axios.put(`/api/music/${id}/transfer`, { email: transferEmail }, { withCredentials: true });
+        await api.put(`/api/music/${id}/transfer`, { email: transferEmail }, { withCredentials: true });
       }
       setShowTransferModal(null);
       setTransferEmail('');
@@ -221,7 +221,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
       for (const id of songIds) {
         const song = music.find(m => m._id === id);
         if (song && song.isPublic !== makePublic) {
-          await axios.put(`/api/music/${id}/visibility`, {}, { withCredentials: true });
+          await api.put(`/api/music/${id}/visibility`, {}, { withCredentials: true });
         }
       }
       setSelectedSongs(new Set());
@@ -235,7 +235,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
     try {
       const songIds = Array.from(selectedSongs);
       for (const musicId of songIds) {
-        await axios.post('/api/music/playlist/add', { playlistId, musicId }, { withCredentials: true });
+        await api.post('/api/music/playlist/add', { playlistId, musicId }, { withCredentials: true });
       }
       setShowAddToPlaylistModal('bulk');
       setSelectedSongs(new Set());

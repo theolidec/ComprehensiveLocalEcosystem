@@ -1,4 +1,3 @@
-const moment = require('moment-timezone');
 const logger = require('../config/logger');
 
 /**

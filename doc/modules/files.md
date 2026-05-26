@@ -9,13 +9,18 @@ The Files module provides comprehensive file storage and management with folder 
 - **Trash System**: Soft delete with restore capability
 - **File Sharing**: Public sharing via token-based URLs
 - **Storage Stats**: Track storage usage and quotas
-- **Rich Document Editor**: TipTap-based WYSIWYG editor for HTML documents with headings (H1-H6), tables, text color, highlight, font family/size, alignment, lists, links, and server-side image upload
-- **Auto-Save**: Debounced auto-save (3s) for HTML documents
+- **Rich Document Editor**: TipTap-based WYSIWYG editor for HTML documents with headings (H1-H6), tables, text color, highlight, font family/size, alignment, lists, blockquote, inline code, links, and server-side image upload
+- **Active Toolbar State**: Heading/font/size dropdowns reflect current cursor selection dynamically (e.g. shows "H2", "Arial", "16")
+- **Auto-Save**: Debounced auto-save (1s) for HTML documents
 - **Version History**: Automatic version snapshots for HTML documents with restore (max 50 versions per document)
+- **Word Count**: Live word and character count displayed in the status bar at the bottom of the editor
+- **Download Dropdown**: Unified download button with HTML and TXT export options
 - **XSS Protection**: DOMPurify sanitization on all loaded HTML content
 - **Export & Print**: Download as HTML or plain text; print with proper formatting
 - **Text File Editor**: Create and edit .txt, .md, .html, .css, .js, .json, .xml files
-- **File Preview**: In-browser preview for images, videos, documents, rendered HTML
+- **File Preview**: In-browser preview for images, videos, audio, PDF, rendered HTML
+- **Audio Player**: Native HTML5 audio player for audio/* MIME types
+- **Responsive PDF Viewer**: PDF page width adjusts to container via ResizeObserver
 - **Favorites**: Mark files as favorites for quick access
 - **Search**: Search files by name and description
 
@@ -132,12 +137,17 @@ MP4, WebM, MOV, AVI, MKV, FLV, MPEG
 - **File**: `frontend/src/components/Pages/DocumentEditor.js`
 - TipTap-based WYSIWYG rich text editor for HTML documents
 - **Extension**: `frontend/src/components/Editor/FontSize.js` - Custom TipTap font size extension
-- Features: Headings, tables, text color/highlight, font family/size, alignment, lists, links, images (server upload), auto-save, version history, print, HTML/TXT export
+- Features: Headings, tables, text color/highlight, font family/size, alignment, lists, blockquote, inline code, links, images (server upload), auto-save, version history, print, HTML/TXT export
+- `getHeadingLabel()` / `getCurrentFontName()` / `getCurrentFontSize()` — helpers that read TipTap selection attributes on each render to show live toolbar state
+- `wordCount` state — updated on every `onUpdate` event, displayed in the bottom status bar
+- `showDownloadMenu` state — toggles a dropdown for HTML/TXT download, replacing the previous non-functional download icon
 
 ### Document Viewer
 - **File**: `frontend/src/components/Pages/DocumentViewer.js`
 - Multi-format viewer with rendered HTML (sanitized via DOMPurify), markdown preview, and plain text editing
 - HTML files navigate to rich DocumentEditor on edit
+- Audio files (`audio/*`) render a native `<audio controls>` element
+- `pdfContainerRef` + `ResizeObserver` measure container width on mount/resize; PDF pages use `pdfWidth` state instead of `window.innerWidth * 0.6`
 
 ### Service
 - **File**: `frontend/src/services/fileService.js`

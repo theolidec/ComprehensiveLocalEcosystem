@@ -65,7 +65,7 @@ Responsive positioning and sizing:
 
 ## Overview
 
-The frontend is built with **React 19.2.4** using modern hooks and functional components. It uses **Tailwind CSS** for styling, **Lucide React** for icons, and **Axios** for API communication.
+The frontend is built with **React 19.2.4** using modern hooks and functional components. It uses **Tailwind CSS** for styling, **Lucide React** for icons, and a custom `fetchClient` (native `fetch` wrapper) for API communication.
 
 ## Technology Stack
 
@@ -76,7 +76,7 @@ The frontend is built with **React 19.2.4** using modern hooks and functional co
 | Styling | Tailwind CSS | 3.4.x |
 | Tailwind Plugins | `@tailwindcss/typography` | 0.5.x |
 | Icons | Lucide React | 0.577.x |
-| HTTP Client | Axios | 1.13.x |
+| HTTP Client | Custom `fetchClient` (native `fetch`) | `src/utils/fetchClient.js` |
 | Routing | React Router DOM | 7.13.x |
 | State | Context API + useReducer | Built-in |
 | Rich Text Editor | TipTap (`@tiptap/react`, `@tiptap/starter-kit` + extensions: color, font-family, highlight, image, link, placeholder, table, table-cell, table-header, table-row, text-align, text-style, underline, `@tiptap/pm`) | 3.23.x |
@@ -84,7 +84,6 @@ The frontend is built with **React 19.2.4** using modern hooks and functional co
 | Markdown | `react-markdown` + `remark-gfm` | 10.1.x / 4.0.x |
 | PDF Viewer | `pdfjs-dist`, `react-pdf` | 5.7.x / 10.4.x |
 | TypeScript | typescript | 5.3.x |
-| Realtime (reserved) | `socket.io-client` | 4.8.x (present but not yet wired up) |
 
 ## Project Structure
 
@@ -425,24 +424,21 @@ removeFromWatchlist(wikiSlug, pageSlug)
 
 ## Services Layer
 
-API service functions wrap Axios calls.
+API service functions wrap the custom `fetchClient` (`src/utils/fetchClient.js`), which uses the native `fetch` API with `credentials: 'include'` and a built-in token-refresh interceptor.
 
 ### Pattern
 
 ```javascript
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
 
-// Axios defaults
-axios.defaults.withCredentials = true;
-
 export const fetchData = async () => {
-  const response = await axios.get(API_URLS.ENDPOINT);
+  const response = await api.get(API_URLS.ENDPOINT);
   return response.data;
 };
 
 export const createData = async (data) => {
-  const response = await axios.post(API_URLS.ENDPOINT, data);
+  const response = await api.post(API_URLS.ENDPOINT, data);
   return response.data;
 };
 ```
@@ -698,22 +694,10 @@ const handleUpload = async (file) => {
 
   try {
     setUploading(true);
-    const response = await axios.post(
-      API_URLS.FILES_UPLOAD,
-      formData,
-      {
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          setProgress(percent);
-        }
-      }
-    );
+    const response = await api.post(API_URLS.FILES_UPLOAD, formData);
     return response.data;
   } finally {
     setUploading(false);
-    setProgress(0);
   }
 };
 ```
@@ -726,7 +710,7 @@ const handleUpload = async (file) => {
 // Service layer
 export const apiCall = async () => {
   try {
-    const response = await axios.get(url);
+    const response = await api.get(url);
     return response.data;
   } catch (error) {
     // Transform error for UI

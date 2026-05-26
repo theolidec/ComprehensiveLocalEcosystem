@@ -250,11 +250,11 @@ app.use('/api/new-resource', newRoutes);
 
 4. **Create service** (`frontend/src/services/newAPI.js`):
 ```javascript
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
 
 export const getItems = async () => {
-  const response = await axios.get(API_URLS.NEW_ITEMS);
+  const response = await api.get(API_URLS.NEW_ITEMS);
   return response.data;
 };
 ```

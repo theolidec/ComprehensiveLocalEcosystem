@@ -1,7 +1,5 @@
-import axios from 'axios';
+import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-axios.defaults.withCredentials = true;
 
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
@@ -13,7 +11,7 @@ export const wishlistCategoryAPI = {
   // Get all categories
   getCategories: async () => {
     try {
-      const response = await axios.get(API_URLS.WISHLIST_CATEGORIES);
+      const response = await api.get(API_URLS.WISHLIST_CATEGORIES);
       return response.data.categories;
     } catch (error) {
       handleApiError(error);
@@ -23,7 +21,7 @@ export const wishlistCategoryAPI = {
   // Create a new category
   createCategory: async (categoryData) => {
     try {
-      const response = await axios.post(API_URLS.WISHLIST_CATEGORIES, {
+      const response = await api.post(API_URLS.WISHLIST_CATEGORIES, {
         name: categoryData.name,
         color: categoryData.color || '#8b5cf6',
         icon: categoryData.icon || 'gift'
@@ -37,7 +35,7 @@ export const wishlistCategoryAPI = {
   // Update a category
   updateCategory: async (id, categoryData) => {
     try {
-      const response = await axios.put(`${API_URLS.WISHLIST_CATEGORIES}/${id}`, categoryData);
+      const response = await api.put(`${API_URLS.WISHLIST_CATEGORIES}/${id}`, categoryData);
       return response.data.category;
     } catch (error) {
       handleApiError(error);
@@ -47,7 +45,7 @@ export const wishlistCategoryAPI = {
   // Delete a category
   deleteCategory: async (id) => {
     try {
-      await axios.delete(`${API_URLS.WISHLIST_CATEGORIES}/${id}`);
+      await api.delete(`${API_URLS.WISHLIST_CATEGORIES}/${id}`);
       return true;
     } catch (error) {
       handleApiError(error);
@@ -57,7 +55,7 @@ export const wishlistCategoryAPI = {
   // Initialize default categories
   initDefaultCategories: async () => {
     try {
-      const response = await axios.post(`${API_URLS.WISHLIST_CATEGORIES}/init`);
+      const response = await api.post(`${API_URLS.WISHLIST_CATEGORIES}/init`);
       return response.data.categories;
     } catch (error) {
       handleApiError(error);

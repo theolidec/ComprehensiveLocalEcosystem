@@ -201,6 +201,7 @@ const UserFollowing = () => {
   };
 
   const renderUserCard = (userItem, showFollowButton = true) => {
+    if (!userItem) return null;
     const isFollowing = userItem.isFollowing || following.some(f => f._id === userItem._id);
 
     return (
