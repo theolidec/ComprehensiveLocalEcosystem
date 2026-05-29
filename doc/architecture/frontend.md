@@ -357,21 +357,28 @@ Manages music playback state, playlist queue, and shuffle mode globally so the f
 {
   currentTrack: Music | null,
   isPlaying: boolean,
-  queue: Music[],             // Active playlist track list
+  progress: number,           // Current playback position (seconds)
+  duration: number,           // Track duration (seconds)
+  playlistQueue: Music[],     // Active playlist track list
   currentIndex: number,
   shuffle: boolean,
   loop: boolean,
+  volume: number,             // 0–1, persisted via cookie
   currentPlaylist: Playlist | null
 }
 
 // Key methods
-playTrack(track, queue?, index?)
+playTrack(track, playlist?, queue?)
+playPlaylist(playlist)        // Play all tracks in a playlist from the first
 togglePlay()
-nextTrack()
-prevTrack()
+playNext()
+playPrevious()
 toggleShuffle()
 toggleLoop()
-setCurrentPlaylist(playlist)
+stop()
+seek(time)                   // Seek to position in seconds
+changeVolume(val)             // Set volume 0–1
+refreshPlaylists()            // Trigger playlist component refresh
 ```
 
 ### WikiContext

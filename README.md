@@ -150,6 +150,7 @@ SUM/SIOM (User Manuals)
 - **Floating Player**: Spotify-style persistent floating player (bottom-right) visible on all pages
 - **Public/Private Tracks**: Control visibility of individual songs
 - **Metadata**: Store title, artist, album, cover URL, duration per track
+- **Volume Control**: Adjustable playback volume (0–100%) via slider; persisted across navigations in a cookie
 - **Visual Indicators**: Currently-playing track highlighted; active playlist shown with green border and ▶ icon
 
 ### Daily Tracker System
@@ -481,7 +482,7 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Task completion analytics and question statistics
 - Music System with audio upload, streaming, and playlist management
 - Floating music player persisting across all pages
-- Shuffle, loop, and auto-advance playlist playback
+- Shuffle, loop, auto-advance playlist playback, and volume control
 - Radiation Monitor with measurements, locations, analytics, and public sharing
 
 ### Development Guidelines
@@ -574,7 +575,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.8.0
-**Last Updated**: 2026-05-26
+**Version**: 2.8.1
+**Last Updated**: 2026-05-29
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
