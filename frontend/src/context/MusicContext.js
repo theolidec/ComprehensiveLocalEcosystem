@@ -36,10 +36,12 @@ export const MusicProvider = ({ children }) => {
   const [playlistQueue, setPlaylistQueue] = useState(storedState?.playlistQueue || []);
   const [currentIndex, setCurrentIndex] = useState(storedState?.currentIndex ?? -1);
   const [shuffle, setShuffle] = useState(storedState?.shuffle || false);
+  const [volume, setVolume] = useState(storedState?.volume ?? 1);
   const [shuffledQueue, setShuffledQueue] = useState(storedState?.shuffledQueue || []);
 
   const playlistRef = useRef(null);
   const audioRef = useRef(null);
+  const volumeRef = useRef(storedState?.volume ?? 1);
   const savedProgress = useRef(storedState?.progress || 0);
   const isRestored = useRef(false);
   const loopRef = useRef(storedState?.loop || false);
@@ -72,6 +74,7 @@ export const MusicProvider = ({ children }) => {
       globalAudio.preload = 'auto';
     }
     audioRef.current = globalAudio;
+    globalAudio.volume = volumeRef.current;
 
     const audio = globalAudio;
 
@@ -143,6 +146,7 @@ export const MusicProvider = ({ children }) => {
           track: currentTrack,
           isPlaying,
           loop,
+          volume,
           progress: audioRef.current.currentTime,
           currentPlaylist: currentPlaylist ? { _id: currentPlaylist._id, name: currentPlaylist.name } : null,
           playlistQueue: playlistQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName })),
@@ -155,7 +159,7 @@ export const MusicProvider = ({ children }) => {
     save();
     const interval = setInterval(save, 100);
     return () => clearInterval(interval);
-  }, [currentTrack, isPlaying, loop, currentPlaylist, playlistQueue, currentIndex, shuffle, shuffledQueue]);
+  }, [currentTrack, isPlaying, loop, currentPlaylist, playlistQueue, currentIndex, shuffle, shuffledQueue, volume]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -292,6 +296,13 @@ export const MusicProvider = ({ children }) => {
     });
   }, []);
 
+  const changeVolume = useCallback((val) => {
+    const v = Math.max(0, Math.min(1, val));
+    volumeRef.current = v;
+    if (audioRef.current) audioRef.current.volume = v;
+    setVolume(v);
+  }, []);
+
   const toggleShuffle = useCallback(() => {
     setShuffle(prev => {
       const newShuffle = !prev;
@@ -336,7 +347,9 @@ export const MusicProvider = ({ children }) => {
       currentPlaylist,
       playlistQueue,
       currentIndex,
-      shuffle
+      shuffle,
+      volume,
+      changeVolume
     }}>
       {children}
     </MusicContext.Provider>

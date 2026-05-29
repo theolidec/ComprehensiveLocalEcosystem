@@ -10,7 +10,7 @@ const formatTime = (seconds) => {
 };
 
 const FloatingMusicPlayer = () => {
-  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue } = useMusic();
+  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, volume, changeVolume } = useMusic();
   const { isAuthenticated } = useAuth();
 
   if (!currentTrack || !isAuthenticated) return null;
@@ -32,7 +32,7 @@ const FloatingMusicPlayer = () => {
         {currentTrack.title || currentTrack.originalName}
         {currentTrack.artist && <span className="text-gray-500 font-normal ml-1">- {currentTrack.artist}</span>}
       </div>
-      <div className="flex gap-1 items-center w-full">
+      <div className="flex gap-1 items-center w-full mb-1">
         <button
           className={`btn btn-secondary font-bold ${shuffle ? 'text-green-500' : ''}`}
           onClick={toggleShuffle}
@@ -81,6 +81,22 @@ const FloatingMusicPlayer = () => {
         <span className="text-xs w-14 text-right">
           {formatTime(progress)}/{formatTime(duration)}
         </span>
+      </div>
+      <div className="flex gap-2 items-center w-full px-1">
+        <span className="text-base select-none" title="Volume">
+          {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
+        </span>
+        <input
+          type="range"
+          min="0"
+          max="1"
+          step="0.02"
+          value={volume}
+          onChange={(e) => changeVolume(parseFloat(e.target.value))}
+          className="w-full"
+          title={`Volume: ${Math.round(volume * 100)}%`}
+        />
+        <span className="text-xs w-8 text-right text-gray-500">{Math.round(volume * 100)}%</span>
       </div>
     </div>
   );

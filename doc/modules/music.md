@@ -26,7 +26,7 @@
   - `/music/upload` → Upload tab
 - Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`
 - Floating player is always visible (bottom right)
-- Context: `MusicContext` manages playback state, playlist queue, and shuffle
+- Context: `MusicContext` manages playback state, playlist queue, shuffle, and volume (`volume`, `changeVolume`)
 
 ## Usage
 - Go to `/music/library` to view your music library
@@ -54,6 +54,7 @@
 - Use ⏮/⏭ buttons to skip to previous/next track in the playlist
 - Use ⇌ button to toggle shuffle mode (randomizes playback order)
 - Use ↻ button to toggle loop mode (single track loop)
+- Use the 🔊/🔉/🔇 volume slider to adjust playback volume (0–100%); persisted across page navigations via cookie
 - When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
 
 ## Architecture References

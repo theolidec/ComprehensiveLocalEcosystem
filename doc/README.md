@@ -149,10 +149,15 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 26, 2026  
-**Version**: 2.8.0
+**Last Updated**: May 29, 2026  
+**Version**: 2.8.1
 
 ## Recent Changes
+
+### Floating Music Player — Volume Control (v2.8.1, 2026-05-29)
+- **`FloatingMusicPlayer.js`**: Added a volume row (🔊/🔉/🔇 icon + range slider + percentage label) below the playback controls. `volume` and `changeVolume` were already defined in `MusicContext` but not exposed in the context value; they are now exported.
+- **`context/MusicContext.js`**: Added `volume` and `changeVolume` to the `MusicContext.Provider` value; volume is already persisted in the `musicState` cookie.
+- **`doc/modules/music.md`**: Documented the volume slider feature and updated context description.
 
 ### Dependency Pruning + fetchClient Migration (v2.8.0, 2026-05-26)
 
