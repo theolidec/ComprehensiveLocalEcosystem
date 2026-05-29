@@ -31,6 +31,7 @@
 ## Usage
 - Go to `/music/library` to view your music library
 - Select an audio file - a popup will appear to enter Song Name, Artist, and optionally add to a playlist
+- When typing an artist name that matches an existing artist case-insensitively (but not identically), a **"Did you mean [Artist]?"** hint appears below the field; clicking "Use it" replaces the typed value with the existing artist's exact casing
 - Check "Make this song public" to make a song publicly discoverable (default is private)
 - Each song shows a 🔓 Public or 🔒 Private badge in "All Your Music"
 - Click the 🔒/🔓 button next to any song to toggle its visibility

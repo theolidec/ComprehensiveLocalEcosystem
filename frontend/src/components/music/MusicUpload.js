@@ -13,10 +13,26 @@ const MusicUpload = ({ onUpload }) => {
   const [selectedPlaylist, setSelectedPlaylist] = useState('');
   const [playlists, setPlaylists] = useState([]);
   const [isPublic, setIsPublic] = useState(false);
+  const [existingArtists, setExistingArtists] = useState([]);
+  const [artistSuggestion, setArtistSuggestion] = useState(null);
 
   useEffect(() => {
     api.get('/api/music/playlist/my', { withCredentials: true })
       .then(res => setPlaylists(res.data))
+      .catch(() => {});
+    api.get('/api/music/my', { withCredentials: true })
+      .then(res => {
+        const names = new Set();
+        res.data.forEach(track => {
+          if (track.artist) {
+            track.artist.split(',').forEach(a => {
+              const trimmed = a.trim();
+              if (trimmed) names.add(trimmed);
+            });
+          }
+        });
+        setExistingArtists([...names]);
+      })
       .catch(() => {});
   }, []);
 
@@ -62,6 +78,7 @@ const MusicUpload = ({ onUpload }) => {
       setSelectedFile(null);
       setSongName('');
       setArtist('');
+      setArtistSuggestion(null);
       setSelectedPlaylist('');
       setIsPublic(false);
       if (fileInput.current) fileInput.current.value = '';
@@ -73,9 +90,24 @@ const MusicUpload = ({ onUpload }) => {
     }
   };
 
+  const handleArtistChange = (e) => {
+    const val = e.target.value;
+    setArtist(val);
+    const trimmed = val.trim();
+    if (trimmed) {
+      const match = existingArtists.find(
+        a => a.toLowerCase() === trimmed.toLowerCase() && a !== trimmed
+      );
+      setArtistSuggestion(match || null);
+    } else {
+      setArtistSuggestion(null);
+    }
+  };
+
   const handleCancel = () => {
     setShowModal(false);
     setSelectedFile(null);
+    setArtistSuggestion(null);
     if (fileInput.current) fileInput.current.value = '';
   };
 
@@ -124,10 +156,22 @@ const MusicUpload = ({ onUpload }) => {
                 <input
                   type="text"
                   value={artist}
-                  onChange={(e) => setArtist(e.target.value)}
+                  onChange={handleArtistChange}
                   className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
                   placeholder="Artist name"
                 />
+                {artistSuggestion && (
+                  <p className="text-sm mt-1 text-yellow-600 dark:text-yellow-400">
+                    Did you mean <strong>{artistSuggestion}</strong>?{' '}
+                    <button
+                      type="button"
+                      onClick={() => { setArtist(artistSuggestion); setArtistSuggestion(null); }}
+                      className="underline font-medium hover:text-yellow-700 dark:hover:text-yellow-300"
+                    >
+                      Use it
+                    </button>
+                  </p>
+                )}
               </div>
               <div className="mb-4">
                 <label className="flex items-center gap-2 cursor-pointer">
