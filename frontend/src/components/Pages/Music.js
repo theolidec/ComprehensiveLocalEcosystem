@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useMusic } from '../../context/MusicContext';
 import Header from '../Layout/Header';
 import Footer from '../Layout/Footer';
@@ -10,6 +10,7 @@ const MusicPage = ({ tab }) => {
   const { playlistRef, playTrack, refreshPlaylists } = useMusic();
   const navigate = useNavigate();
   const location = useLocation();
+  const { artistName } = useParams();
   const [activeTab, setActiveTab] = useState(tab || 'library');
 
   useEffect(() => {
@@ -110,6 +111,7 @@ const MusicPage = ({ tab }) => {
                   ref={playlistRef}
                   onSelectTrack={track => playTrack(track)}
                   showArtistsOnly={true}
+                  initialArtist={artistName ? decodeURIComponent(artistName) : null}
                 />
               </div>
             )}

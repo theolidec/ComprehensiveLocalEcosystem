@@ -21,7 +21,8 @@
 - Routes:
   - `/music` → redirects to `/music/library`
   - `/music/library` → My Library tab
-  - `/music/artists` → Artists tab
+  - `/music/artists` → Artists tab (shows artist grid)
+  - `/music/artists/:artistName` → Artists tab with the given artist pre-selected (URL-encoded name)
   - `/music/discover` → Discover tab (public music)
   - `/music/upload` → Upload tab
 - Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../utils/fetchClient';
 import { useMusic } from '../../context/MusicContext';
 
-const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false, showArtistsOnly = false }, ref) => {
+const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false, showArtistsOnly = false, initialArtist = null }, ref) => {
   const { currentTrack, currentPlaylist, playTrack, playPlaylist } = useMusic();
+  const navigate = useNavigate();
   const [playlists, setPlaylists] = useState([]);
   const [music, setMusic] = useState([]);
   const [publicMusic, setPublicMusic] = useState([]);
@@ -23,7 +25,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSongs, setSelectedSongs] = useState(new Set());
   const [showArtists, setShowArtists] = useState(showArtistsOnly);
-  const [selectedArtist, setSelectedArtist] = useState(null);
+  const [selectedArtist, setSelectedArtist] = useState(initialArtist);
   const [editingTrack, setEditingTrack] = useState(null);
   const [editTitle, setEditTitle] = useState('');
   const [editArtist, setEditArtist] = useState('');
@@ -51,6 +53,10 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
       setShowArtists(true);
     }
   }, [showArtistsOnly]);
+
+  useEffect(() => {
+    setSelectedArtist(initialArtist);
+  }, [initialArtist]);
 
   useEffect(() => {
     fetchData();
@@ -585,7 +591,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                   {filteredArtistList.map(artist => (
                     <div
                       key={artist}
-                      onClick={() => setSelectedArtist(artist)}
+                      onClick={() => navigate('/music/artists/' + encodeURIComponent(artist))}
                       className="p-4 rounded-lg cursor-pointer bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                     >
                       <div className="font-semibold truncate">{artist}</div>
@@ -596,7 +602,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
               ) : (
                 <div>
                   <button
-                    onClick={() => setSelectedArtist(null)}
+                    onClick={() => navigate('/music/artists')}
                     className="mb-4 text-blue-500 hover:text-blue-700 flex items-center gap-1"
                   >
                     ← Back to Artists
