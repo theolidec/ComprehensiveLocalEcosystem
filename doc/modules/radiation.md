@@ -102,7 +102,7 @@ Updated via `PUT /api/settings/radiation` (see `settingsController.updateRadiati
 | File | Purpose |
 |------|---------|
 | `frontend/src/components/Pages/Radiation.js` | Main page component (all tabs) |
-| `frontend/src/services/radiationAPI.js` | Axios service wrapper |
+| `frontend/src/services/radiationAPI.js` | fetchClient service wrapper |
 | `frontend/src/utils/radiationUnits.js` | Unit conversion utilities |
 
 ### Page Tabs

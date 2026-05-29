@@ -512,10 +512,10 @@ curl -X POST http://localhost:3001/api/wishlist \
 **Accessing from a Phone / Device on the Local Network:**
 - The frontend automatically derives the API URL from `window.location.hostname`, so accessing `https://192.168.1.128:3000` will call `https://192.168.1.128:3443` — no extra config needed.
 - CORS allows any RFC 1918 private-network origin in `development` mode.
-- The SSL cert (`backend/ssl/server.crt`) must include the machine's LAN IP as a Subject Alternative Name (SAN). Regenerate if your LAN IP changes:
+- The SSL cert (`backend/certs/server.crt`) must include the machine's LAN IP as a Subject Alternative Name (SAN). Regenerate if your LAN IP changes:
   ```bash
   openssl req -x509 -newkey rsa:2048 \
-    -keyout backend/ssl/server.key -out backend/ssl/server.crt \
+    -keyout backend/certs/server.key -out backend/certs/server.crt \
     -days 365 -nodes \
     -subj "/C=US/ST=State/L=City/O=Development/CN=localhost" \
     -addext "subjectAltName=DNS:localhost,IP:127.0.0.1,IP:<YOUR_LAN_IP>"

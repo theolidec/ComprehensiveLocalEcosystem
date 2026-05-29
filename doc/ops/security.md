@@ -348,15 +348,29 @@ Per-response headers:
 ## CORS Configuration
 
 ```javascript
-// In production the server aborts startup if FRONTEND_URL is unset, so the
-// fallback to localhost only ever applies in development.
-const FRONTEND_URL = process.env.FRONTEND_URL;
-if (process.env.NODE_ENV === 'production' && !FRONTEND_URL) {
-  process.exit(1);
-}
+// Always allows the configured FRONTEND_URL.
+// In non-production, also accepts any RFC 1918 private-network origin so that
+// phones/tablets on the LAN can reach the API without extra config.
+const corsOriginValidator = (origin, callback) => {
+  if (!origin) return callback(null, true); // same-origin / non-browser
+  if (origin === FRONTEND_URL) return callback(null, true);
+  if (process.env.NODE_ENV !== 'production') {
+    try {
+      const { hostname } = new URL(origin);
+      if (
+        hostname === 'localhost' ||
+        hostname === '127.0.0.1' ||
+        /^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname) ||
+        /^172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3}$/.test(hostname)
+      ) return callback(null, true);
+    } catch (_) {}
+  }
+  callback(new Error('CORS: origin not allowed'));
+};
 
 app.use(cors({
-  origin: FRONTEND_URL || 'http://localhost:3000',
+  origin: corsOriginValidator,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type']  // No Authorization — auth is cookies-only.

@@ -503,6 +503,7 @@ React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
   <Route path="/music" element={<Navigate to="/music/library" replace />} />
   <Route path="/music/library" element={<ProtectedRoute><MusicPage tab="library" /></ProtectedRoute>} />
   <Route path="/music/artists" element={<ProtectedRoute><MusicPage tab="artists" /></ProtectedRoute>} />
+  <Route path="/music/artists/:artistName" element={<ProtectedRoute><MusicPage tab="artists" /></ProtectedRoute>} />
   <Route path="/music/discover" element={<ProtectedRoute><MusicPage tab="discover" /></ProtectedRoute>} />
   <Route path="/music/upload" element={<ProtectedRoute><MusicPage tab="upload" /></ProtectedRoute>} />
   

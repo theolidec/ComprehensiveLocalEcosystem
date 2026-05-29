@@ -279,7 +279,7 @@ A full doc-vs-code audit was performed and the following inconsistencies were co
 - **Styles**: Added payment card CSS styles to App.css
 - **Documentation**: Updated passwords.md with payment card details
 
-### Radiation Module (v3.0.0)
+### Radiation Module (added pre-v2.6.0; originally labelled v3.0.0 — version numbering was subsequently reset)
 - **Backend**: New models `RadiationLocation` and `RadiationMeasurement` (full soft-delete audit trail)
 - **Backend**: `radiationController.js` — locations CRUD, measurements CRUD (soft + hard delete, restore, toggle visibility), analytics (time-series, by-location, heatmap)
 - **Backend**: `routes/radiation.js` mounted at `/api/radiation`
