@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users, BookOpen, CheckSquare, Flame, Activity } from 'lucide-react';
+import { Menu, X, Shield, User, LogOut, Calendar, Settings, Key, Home, Plus, Download, Upload, Trash2, Gift, FolderOpen, Calculator, Users, BookOpen, CheckSquare, Flame, Activity, DollarSign } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCalendarActions } from '../../contexts/CalendarActionsContext';
 import { usePageActions } from '../../contexts/PageActionsContext';
@@ -96,6 +96,9 @@ const Header = () => {
     }
     if (location.pathname === '/radiation') {
       return 'Radiation Monitor';
+    }
+    if (location.pathname.startsWith('/finance')) {
+      return 'Finance';
     }
     if (location.pathname.startsWith('/wikis')) {
       return 'Wiki';
@@ -263,6 +266,13 @@ const Header = () => {
                       <Activity className="h-4 w-4 text-green-600" />
                       <span>Radiation Monitor</span>
                     </button>
+                    <button
+                      onClick={() => navigate('/finance')}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <DollarSign className="h-4 w-4 text-green-700" />
+                      <span>Finance</span>
+                    </button>
                   </div>
                 )}
               </div>
@@ -410,6 +420,7 @@ const Header = () => {
                     { icon: <CheckSquare className="h-4 w-4 text-emerald-600" />, label: 'Daily Tracker', path: '/tracker' },
                     { icon: <BookOpen className="h-4 w-4 text-amber-600" />, label: 'Wiki', path: '/wikis' },
                     { icon: <Activity className="h-4 w-4 text-green-600" />, label: 'Radiation Monitor', path: '/radiation' },
+                    { icon: <DollarSign className="h-4 w-4 text-green-700" />, label: 'Finance', path: '/finance' },
                   ].map((app) => (
                     <button
                       key={app.path}

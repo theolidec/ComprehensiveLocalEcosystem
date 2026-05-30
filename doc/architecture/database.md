@@ -52,6 +52,12 @@ mongoose.connect(process.env.MONGODB_URI, {
 | Playlist | `Playlist.js` | Music playlists | References User, Music |
 | RadiationLocation | `RadiationLocation.js` | Named measurement locations with optional GPS | References User |
 | RadiationMeasurement | `RadiationMeasurement.js` | Radiation level log entries with soft-delete audit trail | References User, RadiationLocation |
+| FinanceAccount | `FinanceAccount.js` | Bank/virtual accounts with balance and canvas position | References User, FinanceGroup |
+| FinanceGroup | `FinanceGroup.js` | Canvas group labels for the flow map | References User |
+| FinanceRule | `FinanceRule.js` | Money flow automation rules (percentage, fixed, threshold, recurring) | References User, FinanceAccount (2×) |
+| FinanceTransaction | `FinanceTransaction.js` | Transaction log with pending/completed/cancelled states | References User, FinanceAccount (2×), FinanceRule |
+| FinanceBalanceSnapshot | `FinanceBalanceSnapshot.js` | Daily net-worth snapshots (one per user per day) | References User |
+| FinanceBudget | `FinanceBudget.js` | Monthly spending/inflow targets per account or account type | References User, FinanceAccount |
 
 ---
 

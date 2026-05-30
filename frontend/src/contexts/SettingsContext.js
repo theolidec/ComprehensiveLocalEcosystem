@@ -66,6 +66,9 @@ const defaultSettings = {
     preferredUnit: 'µSv/h',
     defaultLocationId: null,
     cpmConversionFactor: 151
+  },
+  finance: {
+    currency: 'USD'
   }
 };
 
@@ -196,6 +199,17 @@ export const SettingsProvider = ({ children }) => {
     }
   };
 
+  const updateFinanceSettings = async (finance) => {
+    try {
+      const data = await settingsAPI.updateFinanceSettings(finance);
+      const newSettings = { ...state.settings, finance: data.finance };
+      dispatch({ type: 'UPDATE_SETTINGS', payload: newSettings });
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data?.error };
+    }
+  };
+
   const resetSettings = async () => {
     try {
       const data = await settingsAPI.resetSettings();
@@ -289,6 +303,7 @@ export const SettingsProvider = ({ children }) => {
     updatePrivacySettings,
     updateWishlistSettings,
     updateRadiationSettings,
+    updateFinanceSettings,
     resetSettings,
     clearError,
     getActiveSessions,

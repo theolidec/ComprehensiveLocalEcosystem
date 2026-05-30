@@ -153,6 +153,13 @@ const settingsSchema = new mongoose.Schema({
       default: true
     }
   },
+  finance: {
+    currency: {
+      type: String,
+      enum: ['USD', 'EUR', 'GBP', 'NOK', 'SEK', 'DKK', 'CAD', 'AUD', 'CHF', 'JPY'],
+      default: 'USD'
+    }
+  },
   radiation: {
     preferredUnit: {
       type: String,

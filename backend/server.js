@@ -29,6 +29,8 @@ const connectDB = require('./config/database');
 const logger = require('./config/logger');
 const { generalLimiter } = require('./config/rateLimiter');
 const RefreshToken = require('./models/RefreshToken');
+const User = require('./models/User');
+const financeController = require('./controllers/financeController');
 const authRoutes = require('./routes/auth');
 const calendarRoutes = require('./routes/calendar');
 const categoryRoutes = require('./routes/categories');
@@ -48,6 +50,7 @@ const userRightsRoutes = require('./routes/userRights');
 const trackerRoutes = require('./routes/tracker');
 const musicRoutes = require('./routes/music');
 const radiationRoutes = require('./routes/radiation');
+const financeRoutes = require('./routes/finance');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -212,6 +215,7 @@ app.use('/api/user', userRightsRoutes);
 app.use('/api/tracker', trackerRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/radiation', radiationRoutes);
+app.use('/api/finance', financeRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -259,6 +263,32 @@ app.use((error, req, res, next) => {
       await RefreshToken.cleanupExpiredTokens();
     } catch (error) {
       logger.error('Scheduled refresh-token cleanup failed:', error);
+    }
+    setTimeout(run, msUntilNext());
+  };
+  setTimeout(run, msUntilNext());
+})();
+
+// Schedule a daily finance job at 03:30 server time.
+// Snapshots balances for net-worth tracking and fires due recurring rules
+// for all users that have finance accounts.
+(function scheduleDailyFinance() {
+  const msUntilNext = () => {
+    const now = new Date();
+    const next = new Date();
+    next.setHours(3, 30, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 1);
+    return next - now;
+  };
+  const run = async () => {
+    try {
+      const users = await User.find({}, '_id').lean();
+      for (const user of users) {
+        await financeController.snapshotBalances(user._id);
+        await financeController.processRecurringRules(user._id);
+      }
+    } catch (error) {
+      logger.error('Daily finance scheduler failed:', error);
     }
     setTimeout(run, msUntilNext());
   };

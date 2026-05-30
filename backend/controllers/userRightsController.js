@@ -26,6 +26,10 @@ const TrackerQuestion = require('../models/TrackerQuestion');
 const TrackerResponse = require('../models/TrackerResponse');
 const RadiationMeasurement = require('../models/RadiationMeasurement');
 const RadiationLocation = require('../models/RadiationLocation');
+const FinanceAccount = require('../models/FinanceAccount');
+const FinanceGroup = require('../models/FinanceGroup');
+const FinanceRule = require('../models/FinanceRule');
+const FinanceTransaction = require('../models/FinanceTransaction');
 const logger = require('../config/logger');
 
 const getUserData = async (req, res) => {
@@ -181,6 +185,10 @@ const deleteAccount = async (req, res) => {
       await TrackerResponse.deleteMany({ user: userId }, opt);
       await RadiationMeasurement.deleteMany({ userId }, opt);
       await RadiationLocation.deleteMany({ userId }, opt);
+      await FinanceTransaction.deleteMany({ userId }, opt);
+      await FinanceRule.deleteMany({ userId }, opt);
+      await FinanceAccount.deleteMany({ userId }, opt);
+      await FinanceGroup.deleteMany({ userId }, opt);
       // Memberships in other users' wikis and watch entries owned by this user
       await WikiPermission.deleteMany({ user: userId }, opt);
       await WikiWatch.deleteMany({ user: userId }, opt);
@@ -459,6 +467,17 @@ const exportUserData = async (req, res) => {
           isPublic: m.isPublic,
           createdAt: m.createdAt,
           updatedAt: m.updatedAt
+        }))
+      },
+      finance: {
+        accounts: (await FinanceAccount.find({ userId })).map(a => ({
+          id: a._id, name: a.name, type: a.type, balance: a.balance,
+          description: a.description, color: a.color, createdAt: a.createdAt
+        })),
+        transactions: (await FinanceTransaction.find({ userId })).map(t => ({
+          id: t._id, type: t.type, fromAccountId: t.fromAccountId,
+          toAccountId: t.toAccountId, amount: t.amount, description: t.description,
+          date: t.date, status: t.status, createdAt: t.createdAt
         }))
       },
       wikis: wikis.map(w => ({

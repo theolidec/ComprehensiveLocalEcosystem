@@ -44,6 +44,7 @@ import MusicPage from './components/Pages/Music';
 import FloatingMusicPlayer from './components/FloatingMusicPlayer';
 import { MusicProvider } from './context/MusicContext';
 import RadiationPage from './components/Pages/Radiation';
+import Finance from './components/Pages/Finance';
 
 const getInitialTheme = () => {
   if (typeof window === 'undefined') return 'light';
@@ -399,6 +400,20 @@ function AppContent() {
                 <Sidebar inline />
                 <div style={{ flex: 1 }}>
                   <DailyTracker />
+                </div>
+              </Row>
+              <Footer />
+            </div>
+          </ProtectedRoute>
+        } />
+        <Route path="/finance" element={<Navigate to="/finance/flowmap" replace />} />
+        <Route path="/finance/:tab" element={
+          <ProtectedRoute>
+            <div key={location.pathname}>
+              <Header />
+              <Row>
+                <div style={{ flex: 1 }}>
+                  <Finance />
                 </div>
               </Row>
               <Footer />

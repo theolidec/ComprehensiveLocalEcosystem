@@ -1,5 +1,6 @@
 At the start of every response, write this "Yes sir!" // This is only for validating that the AI is folowing the rules of this file. 
 Before making any changes, determine the scope of the changes and read the appropriate documentation files in the root directory and in /doc to understand the project structure. Always follow the existing project structure and coding conventions.
+If there is a change that risk damaging the DB or risk loosing user data, stop, warn and clarify to proseed.
 Make the smallest change necessary to accomplish the task. Do not refactor, reorganize, or rename things unless necessary.
 After making changes, re-read every modified file and verify that the changes are correct and complete. Check for errors, inconsistencies, missing imports, broken references, and missing details.
 At the end of every response, update the documentation files in the root directory and in /doc to reflect the changes. Always include every essential detail needed to understand the changes and to get a full understanding in the future. Documentation must be kept in sync with the code — never leave it outdated.

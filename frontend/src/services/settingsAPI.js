@@ -57,6 +57,11 @@ const settingsAPI = {
     return response.data;
   },
 
+  updateFinanceSettings: async (finance) => {
+    const response = await api.put(`${API_URLS.SETTINGS}/finance`, finance);
+    return response.data;
+  },
+
   resetSettings: async () => {
     const response = await api.post(`${API_URLS.SETTINGS}/reset`);
     return response.data;

@@ -38,6 +38,7 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 | [`modules/daily-tracker.md`](modules/daily-tracker.md) | Daily tracker | `/api/tracker/*` |
 | [`modules/music.md`](modules/music.md) | Music system | `/api/music/*` |
 | [`modules/radiation.md`](modules/radiation.md) | Radiation monitor | `/api/radiation/*` |
+| [`modules/finance.md`](modules/finance.md) | Finance — money flow, rules, transactions | `/api/finance/*` |
 
 ### Security & Operations
 
@@ -110,6 +111,7 @@ Start here if you're integrating with the API:
 - [`modules/daily-tracker.md`](modules/daily-tracker.md) - Habit & task tracker
 - [`modules/music.md`](modules/music.md) - Music library and playlist player
 - [`modules/radiation.md`](modules/radiation.md) - Radiation monitor
+- [`modules/finance.md`](modules/finance.md) - Finance (money flow, rules, transactions, analytics)
 
 ### Organization
 - [`modules/categories.md`](modules/categories.md) - Event categories
@@ -149,10 +151,21 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 29, 2026  
-**Version**: 2.8.1
+**Last Updated**: May 30, 2026  
+**Version**: 2.8.2
 
 ## Recent Changes
+
+### Flow Map Account Groups (v2.8.2, 2026-05-30)
+- **`backend/models/FinanceGroup.js`** (new): `FinanceGroup` model — `userId`, `name`, `color`. Indexed on `userId`.
+- **`backend/models/FinanceAccount.js`**: Added `groupId` field (nullable ObjectId ref to `FinanceGroup`).
+- **`backend/controllers/financeController.js`**: Added `getGroups`, `createGroup`, `updateGroup`, `deleteGroup` handlers; `updateAccount` now accepts and applies `groupId`.
+- **`backend/routes/finance.js`**: Added `/groups` CRUD routes; `PUT /accounts/:id` validator now includes optional `groupId`.
+- **`backend/controllers/userRightsController.js`**: `FinanceGroup.deleteMany` added to GDPR account-deletion cascade.
+- **`frontend/src/config/api.js`**: Added `FINANCE.GROUPS` endpoint and `FINANCE_GROUPS` URL constant.
+- **`frontend/src/services/financeAPI.js`**: Added `getGroups`, `createGroup`, `updateGroup`, `deleteGroup` exports.
+- **`frontend/src/components/Pages/Finance.js`**: Added `GROUP_PAD` / `GROUP_LABEL_H` constants; `GroupBox` SVG component (dashed border + colour-filled label pill, computed from member bounding boxes); `GroupsPanel` side drawer (create/rename/delete groups, colour picker, assign accounts via dropdown); `FlowchartTab` now loads groups on mount, builds `groupMembers` map, renders `GroupBox` elements behind edges/cards, and exposes a *Groups* toolbar button.
+- **`doc/modules/finance.md`**: Updated with `FinanceGroup` model, new API routes, and group rendering documentation.
 
 ### Floating Music Player — Volume Control (v2.8.1, 2026-05-29)
 - **`FloatingMusicPlayer.js`**: Added a volume row (🔊/🔉/🔇 icon + range slider + percentage label) below the playback controls. `volume` and `changeVolume` were already defined in `MusicContext` but not exposed in the context value; they are now exported.
@@ -278,6 +291,20 @@ A full doc-vs-code audit was performed and the following inconsistencies were co
 - **API Service**: New `paymentCardAPI.js` for frontend API calls
 - **Styles**: Added payment card CSS styles to App.css
 - **Documentation**: Updated passwords.md with payment card details
+
+### Finance Module (v2.8.0)
+- **Backend**: New models `FinanceAccount`, `FinanceRule`, `FinanceTransaction`
+- **Backend**: `financeController.js` — accounts CRUD + canvas position, rules CRUD + manual trigger, transactions CRUD + status update (balance sync + rule evaluation), analytics aggregation
+- **Backend**: `routes/finance.js` mounted at `/api/finance`
+- **Backend**: `Settings` model extended with `finance.currency` block (10 supported currencies)
+- **Backend**: `settingsController.updateFinanceSettings` + `PUT /api/settings/finance` route
+- **Backend**: GDPR cascade — `userRightsController` now deletes and exports finance data on account deletion/export
+- **Frontend**: `financeAPI.js` service; `Finance.js` page — 4 tabs: Flow Map (draggable SVG canvas), Rules (full rule engine), Transactions (log + pending confirm/cancel), Analytics (balance KPIs, bar chart, line chart, table)
+- **Frontend**: Flowchart built with pure SVG (no new dependencies); drag positions debounce-saved to backend
+- **Frontend**: `settingsAPI.updateFinanceSettings` added
+- **Frontend**: Wired into `App.js` route, Header apps dropdown (desktop + mobile), `Home.js` quickActions, `HomeLayoutEditor.js`
+- **Frontend**: `SettingsContext` extended with `updateFinanceSettings` and `finance.currency` default
+- **Documentation**: `doc/modules/finance.md` created; `doc/architecture/database.md`, `doc/architecture/api-overview.md`, `doc/README.md`, `README.md` updated
 
 ### Radiation Module (added pre-v2.6.0; originally labelled v3.0.0 — version numbering was subsequently reset)
 - **Backend**: New models `RadiationLocation` and `RadiationMeasurement` (full soft-delete audit trail)

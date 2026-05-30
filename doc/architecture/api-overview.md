@@ -38,6 +38,68 @@ Route prefix: `/api/radiation` — All endpoints require JWT authentication exce
 
 ---
 
+## Finance Module
+
+Route prefix: `/api/finance` — All endpoints require JWT authentication.
+
+### Accounts
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/accounts` | List accounts (`?includeArchived=true` to include archived) |
+| POST | `/api/finance/accounts` | Create account |
+| PUT | `/api/finance/accounts/:id` | Update account metadata (also accepts `groupId`) |
+| PUT | `/api/finance/accounts/:id/position` | Save canvas x/y position |
+| PUT | `/api/finance/accounts/:id/archive` | Archive / unarchive account (`{ isArchived: bool }`) |
+| DELETE | `/api/finance/accounts/:id` | Delete account + cascade-delete its rules |
+
+### Groups
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/groups` | List all groups |
+| POST | `/api/finance/groups` | Create group |
+| PUT | `/api/finance/groups/:id` | Update group (name, color) |
+| DELETE | `/api/finance/groups/:id` | Delete group (clears `groupId` on member accounts) |
+
+### Rules
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/rules` | List all rules (populated, sorted by priority) |
+| POST | `/api/finance/rules` | Create rule |
+| PUT | `/api/finance/rules/reorder` | Bulk-update `priority` (`{ order: [{ id, priority }] }`) |
+| PUT | `/api/finance/rules/:id` | Update rule |
+| DELETE | `/api/finance/rules/:id` | Delete rule |
+| POST | `/api/finance/rules/:id/trigger` | Manually trigger a `fixed` recurring rule |
+| POST | `/api/finance/rules/:id/dryrun` | Simulate rule with `{ amount }`, returns projected balances |
+
+### Transactions
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/transactions` | List transactions (filterable, paginated) |
+| POST | `/api/finance/transactions` | Create transaction |
+| POST | `/api/finance/transactions/bulk` | Bulk-create transactions from CSV import (max 500) |
+| PUT | `/api/finance/transactions/:id/status` | Update transaction status |
+| DELETE | `/api/finance/transactions/:id` | Delete transaction |
+
+### Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/analytics` | Account summaries + daily flow (`?days=90`) |
+| GET | `/api/finance/analytics/net-worth` | Net worth history from balance snapshots (up to 365 entries) |
+
+### Budgets
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/finance/budgets` | List budgets (`?month=YYYY-MM` optional) |
+| PUT | `/api/finance/budgets` | Upsert budget by `{ month, accountId?, accountType?, monthlyTarget, note? }` |
+| DELETE | `/api/finance/budgets/:id` | Delete budget |
+
+### Settings
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| PUT | `/api/settings/finance` | Update currency preference (`{ currency: "USD" }`) |
+
+---
+
 ## Music Module
 
 - `/music` route and FloatingMusicPlayer component available on frontend, linking to backend endpoints.

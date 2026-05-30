@@ -319,6 +319,35 @@ const settingsController = {
     }
   },
 
+  updateFinanceSettings: async (req, res) => {
+    try {
+      const allowedFields = ['currency'];
+      const updates = {};
+      for (const field of allowedFields) {
+        if (req.body[field] !== undefined) {
+          updates[`finance.${field}`] = req.body[field];
+        }
+      }
+
+      const settings = await Settings.findOneAndUpdate(
+        { userId: req.user._id },
+        { $set: updates },
+        { new: true, runValidators: true }
+      );
+
+      res.json({
+        message: 'Finance settings updated successfully',
+        finance: settings.finance
+      });
+    } catch (error) {
+      logger.error('Update finance settings error:', error);
+      res.status(500).json({
+        error: 'Failed to update finance settings',
+        code: 'SERVER_ERROR'
+      });
+    }
+  },
+
   resetSettings: async (req, res) => {
     try {
       await Settings.findOneAndUpdate(

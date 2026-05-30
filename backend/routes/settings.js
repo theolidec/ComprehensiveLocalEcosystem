@@ -78,6 +78,10 @@ router.put('/radiation', settingsLimiter, [
   body('cpmConversionFactor').optional().isFloat({ min: 1, max: 10000 })
 ], validateSettingsUpdate, settingsController.updateRadiationSettings);
 
+router.put('/finance', settingsLimiter, [
+  body('currency').optional().isIn(['USD', 'EUR', 'GBP', 'NOK', 'SEK', 'DKK', 'CAD', 'AUD', 'CHF', 'JPY'])
+], validateSettingsUpdate, settingsController.updateFinanceSettings);
+
 router.get('/sessions', settingsController.getActiveSessions);
 
 router.delete('/sessions/:sessionId', [

@@ -343,6 +343,7 @@ For detailed API documentation including request/response examples, see [doc/arc
 - Tracker: `/api/tracker/*` - Daily habit & task tracker
 - Music: `/api/music/*` - Music library and playlist streaming
 - Radiation: `/api/radiation/*` - Radiation measurements and analytics
+- Finance: `/api/finance/*` - Accounts, rules, transactions, and analytics
 - Settings: `/api/settings/*` - User preferences
 - Follow: `/api/follow/*` - Social features
 
@@ -363,6 +364,7 @@ For detailed application flow and usage instructions, see [doc/README.md](doc/RE
 - **Tracker**: `/tracker` for daily habit & task tracking
 - **Music**: `/music` for music library and playlist management
 - **Radiation**: `/radiation` for radiation monitoring and analytics
+- **Finance**: `/finance` for money flow visualisation, rules, transactions, and analytics
 - **Settings**: `/settings` for user preferences
 
 ## Security
@@ -484,6 +486,7 @@ curl -X POST http://localhost:3001/api/wishlist \
 - Floating music player persisting across all pages
 - Shuffle, loop, auto-advance playlist playback, and volume control
 - Radiation Monitor with measurements, locations, analytics, and public sharing
+- Finance module with draggable SVG flowchart, rule engine (percentage/fixed/threshold/recurring), transaction log, and analytics
 
 ### Development Guidelines
 - Follow existing code patterns and conventions
@@ -575,7 +578,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.8.1
-**Last Updated**: 2026-05-29
+**Version**: 2.9.0
+**Last Updated**: 2026-05-30
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
