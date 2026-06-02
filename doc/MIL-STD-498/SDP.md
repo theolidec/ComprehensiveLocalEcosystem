@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SDP-001  
-**Revision**: 1.1  
-**Date**: May 26, 2026  
+**Revision**: 1.2  
+**Date**: June 2, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -91,6 +91,7 @@ The project uses an **iterative development model** with continuous deployment c
 | Phase 10 | Rich-text document editor with versioning | Complete |
 | Phase 11 | Music library and floating player | Complete |
 | Phase 12 | Radiation monitor with analytics | Complete |
+| Phase 13 | Finance module (flow map, rules, transactions, analytics, budgets) | Complete |
 
 ---
 
@@ -114,7 +115,8 @@ The project uses an **iterative development model** with continuous deployment c
 | M12 | Music library | Q3 2025 |
 | M13 | Rich-text document editor (TipTap) | Q4 2025 |
 | M14 | Radiation monitor | Q1 2026 |
-| M15 | Current release | May 2026 |
+| M15 | Finance module | Q2 2026 |
+| M16 | Current release | June 2026 |
 
 ### 5.2 Current Status
 
@@ -215,6 +217,7 @@ The project is in **maintenance and enhancement phase** with regular updates and
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SDP creation |
 | 1.1 | May 26, 2026 | System | Added Music, Radiation, TipTap editor phases and milestones; updated dependency versions (Mongoose 8.x, etc.) |
+| 1.2 | June 2, 2026 | System | Added Phase 13 (Finance module); added Milestone M15 (Finance), renumbered current release to M16 |
 
 ---
 

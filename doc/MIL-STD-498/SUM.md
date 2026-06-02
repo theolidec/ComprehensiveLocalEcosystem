@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SUM-001  
-**Revision**: 1.1  
-**Date**: May 26, 2026  
+**Revision**: 1.3  
+**Date**: June 2, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -144,9 +144,7 @@ Calendar overview for the current day:
 - Shows next upcoming event when no events today
 
 #### Quick Access Grid
-Navigation shortcuts to all application modules:
-- Calendar, Passwords, Wishlist, Files
-- Calculator, Following, Wikis, Daily Tracker
+Customizable navigation shortcuts to application modules. Defaults include: Calendar, Passwords, Wishlist, Files, Music, Calculator, Following, Wikis, Daily Tracker, and Radiation. Finance and other modules can be added via the **Home Layout Editor** (`/home/edit`).
 
 ### 5.2 Calendar
 
@@ -557,6 +555,8 @@ Under the **"Account"** tab:
 | Wiki pages not loading | Refresh the page |
 | Music doesn't play | Check browser audio permissions; verify the file is a supported audio format |
 | Radiation values look wrong | Verify the preferred unit and CPM factor in Radiation → Settings |
+| Finance balance not updating | Ensure transactions are marked **Completed** (Pending transactions do not apply to balances until confirmed) |
+| Finance rules not firing | Verify rule is Active and the trigger type matches the transaction direction (on_inflow / on_outflow) |
 
 ### 7.2 Getting Help
 
@@ -592,6 +592,7 @@ Under the **"Account"** tab:
 | 1.0 | May 10, 2026 | System | Initial SUM creation |
 | 1.1 | May 26, 2026 | System | Added Music, Radiation, and Rich-Text Document sections; corrected password length to 12-128 chars; added Music/Radiation entries to the Apps menu |
 | 1.2 | June 2, 2026 | System | Added Finance module to Apps menu table; added section 5.10 Finance (Flow Map, Rules, Transactions, Analytics); renumbered Settings to 5.11 |
+| 1.3 | June 2, 2026 | System | Updated Quick Access Grid description to reflect configurable defaults (Music, Radiation included); added Finance troubleshooting entries |
 
 ---
 

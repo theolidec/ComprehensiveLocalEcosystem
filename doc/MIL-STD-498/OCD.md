@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: OCD-001  
-**Revision**: 1.1  
-**Date**: May 26, 2026  
+**Revision**: 1.2  
+**Date**: June 2, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -115,6 +115,15 @@ The Comprehensive Local Ecosystem was developed to provide individuals with a un
 4. User reviews analytics (time-series, per-location bar chart, heatmap calendar)
 5. User can mark measurements public, soft-delete with audit trail, and restore later
 
+#### 3.4.8 Finance Tracking
+
+1. User creates financial accounts (checking, savings, investment, income, expense, cash, credit, bridge) on the Flow Map
+2. User defines money flow rules (percentage, fixed, threshold, recurring) between accounts
+3. User logs deposits, withdrawals, and transfers; completed transactions update balances and trigger eligible rules
+4. System cascades inflow rules automatically for bridge (routing hub) accounts
+5. User reviews Analytics (net-worth history, inflow/outflow bar chart, daily flow, budget progress)
+6. System takes a daily balance snapshot at 03:30 for net-worth history
+
 ---
 
 ## 4. User Classes and Characteristics
@@ -185,6 +194,7 @@ The Comprehensive Local Ecosystem was developed to provide individuals with a un
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial OCD creation |
 | 1.1 | May 26, 2026 | System | Added Music and Radiation scenarios; clarified guest user class |
+| 1.2 | June 2, 2026 | System | Added Finance operational scenario (3.4.8) |
 
 ---
 
