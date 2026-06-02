@@ -101,19 +101,19 @@ The project uses an **iterative development model** with continuous deployment c
 
 | Milestone | Description | Target |
 |-----------|-------------|--------|
-| M1 | Project initialization | Q1 2024 |
-| M2 | Core backend/frontend setup | Q1 2024 |
-| M3 | Authentication system | Q2 2024 |
-| M4 | Calendar module | Q2 2024 |
-| M5 | Password manager | Q3 2024 |
-| M6 | File manager | Q3 2024 |
-| M7 | Wiki system | Q4 2024 |
-| M8 | Wishlist system | Q4 2024 |
-| M9 | Daily tracker | Q1 2025 |
-| M10 | GDPR/User rights | Q1 2025 |
-| M11 | Payment cards | Q2 2025 |
-| M12 | Music library | Q3 2025 |
-| M13 | Rich-text document editor (TipTap) | Q4 2025 |
+| M1 | Project initialization | Q1 2026 |
+| M2 | Core backend/frontend setup | Q1 2026 |
+| M3 | Authentication system | Q1 2026 |
+| M4 | Calendar module | Q1 2026 |
+| M5 | Password manager | Q1 2026 |
+| M6 | File manager | Q1 2026 |
+| M7 | Wiki system | Q1 2026 |
+| M8 | Wishlist system | Q1 2026 |
+| M9 | Daily tracker | Q1 2026 |
+| M10 | GDPR/User rights | Q1 2026 |
+| M11 | Payment cards | Q1 2026 |
+| M12 | Music library | Q1 2026 |
+| M13 | Rich-text document editor (TipTap) | Q1 2026 |
 | M14 | Radiation monitor | Q1 2026 |
 | M15 | Finance module | Q2 2026 |
 | M16 | Current release | June 2026 |
