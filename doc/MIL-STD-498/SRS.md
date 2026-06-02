@@ -16,7 +16,7 @@ This document defines the Software Requirements Specification (SRS) for the Comp
 
 ### 1.2 Purpose
 
-The purpose of this system is to provide users with an integrated suite of tools for managing personal data including calendars, passwords, payment cards, files, rich-text documents, wikis, wishlists, daily tracking, music libraries, radiation measurements, and a graphing calculator. The system operates as a self-hosted web application with a React frontend and Node.js/Express backend.
+The purpose of this system is to provide users with an integrated suite of tools for managing personal data including calendars, passwords, payment cards, files, rich-text documents, wikis, wishlists, daily tracking, music libraries, radiation measurements, personal finance tracking, and a graphing calculator. The system operates as a self-hosted web application with a React frontend and Node.js/Express backend.
 
 ### 3.1 Product Perspective
 
@@ -209,13 +209,34 @@ End users are individuals seeking a personal productivity platform with the foll
 | FR-RAD-007 | Soft Delete & Restore | System shall support soft delete with audit trail, hard delete, and restore |
 | FR-RAD-008 | Analytics | System shall provide time-series, per-location bar chart, and heatmap calendar analytics |
 
-#### 3.1.13 Graphing Calculator
+#### 3.1.13 Finance Module
+
+| ID | Requirement | Description |
+|----|-------------|-------------|
+| FR-FIN-001 | Accounts | Users shall be able to create and manage virtual bank/financial accounts with balance, type (checking/savings/investment/income/expense/cash/credit/bridge), and colour |
+| FR-FIN-002 | Flow Map | System shall render a draggable SVG canvas showing accounts as cards and rules as animated flow edges |
+| FR-FIN-003 | Account Groups | Users shall be able to group accounts visually on the flow map with a named, coloured group border |
+| FR-FIN-004 | Account Archiving | Users shall be able to archive accounts (soft-delete); archived accounts are hidden by default |
+| FR-FIN-005 | Rules Engine | Users shall be able to define money flow rules (percentage, fixed, threshold, recurring) between accounts |
+| FR-FIN-006 | Rule Priority | Users shall be able to reorder rules by priority; lower priority value = evaluated first |
+| FR-FIN-007 | Transactions | Users shall be able to log deposits, withdrawals, and transfers; completed transactions shall update account balances and trigger eligible rules |
+| FR-FIN-008 | Pending Transactions | System shall support pending transactions that require explicit confirmation before balance is applied |
+| FR-FIN-009 | Bridge Accounts | System shall auto-cascade inflow rules for bridge (routing hub) accounts on transaction completion |
+| FR-FIN-010 | Bulk Import | Users shall be able to import transactions via CSV with a parse-preview step |
+| FR-FIN-011 | CSV Export | Users shall be able to export filtered transaction history as CSV |
+| FR-FIN-012 | Budgets | Users shall be able to create monthly spending/inflow budgets per account or account type |
+| FR-FIN-013 | Analytics | System shall provide balance KPIs, net-worth history chart, per-account inflow/outflow bar chart, daily flow line chart, and budget progress bars |
+| FR-FIN-014 | Daily Snapshot | System shall take a daily balance snapshot for every user at 03:30 server time for net-worth history |
+| FR-FIN-015 | Currency | System shall support a per-user currency setting (USD, EUR, GBP, NOK, SEK, DKK, CAD, AUD, CHF, JPY) |
+| FR-FIN-016 | GDPR | Finance data shall be included in user data export and cascade-deleted on account deletion |
+
+#### 3.1.14 Graphing Calculator
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
 | FR-CALC-001 | Graphing | System shall provide an in-app graphing calculator (custom implementation, no external GeoGebra code) |
 
-#### 3.1.14 Home Dashboard
+#### 3.1.15 Home Dashboard
 
 | ID | Requirement | Description |
 |----|-------------|-------------|
@@ -292,7 +313,7 @@ End users are individuals seeking a personal productivity platform with the foll
 |-------|-------------|
 | User | User accounts with authentication data |
 | RefreshToken | Refresh token records for multi-session support |
-| Settings | Per-user preferences (display, calendar, notifications, privacy, radiation) |
+| Settings | Per-user preferences (display, calendar, notifications, privacy, radiation, finance) |
 | Event | Calendar events |
 | Category | Event categories |
 | Password | Encrypted password entries |
@@ -319,6 +340,12 @@ End users are individuals seeking a personal productivity platform with the foll
 | Playlist | User-managed playlists referencing Music tracks |
 | RadiationLocation | Named radiation measurement locations |
 | RadiationMeasurement | Radiation measurement records (incl. soft-delete audit) |
+| FinanceAccount | Bank/virtual accounts with balance, type, colour, and canvas position |
+| FinanceGroup | Canvas group labels for the flow map |
+| FinanceRule | Money flow automation rules (percentage, fixed, threshold, recurring) |
+| FinanceTransaction | Transaction log with pending/completed/cancelled states |
+| FinanceBalanceSnapshot | Daily net-worth snapshots (one per user per day) |
+| FinanceBudget | Monthly spending/inflow targets per account or account type |
 
 ---
 
@@ -362,6 +389,7 @@ End users are individuals seeking a personal productivity platform with the foll
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SRS creation |
 | 1.1 | May 26, 2026 | System | Added Music, Radiation, Graphing Calculator, Home dashboard, Document versioning; expanded data model list; corrected password policy |
+| 1.2 | June 2, 2026 | System | Added Finance module (FR-FIN-001–016); added Finance models to data model table; updated Settings row to include finance; updated purpose statement |
 
 ---
 

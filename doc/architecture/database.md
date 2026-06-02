@@ -970,6 +970,12 @@ User
 ├── Playlists (1:N)                                 # Music playlists (reference Music)
 ├── RadiationLocations (1:N)                        # Named measurement spots
 ├── RadiationMeasurements (1:N)                     # Radiation log entries
+├── FinanceAccounts (1:N)                           # Bank/virtual accounts with balance and canvas position
+├── FinanceGroups (1:N)                             # Canvas group labels for the flow map
+├── FinanceRules (1:N)                              # Money flow automation rules (ref FinanceAccount ×2)
+├── FinanceTransactions (1:N)                       # Transaction log (ref FinanceAccount ×2, FinanceRule)
+├── FinanceBalanceSnapshots (1:N)                   # Daily net-worth snapshots (one per user per day)
+├── FinanceBudgets (1:N)                            # Monthly spending/inflow targets (ref FinanceAccount)
 └── Wikis (1:N, as owner)
     ├── WikiPages (1:N)
     │   └── WikiVersions (1:N)

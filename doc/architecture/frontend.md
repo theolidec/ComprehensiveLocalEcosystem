@@ -157,6 +157,7 @@ components/
 │   ├── LinkNotFound.js + .css   # 404 page
 │   ├── Music.js                 # Music page shell (/music/*) — renders MusicPage with MusicProvider layout
 │   ├── Radiation.js             # Radiation monitor with measurements, analytics, locations
+│   ├── Finance.js               # Finance module — 4 tabs: Flow Map, Rules, Transactions, Analytics (~115KB)
 │   └── CategoryManager.js       # Event category management
 ├── (root)                      # Shared/loose components
 │   ├── FloatingMusicPlayer.js   # Persistent floating music player (bottom-right, all pages)
@@ -302,6 +303,7 @@ updateDisplaySettings(data)
 updatePrivacySettings(data)
 updateWishlistSettings(data)
 updateRadiationSettings(data) // Radiation unit, CPM factor, default location
+updateFinanceSettings(data) // Finance currency preference
 resetSettings()             // Restore defaults
 uploadAvatar(file)          // Upload profile picture
 removeAvatar()              // Delete avatar
@@ -378,6 +380,7 @@ toggleLoop()
 stop()
 seek(time)                   // Seek to position in seconds
 changeVolume(val)             // Set volume 0–1
+dismissPlayer()              // Stop audio, clear track/playlist/queue state, persist volume to cookie
 refreshPlaylists()            // Trigger playlist component refresh
 ```
 
@@ -465,6 +468,7 @@ export const createData = async (data) => {
 | `wishlistAPI.js` | Wishlists, items, reservations, public links |
 | `wishlistCategoryAPI.js` | Wishlist category CRUD |
 | `trackerAPI.js` | Daily tracker (tasks, questions, responses, stats, heatmap, export/import) |
+| `financeAPI.js` | Finance accounts, groups, rules, transactions, budgets, analytics, settings |
 
 > Wiki API calls are made directly from `WikiContext` rather than via a dedicated `wikiAPI.js` service.
 

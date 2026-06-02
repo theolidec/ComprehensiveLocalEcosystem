@@ -103,6 +103,7 @@ The Apps menu (accessed via the AL icon in the Header) provides access to all mo
 | 📚 | Wiki | Knowledge base and documentation |
 | 🎵 | Music | Music library, playlists, and floating player |
 | ☢️ | Radiation | Radiation measurement logging and analytics |
+| 💰 | Finance | Money flow visualisation, rules, transactions, and analytics |
 
 ### 4.3 User Menu
 
@@ -432,7 +433,51 @@ Open the **Analytics** tab to view:
 
 ---
 
-### 5.10 Settings
+### 5.10 Finance
+
+#### Flow Map
+
+1. Navigate to **Finance** (redirects to **Finance → Flow Map**)
+2. Account cards appear on a draggable SVG canvas; drag cards to rearrange positions
+3. Click **"+ Account"** in the toolbar to create a new account
+4. Click an account card to view or edit its details
+5. Click **"Auto-layout"** to automatically arrange the canvas
+6. Toggle **Lock** (padlock icon) to prevent accidental drags
+7. Toggle **Mini-map** to show a thumbnail overview in the bottom-right corner
+8. Use the **Groups** button to create named, coloured groups and assign accounts to them
+
+#### Rules
+
+1. Navigate to **Finance → Rules**
+2. Click **"+ Rule"** to define a money flow rule
+3. Choose type: **Percentage**, **Fixed**, **Threshold**, or **Recurring**
+4. Select source and target accounts, set the value, trigger, and optionally a priority
+5. Use the ↑ / ↓ arrows to reorder rule priority
+6. Click **Dry Run** to simulate the rule\'s effect without creating a transaction
+7. Click **Trigger** on a recurring/fixed rule to manually fire it
+
+#### Transactions
+
+1. Navigate to **Finance → Transactions**
+2. Click **"+ Transaction"** to log a deposit, withdrawal, or transfer
+3. Creating a transaction as **Completed** immediately updates account balances and fires eligible rules
+4. Creating a transaction as **Pending** requires manual confirmation before balances are affected
+5. Use filters (status, type, account, date range, amount range) to narrow the list
+6. Click **Export CSV** to download the current filtered view
+7. Click **Import CSV** to bulk-import transactions (parse preview shown before saving)
+
+#### Analytics
+
+Navigate to **Finance → Analytics** to view:
+- **Balance KPIs** — current balance per account
+- **Net Worth History** — area chart from daily snapshots
+- **Inflow / Outflow** — per-account bar chart
+- **Daily Flow** — line chart of daily net movement
+- **Budgets** — monthly spending/inflow targets with progress bars
+
+---
+
+### 5.11 Settings
 
 #### Profile Settings
 
@@ -546,6 +591,7 @@ Under the **"Account"** tab:
 |----------|------|--------|-------------|
 | 1.0 | May 10, 2026 | System | Initial SUM creation |
 | 1.1 | May 26, 2026 | System | Added Music, Radiation, and Rich-Text Document sections; corrected password length to 12-128 chars; added Music/Radiation entries to the Apps menu |
+| 1.2 | June 2, 2026 | System | Added Finance module to Apps menu table; added section 5.10 Finance (Flow Map, Rules, Transactions, Analytics); renumbered Settings to 5.11 |
 
 ---
 

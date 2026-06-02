@@ -151,10 +151,14 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: May 30, 2026  
-**Version**: 2.8.2
+**Last Updated**: June 2, 2026  
+**Version**: 2.9.0
 
 ## Recent Changes
+
+### Floating Music Player — Dismiss Button + Volume Persistence Fix (v2.9.0, 2026-06-02)
+- **`frontend/src/components/FloatingMusicPlayer.js`**: Added a `✕` close button (top-right corner) that calls `dismissPlayer`; clicking it stops audio playback, clears the current track, playlist, and queue, and dismisses the player entirely.
+- **`frontend/src/context/MusicContext.js`**: Added `dismissPlayer` callback — pauses audio, resets all playback state (track, playlist, queue, progress/duration), and persists the current volume to the cookie. Fixed a bug where `setCookie({ volume })` was only called inside the media-session branch; volume is now also persisted in the `else` branch so it survives navigations even when no media session is active. `dismissPlayer` is now exported in the context value.
 
 ### Flow Map Account Groups (v2.8.2, 2026-05-30)
 - **`backend/models/FinanceGroup.js`** (new): `FinanceGroup` model — `userId`, `name`, `color`. Indexed on `userId`.

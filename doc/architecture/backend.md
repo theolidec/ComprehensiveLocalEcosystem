@@ -47,11 +47,12 @@ backend/
 │   ├── database.js      # MongoDB connection + legacy index cleanup
 │   ├── logger.js        # Winston logging setup
 │   └── rateLimiter.js   # Rate limiting rules (8 limiters)
-├── controllers/         # Request handlers (business logic) — 13 files
+├── controllers/         # Request handlers (business logic) — 14 files
 │   ├── calendarController.js
 │   ├── categoryController.js
 │   ├── fileController.js
 │   ├── fileFolderController.js
+│   ├── financeController.js
 │   ├── musicController.js
 │   ├── passwordController.js
 │   ├── passwordCategoryController.js
@@ -92,8 +93,14 @@ backend/
 │   ├── Music.js
 │   ├── Playlist.js
 │   ├── RadiationLocation.js
-│   └── RadiationMeasurement.js
-├── routes/              # API route definitions — 22 files
+│   ├── RadiationMeasurement.js
+│   ├── FinanceAccount.js
+│   ├── FinanceGroup.js
+│   ├── FinanceRule.js
+│   ├── FinanceTransaction.js
+│   ├── FinanceBalanceSnapshot.js
+│   └── FinanceBudget.js
+├── routes/              # API route definitions — 23 files
 │   ├── auth.js
 │   ├── calendar.js
 │   ├── categories.js
@@ -104,6 +111,7 @@ backend/
 │   ├── passwords.js
 │   ├── passwordCategories.js
 │   ├── paymentCards.js
+│   ├── finance.js
 │   ├── radiation.js
 │   ├── settings.js
 │   ├── tracker.js
@@ -222,6 +230,7 @@ const getItems = async (req, res) => {
 | `passwordController.js` | Password CRUD, encryption, favorites | ~230 lines |
 | `passwordCategoryController.js` | Password category management | ~100 lines |
 | `paymentCardController.js` | Payment card CRUD, encryption | ~200 lines |
+| `financeController.js` | Accounts, groups, rules, transactions, budgets, snapshots, analytics | ~800 lines |
 | `radiationController.js` | Radiation measurements, locations, analytics | ~400 lines |
 | `settingsController.js` | User settings, profile, sessions | ~250 lines |
 | `userRightsController.js` | GDPR user rights (access, export, delete) | ~450 lines |
@@ -335,7 +344,7 @@ module.exports = router;
 
 ### Route Registration (server.js)
 
-All 19 API namespaces mounted under `/api/*`:
+All 20 API namespaces mounted under `/api/*`:
 
 ```javascript
 app.use('/api/auth', authRoutes);
@@ -357,6 +366,7 @@ app.use('/api/user', userRightsRoutes);              // GDPR endpoints
 app.use('/api/tracker', trackerRoutes);
 app.use('/api/music', musicRoutes);
 app.use('/api/radiation', radiationRoutes);
+app.use('/api/finance', financeRoutes);
 ```
 
 **Note**: `wikiPageRoutes` is mounted under `/api/wikis/:slug/pages`, so the wiki slug is available via `req.params.slug` inside the page router (Express forwards parent params).

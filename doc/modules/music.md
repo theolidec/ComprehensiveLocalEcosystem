@@ -27,7 +27,7 @@
   - `/music/upload` → Upload tab
 - Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`
 - Floating player is always visible (bottom right)
-- Context: `MusicContext` manages playback state, playlist queue, shuffle, and volume (`volume`, `changeVolume`)
+- Context: `MusicContext` manages playback state, playlist queue, shuffle, volume (`volume`, `changeVolume`), and player dismissal (`dismissPlayer`)
 
 ## Usage
 - Go to `/music/library` to view your music library
@@ -57,6 +57,7 @@
 - Use ↻ button to toggle loop mode (single track loop)
 - Use the 🔊/🔉/🔇 volume slider to adjust playback volume (0–100%); persisted across page navigations via cookie
 - When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
+- Click the **✕** button (top-right corner of the floating player) to dismiss the player entirely — stops playback and clears the current track and queue
 
 ## Architecture References
 - See also: `doc/architecture/backend.md`, `doc/architecture/frontend.md`, `doc/architecture/api-overview.md`
