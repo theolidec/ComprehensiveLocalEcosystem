@@ -154,6 +154,8 @@ export const MusicProvider = ({ children }) => {
           shuffle,
           shuffledQueue: shuffledQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName }))
         });
+      } else {
+        setCookie({ volume });
       }
     };
     save();
@@ -272,6 +274,22 @@ export const MusicProvider = ({ children }) => {
     setIsPlaying(false);
   }, []);
 
+  const dismissPlayer = useCallback(() => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.src = '';
+    }
+    setCookie({ volume: volumeRef.current });
+    setIsPlaying(false);
+    setCurrentTrack(null);
+    setCurrentPlaylist(null);
+    setPlaylistQueue([]);
+    setCurrentIndex(-1);
+    setProgress(0);
+    setDuration(0);
+    savedProgress.current = 0;
+  }, []);
+
   const seek = useCallback((time) => {
     if (audioRef.current) {
       audioRef.current.currentTime = time;
@@ -340,6 +358,7 @@ export const MusicProvider = ({ children }) => {
       toggleLoop,
       toggleShuffle,
       stop,
+      dismissPlayer,
       setIsPlaying,
       seek,
       playlistRef,

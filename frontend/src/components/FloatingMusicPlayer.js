@@ -10,7 +10,7 @@ const formatTime = (seconds) => {
 };
 
 const FloatingMusicPlayer = () => {
-  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, volume, changeVolume } = useMusic();
+  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, volume, changeVolume, dismissPlayer } = useMusic();
   const { isAuthenticated } = useAuth();
 
   if (!currentTrack || !isAuthenticated) return null;
@@ -23,6 +23,14 @@ const FloatingMusicPlayer = () => {
 
   return (
     <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-3 sm:p-4 flex flex-col items-center w-72 sm:w-80 max-w-[calc(100vw-1rem)] transition-transform hover:scale-105 animate-fade-in">
+      <button
+        className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-xs leading-none"
+        onClick={dismissPlayer}
+        title="Close player"
+        aria-label="Close player"
+      >
+        ✕
+      </button>
       {currentPlaylist && (
         <div className="text-xs text-blue-500 truncate w-full text-center mb-1">
           ▶ {currentPlaylist.name}
