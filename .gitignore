@@ -37,8 +37,8 @@ frontend/build/
 .DS_Store
 Thumbs.db
 
-# Windsurf workspace files
-.windsurf/
+# Devin workspace files
+.devin/
 
 # Personal planning file
 NEXT.md
