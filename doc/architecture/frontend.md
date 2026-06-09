@@ -50,7 +50,9 @@ This means on mobile (≤768px) the sidebar and main content stack vertically. `
 The hamburger menu (`md:hidden`) exposes all navigation on small screens:
 - **Calendar actions** section (Import, Export, Add Event, Create/Remove Test Events) — shown only on `/calendar` routes.
 - **Actions** section — the current page's sidebar items from `PageActionsContext` (e.g. "New File", "Add Password").
-- **Apps** section — all app navigation links (Home, Calendar, Passwords, Wishlist, Files, Music, Calculator, Following, Tracker, Wiki).
+- **Apps** section — app navigation links split into two groups:
+  - **Primary**: Home, Calendar, Password Manager, Files, Finance
+  - **Secondary**: Wishlist, Music, Calculator, Following, Daily Tracker, Wiki, Radiation Monitor
 - **Account** section — avatar, Settings link, Logout.
 
 The home-page welcome greeting (`Welcome, {name}!`) is hidden on mobile (`hidden sm:block`) to prevent header overflow.
@@ -476,46 +478,53 @@ export const createData = async (data) => {
 
 **File**: `src/App.js`
 
-React Router DOM v7 configuration (using `BrowserRouter` + `Routes`):
+React Router DOM v7 configuration (using `BrowserRouter` + `Routes`). All routes are defined in `AppContent`. Protected routes render inside `<ProtectedRoute>` which redirects unauthenticated users to `/login`.
 
-```javascript
-<Routes>
-  {/* Public routes */}
-  <Route path="/" element={<RootRoute />} />
-  <Route path="/login" element={<AuthPage />} />
-  <Route path="/privacy" element={<Privacy />} />
-  
-  {/* Protected routes */}
-  <Route path="/home" element={
-    <ProtectedRoute>
-      <Layout><Home /></Layout>
-    </ProtectedRoute>
-  } />
-  <Route path="/calendar/:view" element={
-    <ProtectedRoute>
-      <Layout><CalendarApp /></Layout>
-    </ProtectedRoute>
-  } />
-  
-  {/* Wiki routes - order matters! */}
-  <Route path="/wiki/:slug" element={<ProtectedRoute><WikiView /></ProtectedRoute>} />
-  <Route path="/wiki/:slug/new" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
-  <Route path="/wiki/:slug/:pageSlug" element={<ProtectedRoute><WikiPageView /></ProtectedRoute>} />
-  <Route path="/wiki/:slug/edit/:pageSlug" element={<ProtectedRoute><WikiPageEditor /></ProtectedRoute>} />
-  
-  {/* Music */}
-  <Route path="/music" element={<Navigate to="/music/library" replace />} />
-  <Route path="/music/library" element={<ProtectedRoute><MusicPage tab="library" /></ProtectedRoute>} />
-  <Route path="/music/artists" element={<ProtectedRoute><MusicPage tab="artists" /></ProtectedRoute>} />
-  <Route path="/music/artists/:artistName" element={<ProtectedRoute><MusicPage tab="artists" /></ProtectedRoute>} />
-  <Route path="/music/discover" element={<ProtectedRoute><MusicPage tab="discover" /></ProtectedRoute>} />
-  <Route path="/music/upload" element={<ProtectedRoute><MusicPage tab="upload" /></ProtectedRoute>} />
-  
-  {/* Redirects */}
-  <Route path="/pass" element={<Navigate to="/passwords" />} />
-  <Route path="/drive" element={<Navigate to="/files" />} />
-</Routes>
-```
+### Complete Route Reference
+
+| Path | Component | Auth | Notes |
+|------|-----------|------|-------|
+| `/` | `RootRoute` | No | Redirects to `/home` if authenticated, else renders `LandingPage` |
+| `/login` | `AuthPage` | No | Login / Register |
+| `/privacy` | `Privacy` | No | Privacy Policy page |
+| `/terms` | `Terms` | No | Terms of Service page |
+| `/cookies` | `Cookies` | No | Cookie Policy page |
+| `/pass` | — | No | Redirect → `/passwords` |
+| `/drive` | — | No | Redirect → `/files` |
+| `/home` | `Home` | Yes | Personal dashboard |
+| `/home/edit` | `HomeLayoutEditor` | Yes | Toggle/reorder homepage widgets and Quick Access shortcuts |
+| `/calendar` | — | Yes | Redirect → `/calendar/month` |
+| `/calendar/:view` | `CalendarApp` | Yes | `view` = `month` / `week` / `day` |
+| `/passwords` | `PasswordManager` | Yes | Password vault + payment cards |
+| `/settings` | `Settings` | Yes | User preferences and account management |
+| `/wishlist` | `Wishlist` | Yes | Wishlist management |
+| `/wishlist/shared/:token` | `PublicWishlistItem` | No | Public item view for reservations |
+| `/files` | `FileManager` | Yes | File explorer with folder tree |
+| `/files/document/:fileId` | `DocumentViewer` | Yes | File preview / lightweight text+markdown editor |
+| `/files/document/new` | `DocumentViewer` | Yes | Create new markdown/text file |
+| `/files/document/edit/:fileId` | `DocumentEditor` | Yes | TipTap rich-text editor for existing file |
+| `/files/document/edit/new` | `DocumentEditor` | Yes | New TipTap rich-text document |
+| `/files/shared/:token` | `FileManager` | No | Shared file access via public token |
+| `/calculator` | `GeoGebraCalculator` | Yes | Interactive graphing calculator |
+| `/following` | `UserFollowing` | Yes | Social follow management |
+| `/tracker` | `DailyTracker` | Yes | Habit & task tracker |
+| `/finance` | — | Yes | Redirect → `/finance/flowmap` |
+| `/finance/:tab` | `Finance` | Yes | `tab` = `flowmap` / `rules` / `transactions` / `analytics` |
+| `/radiation` | `RadiationPage` | Yes | Radiation measurement logging and analytics |
+| `/music` | — | Yes | Redirect → `/music/library` |
+| `/music/library` | `MusicPage` | Yes | My music library (`tab="library"`) |
+| `/music/artists` | `MusicPage` | Yes | Artists browse (`tab="artists"`) |
+| `/music/artists/:artistName` | `MusicPage` | Yes | Artist detail view |
+| `/music/discover` | `MusicPage` | Yes | Public music feed (`tab="discover"`) |
+| `/music/upload` | `MusicPage` | Yes | Audio upload form (`tab="upload"`) |
+| `/wikis` | `WikiList` | Yes | Wiki directory (all user wikis) |
+| `/wiki/:slug` | `WikiView` | Yes | Wiki home page |
+| `/wiki/:slug/new` | `WikiPageEditor` | Yes | New page creation |
+| `/wiki/:slug/:pageSlug` | `WikiPageView` | Yes | Page view |
+| `/wiki/:slug/edit/:pageSlug` | `WikiPageEditor` | Yes | Page editor |
+| `/wiki/:slug/history/:pageSlug` | `WikiPageHistory` | Yes | Version history for a page |
+| `/wiki/:slug/settings` | `WikiSettings` | Yes | Wiki configuration and member management |
+| `/wiki/:slug/recent-changes` | `WikiRecentChanges` | Yes | Activity feed for the wiki |
 
 ### Route Order Importance
 

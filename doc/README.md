@@ -24,21 +24,36 @@ Welcome to the Comprehensive Local Ecosystem documentation. This directory conta
 ### API & Module Documentation
 
 | Document | Description | Endpoints |
-|----------|-------------|-----------|
+|----------|-------------|----------|
 | [`architecture/api-overview.md`](architecture/api-overview.md) | Complete API reference | All endpoints |
+
+**Primary Modules**
+
+| Document | Description | Endpoints |
+|----------|-------------|----------|
 | [`modules/calendar.md`](modules/calendar.md) | Calendar module | `/api/calendar/*` |
-| [`modules/categories.md`](modules/categories.md) | Category management | `/api/categories/*` |
 | [`modules/files.md`](modules/files.md) | File management | `/api/files/*`, `/api/file-folders/*` |
 | [`modules/passwords.md`](modules/passwords.md) | Password manager | `/api/passwords/*` |
-| [`modules/settings.md`](modules/settings.md) | User settings & GDPR rights | `/api/settings/*`, `/api/user/*` |
-| [`modules/wishlist.md`](modules/wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
-| [`modules/wiki.md`](modules/wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
-| [`modules/user-following.md`](modules/user-following.md) | Social features | `/api/follow/*` |
-| [`modules/calculator.md`](modules/calculator.md) | Graphing Calculator | Frontend component |
-| [`modules/daily-tracker.md`](modules/daily-tracker.md) | Daily tracker | `/api/tracker/*` |
-| [`modules/music.md`](modules/music.md) | Music system | `/api/music/*` |
-| [`modules/radiation.md`](modules/radiation.md) | Radiation monitor | `/api/radiation/*` |
 | [`modules/finance.md`](modules/finance.md) | Finance — money flow, rules, transactions | `/api/finance/*` |
+
+**Secondary Modules**
+
+| Document | Description | Endpoints |
+|----------|-------------|----------|
+| [`modules/wishlist.md`](modules/wishlist.md) | Wishlist system | `/api/wishlist/*`, `/api/wishlists/*` |
+| [`modules/music.md`](modules/music.md) | Music system | `/api/music/*` |
+| [`modules/calculator.md`](modules/calculator.md) | Graphing Calculator | Frontend component |
+| [`modules/user-following.md`](modules/user-following.md) | Social features | `/api/follow/*` |
+| [`modules/daily-tracker.md`](modules/daily-tracker.md) | Daily tracker | `/api/tracker/*` |
+| [`modules/wiki.md`](modules/wiki.md) | Wiki/knowledge base | `/api/wikis/*`, `/api/wikis/:slug/pages/*` |
+| [`modules/radiation.md`](modules/radiation.md) | Radiation monitor | `/api/radiation/*` |
+
+**Supporting**
+
+| Document | Description | Endpoints |
+|----------|-------------|----------|
+| [`modules/categories.md`](modules/categories.md) | Category management | `/api/categories/*` |
+| [`modules/settings.md`](modules/settings.md) | User settings & GDPR rights | `/api/settings/*`, `/api/user/*` |
 
 ### Security & Operations
 
@@ -94,24 +109,24 @@ Start here if you're integrating with the API:
 
 ## Module Quick Reference
 
+### Primary Modules
+- [`modules/calendar.md`](modules/calendar.md) - Events and scheduling
+- [`modules/files.md`](modules/files.md) - File storage and management
+- [`modules/passwords.md`](modules/passwords.md) - Password vault
+- [`modules/finance.md`](modules/finance.md) - Finance (money flow, rules, transactions, analytics)
+
+### Secondary Modules
+- [`modules/wishlist.md`](modules/wishlist.md) - Gift registry
+- [`modules/music.md`](modules/music.md) - Music library and playlist player
+- [`modules/calculator.md`](modules/calculator.md) - Graphing Calculator (custom implementation)
+- [`modules/user-following.md`](modules/user-following.md) - Social features
+- [`modules/daily-tracker.md`](modules/daily-tracker.md) - Habit & task tracker
+- [`modules/wiki.md`](modules/wiki.md) - Knowledge base
+- [`modules/radiation.md`](modules/radiation.md) - Radiation monitor
+
 ### Authentication & Users
 - [`architecture/authentication.md`](architecture/authentication.md) - JWT, sessions, cookies
 - [`modules/settings.md`](modules/settings.md) - User preferences, GDPR user rights (view/export/correct/delete data)
-- [`modules/user-following.md`](modules/user-following.md) - Social features
-
-### Content Management
-- [`modules/calendar.md`](modules/calendar.md) - Events and scheduling
-- [`modules/files.md`](modules/files.md) - File storage and management
-- [`modules/wiki.md`](modules/wiki.md) - Knowledge base
-
-### Personal Tools
-- [`modules/passwords.md`](modules/passwords.md) - Password vault
-- [`modules/wishlist.md`](modules/wishlist.md) - Gift registry
-- [`modules/calculator.md`](modules/calculator.md) - Graphing Calculator (custom implementation)
-- [`modules/daily-tracker.md`](modules/daily-tracker.md) - Habit & task tracker
-- [`modules/music.md`](modules/music.md) - Music library and playlist player
-- [`modules/radiation.md`](modules/radiation.md) - Radiation monitor
-- [`modules/finance.md`](modules/finance.md) - Finance (money flow, rules, transactions, analytics)
 
 ### Organization
 - [`modules/categories.md`](modules/categories.md) - Event categories
@@ -151,7 +166,7 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: June 2, 2026  
+**Last Updated**: June 9, 2026  
 **Version**: 2.9.0
 
 ## Recent Changes

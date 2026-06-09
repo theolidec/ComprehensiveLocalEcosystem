@@ -352,19 +352,25 @@ For detailed API documentation including request/response examples, see [doc/arc
 For detailed application flow and usage instructions, see [doc/README.md](doc/README.md).
 
 **Quick Navigation:**
-- **Authentication**: `/login` and `/register` pages
+
+*Primary Modules:*
 - **Home**: `/home` personal dashboard
 - **Home Layout Editor**: `/home/edit` toggle homepage widgets (Daily Tracker, Today\'s Events)
 - **Calendar**: `/calendar/month` with multiple views
 - **Passwords**: `/passwords` for secure password management
-- **Wishlist**: `/wishlist` for gift registry
 - **Files**: `/files` or `/drive` for file management
-- **Calculator**: `/calculator` for interactive function graphing
-- **Wiki**: `/wikis` for knowledge base system
-- **Tracker**: `/tracker` for daily habit & task tracking
-- **Music**: `/music` for music library and playlist management
-- **Radiation**: `/radiation` for radiation monitoring and analytics
 - **Finance**: `/finance` for money flow visualisation, rules, transactions, and analytics
+
+*Secondary Modules:*
+- **Wishlist**: `/wishlist` for gift registry
+- **Music**: `/music` for music library and playlist management
+- **Calculator**: `/calculator` for interactive function graphing
+- **Tracker**: `/tracker` for daily habit & task tracking
+- **Wiki**: `/wikis` for knowledge base system
+- **Radiation**: `/radiation` for radiation monitoring and analytics
+
+*Account:*
+- **Authentication**: `/login` and `/register` pages
 - **Settings**: `/settings` for user preferences
 
 ## Security
@@ -579,6 +585,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Version**: 2.9.0
-**Last Updated**: 2026-05-30
+**Last Updated**: 2026-06-09
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem

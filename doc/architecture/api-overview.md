@@ -1,5 +1,13 @@
 # API Overview
 
+Complete reference of all REST API endpoints in the Comprehensive Local Ecosystem.
+
+**Base URL**: `http://localhost:3001/api`
+
+**Authentication**: Most endpoints require JWT authentication via HttpOnly cookies. `Authorization: Bearer` is not accepted.
+
+---
+
 ## Radiation Module
 
 Route prefix: `/api/radiation` — All endpoints require JWT authentication except the public measurements feed.
@@ -134,14 +142,6 @@ Route prefix: `/api/finance` — All endpoints require JWT authentication.
 ### Streaming
 - Supports HTTP range requests for efficient music playback.
 
-
-Complete reference of all REST API endpoints in the Comprehensive Local Ecosystem.
-
-**Base URL**: `http://localhost:3001/api`
-
-**Authentication**: Most endpoints require JWT authentication via HttpOnly cookies. `Authorization: Bearer` is not accepted.
-
----
 
 ## Authentication Endpoints
 

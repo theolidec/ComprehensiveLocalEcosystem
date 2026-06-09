@@ -18,7 +18,7 @@ This document defines the Software Requirements Specification (SRS) for the Comp
 
 The purpose of this system is to provide users with an integrated suite of tools for managing personal data including calendars, passwords, payment cards, files, rich-text documents, wikis, wishlists, daily tracking, music libraries, radiation measurements, personal finance tracking, and a graphing calculator. The system operates as a self-hosted web application with a React frontend and Node.js/Express backend.
 
-### 3.1 Product Perspective
+### 1.3 Product Perspective
 
 The Comprehensive Local Ecosystem is a standalone web application consisting of:
 
@@ -27,7 +27,7 @@ The Comprehensive Local Ecosystem is a standalone web application consisting of:
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT-based with refresh token rotation
 
-### 3.2 User Characteristics
+### 1.4 User Characteristics
 
 End users are individuals seeking a personal productivity platform with the following characteristics:
 

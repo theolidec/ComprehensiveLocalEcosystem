@@ -2,8 +2,8 @@
 ## Comprehensive Local Ecosystem
 
 **Document Number**: SUM-001  
-**Revision**: 1.3  
-**Date**: June 2, 2026  
+**Revision**: 1.4  
+**Date**: June 9, 2026  
 **Standard**: MIL-STD-498  
 
 ---
@@ -88,22 +88,29 @@ The purpose of this manual is to provide end users with instructions for operati
 
 ### 4.2 Apps Menu Navigation
 
-The Apps menu (accessed via the AL icon in the Header) provides access to all modules:
+The Apps menu (accessed via the AL icon in the Header) provides access to all modules, split into two groups:
 
-| Icon | Section | Description |
-|------|---------|-------------|
+#### Primary Modules
+
+| Icon | Module | Description |
+|------|--------|-------------|
 | 🏠 | Home | Dashboard with overview and quick actions |
 | 📅 | Calendar | Event management and scheduling |
 | 🔑 | Password Manager | Secure password and payment-card storage |
-| 🎁 | Wishlist | Gift wishlists and reservations |
 | 📁 | Files | File storage, rich-text documents, and sharing |
+| 💰 | Finance | Money flow visualisation, rules, transactions, and analytics |
+
+#### Secondary Modules
+
+| Icon | Module | Description |
+|------|--------|-------------|
+| 🎁 | Wishlist | Gift wishlists and reservations |
+| 🎵 | Music | Music library, playlists, and floating player |
 | 🧮 | Calculator | Graphing Calculator (custom implementation) |
 | 👥 | Following | Social connections and user following |
 | ✅ | Daily Tracker | Habit tracking and daily check-ins |
 | 📚 | Wiki | Knowledge base and documentation |
-| 🎵 | Music | Music library, playlists, and floating player |
 | ☢️ | Radiation | Radiation measurement logging and analytics |
-| 💰 | Finance | Money flow visualisation, rules, transactions, and analytics |
 
 ### 4.3 User Menu
 
@@ -580,7 +587,7 @@ Under the **"Account"** tab:
 | Acronym | Definition |
 |---------|------------|
 | AES | Advanced Encryption Standard |
-| GDPR | General Data Protection Ratio |
+| GDPR | General Data Protection Regulation |
 | JWT | JSON Web Token |
 | MIL-STD | Military Standard |
 | SUM | Software User Manual |
@@ -593,6 +600,7 @@ Under the **"Account"** tab:
 | 1.1 | May 26, 2026 | System | Added Music, Radiation, and Rich-Text Document sections; corrected password length to 12-128 chars; added Music/Radiation entries to the Apps menu |
 | 1.2 | June 2, 2026 | System | Added Finance module to Apps menu table; added section 5.10 Finance (Flow Map, Rules, Transactions, Analytics); renumbered Settings to 5.11 |
 | 1.3 | June 2, 2026 | System | Updated Quick Access Grid description to reflect configurable defaults (Music, Radiation included); added Finance troubleshooting entries |
+| 1.4 | June 9, 2026 | System | Split Apps menu (section 4.2) into Primary and Secondary module groups: Primary = Home, Calendar, Password Manager, Files, Finance; Secondary = Wishlist, Music, Calculator, Following, Daily Tracker, Wiki, Radiation |
 
 ---
 

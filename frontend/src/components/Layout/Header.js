@@ -187,7 +187,7 @@ const Header = () => {
                 {isAppsOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
                     <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                      Apps
+                      Primary
                     </div>
                     <button
                       onClick={() => navigate('/home')}
@@ -211,18 +211,29 @@ const Header = () => {
                       <span>Password Manager</span>
                     </button>
                     <button
-                      onClick={() => navigate('/wishlist')}
-                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <Gift className="h-4 w-4 text-purple-600" />
-                      <span>Wishlist</span>
-                    </button>
-                    <button
                       onClick={() => navigate('/files')}
                       className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
                     >
                       <FolderOpen className="h-4 w-4 text-teal-600" />
                       <span>Files</span>
+                    </button>
+                    <button
+                      onClick={() => navigate('/finance')}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <DollarSign className="h-4 w-4 text-green-700" />
+                      <span>Finance</span>
+                    </button>
+                    <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                    <div className="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
+                      Secondary
+                    </div>
+                    <button
+                      onClick={() => navigate('/wishlist')}
+                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    >
+                      <Gift className="h-4 w-4 text-purple-600" />
+                      <span>Wishlist</span>
                     </button>
                     <button
                       onClick={() => navigate('/music')}
@@ -265,13 +276,6 @@ const Header = () => {
                     >
                       <Activity className="h-4 w-4 text-green-600" />
                       <span>Radiation Monitor</span>
-                    </button>
-                    <button
-                      onClick={() => navigate('/finance')}
-                      className="flex items-center space-x-3 w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                    >
-                      <DollarSign className="h-4 w-4 text-green-700" />
-                      <span>Finance</span>
                     </button>
                   </div>
                 )}
@@ -407,20 +411,33 @@ const Header = () => {
               {/* App navigation */}
               {isAuthenticated && (
                 <div className="border-b border-gray-200 dark:border-gray-700 pb-2 mb-2">
-                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Apps</div>
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Primary</div>
                   {[
                     { icon: <Home className="h-4 w-4 text-blue-600 dark:text-blue-400" />, label: 'Home', path: '/home' },
                     { icon: <Calendar className="h-4 w-4 text-blue-600 dark:text-blue-400" />, label: 'Calendar', path: '/calendar' },
                     { icon: <Key className="h-4 w-4 text-orange-600" />, label: 'Password Manager', path: '/passwords' },
-                    { icon: <Gift className="h-4 w-4 text-purple-600" />, label: 'Wishlist', path: '/wishlist' },
                     { icon: <FolderOpen className="h-4 w-4 text-teal-600" />, label: 'Files', path: '/files' },
+                    { icon: <DollarSign className="h-4 w-4 text-green-700" />, label: 'Finance', path: '/finance' },
+                  ].map((app) => (
+                    <button
+                      key={app.path}
+                      onClick={() => { navigate(app.path); setIsMenuOpen(false); }}
+                      className="flex items-center space-x-3 w-full px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg text-left"
+                    >
+                      {app.icon}
+                      <span>{app.label}</span>
+                    </button>
+                  ))}
+                  <div className="border-t border-gray-200 dark:border-gray-700 my-1"></div>
+                  <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Secondary</div>
+                  {[
+                    { icon: <Gift className="h-4 w-4 text-purple-600" />, label: 'Wishlist', path: '/wishlist' },
                     { icon: <Flame className="h-4 w-4 text-pink-500" />, label: 'Music', path: '/music' },
                     { icon: <Calculator className="h-4 w-4 text-teal-600" />, label: 'Calculator', path: '/calculator' },
                     { icon: <Users className="h-4 w-4 text-pink-600" />, label: 'Following', path: '/following' },
                     { icon: <CheckSquare className="h-4 w-4 text-emerald-600" />, label: 'Daily Tracker', path: '/tracker' },
                     { icon: <BookOpen className="h-4 w-4 text-amber-600" />, label: 'Wiki', path: '/wikis' },
                     { icon: <Activity className="h-4 w-4 text-green-600" />, label: 'Radiation Monitor', path: '/radiation' },
-                    { icon: <DollarSign className="h-4 w-4 text-green-700" />, label: 'Finance', path: '/finance' },
                   ].map((app) => (
                     <button
                       key={app.path}
