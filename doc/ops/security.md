@@ -104,7 +104,7 @@ Email delivery is **not yet wired up** — there is no SMTP integration in the c
 
 The endpoint also performs equivalent dummy work (`crypto.randomBytes` + sha256 + a no-op `findOne`) when the email doesn't match a user, so response timing doesn't reveal account existence.
 
-`POST /api/auth/reset-password/:token` hashes the incoming plain token and looks it up by hash via `User.findByResetToken`, consumes the token (cleared on successful reset), and re-hashes the new password via the User model's `pre('save')` hook. Password length policy is 12–128 characters.
+`POST /api/auth/reset-password/:token` hashes the incoming plain token and looks it up by hash via `User.findByResetToken`, consumes the token (cleared on successful reset), and re-hashes the new password via the User model's `pre('save')` hook. Password length policy is 12–128 characters. On success **all refresh tokens for the account are revoked** (`RefreshToken.revokeAllUserTokens`), so any stolen session dies with the old password. The user's `passwordSalt` (vault encryption KDF salt) is **not** rotated on password change — it is generated exactly once at registration; rotating it would make all encrypted vault entries undecryptable.
 
 ### Password Security
 
@@ -216,7 +216,7 @@ Payment cards use the same AES-256-GCM encryption as passwords to protect sensit
 **Stored Data** (encrypted):
 - Card number (full)
 - Expiry date
-- CVV
+- CVV (optional — PCI DSS 3.2 forbids mandatory CVV storage; saving it is the user's explicit choice)
 
 **Stored Data** (plaintext):
 - Card name, cardholder name, card type, last 4 digits, billing address
@@ -333,7 +333,8 @@ app.use(helmet({
 
 Per-response headers:
 - File streaming endpoints (`streamFile`, `getSharedFile`, `serveDocumentImage`) set `X-Content-Type-Options: nosniff`.
-- SVG responses additionally get `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` so embedded `<script>` cannot execute on top-level navigation.
+- All script-capable MIME types (SVG, HTML, XHTML, XML, JavaScript) additionally get `Content-Security-Policy: default-src 'none'; style-src 'unsafe-inline'; sandbox` so embedded `<script>` cannot execute on top-level navigation (stored-XSS defense for uploaded files, including public share links).
+- `Content-Disposition` filenames are sanitized (`\r`, `\n`, `"`, `\` replaced) to prevent header injection.
 
 ### Headers Applied
 

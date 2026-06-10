@@ -52,7 +52,7 @@ The Passwords module provides secure password and payment card management with A
 - `cardholderName`: String (trim, max 100 chars) - Name on card
 - `encryptedCardNumber`: String (required) - AES encrypted
 - `encryptedExpiryDate`: String (required) - AES encrypted
-- `encryptedCVV`: String (required) - AES encrypted
+- `encryptedCVV`: String (optional — PCI DSS forbids mandatory CVV storage) - AES encrypted
 - `cardType`: String (enum: ['visa','mastercard','amex','discover','other'], default: 'other')
 - `lastFourDigits`: String (4 digits) - For display
 - `billingAddress`: String (trim, max 500 chars)

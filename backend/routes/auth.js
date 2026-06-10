@@ -449,6 +449,11 @@ router.post('/reset-password/:token', authLimiter, [
     user.resetPasswordExpires = undefined;
     await user.save();
 
+    // Revoke every refresh token for this account. Without this, an attacker
+    // holding a stolen refresh token would keep their session alive even after
+    // the legitimate user resets the password.
+    await RefreshToken.revokeAllUserTokens(user._id);
+
     logger.info(`Password reset successful for user: ${user.email}`);
 
     res.json({

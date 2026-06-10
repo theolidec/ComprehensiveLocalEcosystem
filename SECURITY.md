@@ -86,13 +86,14 @@ We take security vulnerabilities seriously. If you discover a security issue, pl
 - **CORS Headers**: Only `Content-Type` is allowed (no `Authorization`)
 - **X-Content-Type-Options**: nosniff (default + per-response on file streaming)
 - **X-Frame-Options**: DENY (via Helmet, plus CSP `frame-ancestors`)
-- **SVG Sandbox**: Per-response strict CSP applied to SVG file streams to neutralize embedded `<script>`
+- **Active-Content Sandbox**: Per-response strict CSP (`sandbox`, `default-src 'none'`) applied to all script-capable file streams (SVG, HTML, XHTML, XML, JavaScript) to neutralize stored XSS via uploaded files; `Content-Disposition` filenames are sanitized against header injection
 - **trust proxy**: Defaults to internal-only ranges (`loopback, linklocal, uniquelocal`); override via `TRUST_PROXY` env
 
 ### Transport
 
 - **nginx**: HTTP (port 80) redirects to HTTPS for everything except the Let's Encrypt ACME challenge
-- **HSTS**: Enabled by Helmet defaults
+- **HSTS**: Enabled by Helmet defaults and explicitly set by nginx (`max-age=31536000; includeSubDomains`)
+- **MongoDB**: Docker port binding restricted to `127.0.0.1` — never published to the LAN
 
 ### Data Protection
 
@@ -212,6 +213,19 @@ The project uses the following security-focused dependencies:
 
 ## Changelog
 
+- **v2.9.1** (Security review fixes — 2026-06-10):
+  - **Vault data-loss bug fixed**: `passwordSalt` (the AES key-derivation salt for the password manager and payment cards) is now generated only once at user creation. Previously every password change/reset regenerated it, permanently breaking decryption of all stored vault entries.
+  - **Stored XSS via uploaded files closed**: the per-response sandbox CSP previously applied only to SVG now covers all script-capable MIME types (`text/html`, XHTML, XML, JavaScript) on both authenticated streaming and public share links. `Content-Disposition` filenames sanitized.
+  - **Sessions revoked on password reset**: `/api/auth/reset-password/:token` now revokes all refresh tokens for the account.
+  - **Refresh token cookie-only**: `verifyRefreshToken` no longer accepts the token from the request body.
+  - **Access token lifetime restored to 15 minutes** (dev env had drifted to 7d).
+  - **MongoDB no longer LAN-exposed**: docker-compose binds 27017 to `127.0.0.1` only.
+  - **Production container hygiene**: removed the `./backend` bind mount and `env_file` from docker-compose so the developer's `backend/.env` (dev secrets) can no longer leak into the production backend container; `PASSWORD_MASTER_KEY` passed explicitly.
+  - **CVV optional (PCI DSS)**: storing a card CVV is now the user's explicit choice — no longer required by schema, API, or UI.
+  - **Music streaming hardened**: strict `Range` header parsing (416 on invalid/out-of-bounds), removed per-route `Access-Control-Allow-Origin: *` that bypassed the global CORS allow-list.
+  - **Atomic account lock**: lockout write is a single conditional update; concurrent failed logins can no longer race the lock check.
+  - **HSTS at nginx**: explicit `Strict-Transport-Security` header on the TLS server block.
+  - **Repo hygiene**: untracked committed TLS keys/certs, `cookies.txt` (contained real JWTs), log files, `backend/node_modules`, and editor temp files; `.gitignore` extended (`*.key`, `*.crt`, `*.pem`, `cookies.txt`, `*.save`, cert dirs). Git history still contains the old blobs until a history rewrite is performed.
 - **v2.7.0** (Legal/GDPR hardening pass — 2026-05-18):
   - **Registration consent gate**: `/api/auth/register` now requires three affirmative-consent flags (`acceptTerms`, `acceptPrivacy`, `confirmAge`) as the literal boolean `true`; missing or false values return 400 (GDPR Art. 7 demonstrable consent).
   - **Consent record persistence**: `User.consent` subdocument captures `acceptedTermsAt`, `acceptedPrivacyAt`, `ageConfirmation13Plus`, `ipAtConsent`, `userAgentAtConsent`, `termsVersion`, `privacyVersion` at registration. Included in the user data export so users can audit their own consent record.

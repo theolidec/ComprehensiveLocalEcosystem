@@ -1459,7 +1459,7 @@ const PasswordManager = () => {
 
                 <div className="pm-form-group">
                   <label className="pm-label">
-                    CVV {editingCard ? '(leave empty to keep current)' : '*'}
+                    CVV {editingCard ? '(leave empty to keep current)' : '(optional)'}
                   </label>
                   <input
                     type="password"
@@ -1468,7 +1468,6 @@ const PasswordManager = () => {
                     className="pm-input"
                     placeholder={editingCard ? '•••' : '123'}
                     maxLength={4}
-                    required={!editingCard}
                   />
                 </div>
               </div>

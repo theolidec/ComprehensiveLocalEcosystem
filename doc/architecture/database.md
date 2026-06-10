@@ -291,7 +291,7 @@ mongoose.connect(process.env.MONGODB_URI, {
   cardholderName: String,    // Max 100 chars
   encryptedCardNumber: String,  // Required, AES-256-GCM encrypted
   encryptedExpiryDate: String,  // Required
-  encryptedCVV: String,      // Required
+  encryptedCVV: String,      // Optional (PCI DSS: CVV storage must never be mandatory)
   cardType: String,          // Enum: visa/mastercard/amex/discover/other
   lastFourDigits: String,    // 4 digits
   billingAddress: String,    // Max 500 chars

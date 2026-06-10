@@ -246,7 +246,7 @@ router.get('/protected', authenticateToken, handler);
 Validates refresh token for token rotation.
 
 **Behavior**:
-1. Extract from request body or `cookies.refreshToken`
+1. Extract from `cookies.refreshToken` (HttpOnly cookie only — request body is not accepted)
 2. Verify in database (not revoked, not expired)
 3. Verify JWT signature with `JWT_REFRESH_SECRET`
 4. Attach `req.user`, `req.refreshToken`, `req.refreshTokenDoc`

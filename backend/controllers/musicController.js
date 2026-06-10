@@ -143,27 +143,35 @@ const musicController = {
       }
       const filePath = music.path;
       const stat = fs.statSync(filePath);
+      // CORS is handled by the global cors() middleware in server.js — no
+      // wildcard Access-Control-Allow-Origin here, which would bypass the
+      // origin allow-list.
       const range = req.headers.range;
       if (range) {
-        const parts = range.replace(/bytes=/, '').split('-');
-        const start = parseInt(parts[0], 10);
-        const end = parts[1] ? parseInt(parts[1], 10) : stat.size - 1;
+        // Strict parse: only "bytes=start-[end]" is supported. Invalid or
+        // out-of-bounds ranges get 416 instead of crashing the stream.
+        const match = /^bytes=(\d+)-(\d*)$/.exec(range);
+        const start = match ? parseInt(match[1], 10) : NaN;
+        let end = match && match[2] ? parseInt(match[2], 10) : stat.size - 1;
+        if (end > stat.size - 1) end = stat.size - 1;
+        if (!match || Number.isNaN(start) || start >= stat.size || start > end) {
+          res.setHeader('Content-Range', `bytes */${stat.size}`);
+          return res.status(416).json({ error: 'Range not satisfiable', code: 'RANGE_NOT_SATISFIABLE' });
+        }
         const chunksize = (end - start) + 1;
         const file = fs.createReadStream(filePath, { start, end });
         res.writeHead(206, {
           'Content-Range': `bytes ${start}-${end}/${stat.size}`,
           'Accept-Ranges': 'bytes',
           'Content-Length': chunksize,
-          'Content-Type': music.mimeType,
-          'Access-Control-Allow-Origin': '*',
-          'Access-Control-Allow-Headers': 'Range'
+          'Content-Type': music.mimeType
         });
         file.pipe(res);
       } else {
         res.writeHead(200, {
           'Content-Length': stat.size,
-          'Content-Type': music.mimeType,
-          'Access-Control-Allow-Origin': '*'
+          'Accept-Ranges': 'bytes',
+          'Content-Type': music.mimeType
         });
         fs.createReadStream(filePath).pipe(res);
       }

@@ -86,7 +86,16 @@ userSchema.pre('save', async function(next) {
   try {
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
-    this.passwordSalt = crypto.randomBytes(32).toString('hex');
+    // passwordSalt is the KDF salt for AES-256-GCM encryption of password-manager
+    // entries and payment cards (see services/passwordService.js). It must be
+    // generated exactly once — regenerating it on a password change would make
+    // every previously encrypted vault entry permanently undecryptable.
+    // Only generate for brand-new users; passwordSalt has select:false, so on
+    // loaded documents the field may simply not be selected. Legacy users
+    // without a salt get one lazily via getUserSalt() in the controllers.
+    if (this.isNew && !this.passwordSalt) {
+      this.passwordSalt = crypto.randomBytes(32).toString('hex');
+    }
     next();
   } catch (error) {
     logger.error('Password hashing error:', error);
@@ -166,10 +175,20 @@ userSchema.statics.incrementLoginAttempts = async function(userId) {
   );
 
   if (user && user.loginAttempts >= 5) {
-    const alreadyLocked = user.lockUntil && user.lockUntil > new Date();
-    if (!alreadyLocked) {
-      const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
-      await this.findByIdAndUpdate(userId, { $set: { lockUntil } });
+    const now = new Date();
+    const lockUntil = new Date(Date.now() + 2 * 60 * 60 * 1000);
+    // Atomic conditional update: only set the lock if no active lock exists.
+    // The "already locked" guard lives in the query itself so concurrent failed
+    // logins cannot race past a separate read-then-write check.
+    const locked = await this.findOneAndUpdate(
+      {
+        _id: userId,
+        $or: [{ lockUntil: { $exists: false } }, { lockUntil: null }, { lockUntil: { $lte: now } }]
+      },
+      { $set: { lockUntil } },
+      { new: true }
+    );
+    if (locked) {
       user.lockUntil = lockUntil;
       logger.warn(`Account locked due to ${user.loginAttempts} failed login attempts: ${user.email}`);
     }

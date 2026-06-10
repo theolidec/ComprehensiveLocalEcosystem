@@ -6,8 +6,12 @@ services:
     image: mongo:6
     container_name: cle_mongodb
     restart: unless-stopped
+    # Bound to loopback only: publishing 0.0.0.0:27017 would expose the database
+    # (and its credentials) to the entire LAN. 127.0.0.1 keeps `npm run dev:services`
+    # working (host backend connects via localhost) while the dockerized backend
+    # reaches it via the cle_network bridge.
     ports:
-      - "27017:27017"
+      - "127.0.0.1:27017:27017"
     volumes:
       - mongodb_data:/data/db
     environment:
@@ -26,10 +30,12 @@ services:
     restart: unless-stopped
     expose:
       - "3001"
+    # No source bind mount: mounting ./backend would inject the developer's
+    # backend/.env (dev JWT secrets, PASSWORD_MASTER_KEY) into the production
+    # container. The image built from backend/Dockerfile (.dockerignore excludes
+    # .env) is the only code source; secrets come from the variables below.
     volumes:
       - file_uploads:/app/uploads
-      - ./backend:/app
-      - /app/node_modules
     environment:
       - NODE_ENV=production
       - PORT=3001
@@ -38,11 +44,10 @@ services:
       - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - FRONTEND_URL=${FRONTEND_URL}
       - BACKEND_URL=${FRONTEND_URL}
+      - PASSWORD_MASTER_KEY=${PASSWORD_MASTER_KEY}
       - UPLOAD_DIR=/app/uploads/files
       - MAX_FILE_SIZE=524288000
       - MAX_STORAGE_BYTES=10737418240
-    env_file:
-      - ./backend/.env
     depends_on:
       - mongodb
     networks:

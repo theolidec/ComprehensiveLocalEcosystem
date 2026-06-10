@@ -72,14 +72,12 @@ const createCard = async (req, res, next) => {
       return res.status(400).json({ error: 'Expiry date is required' });
     }
 
-    if (!cvv) {
-      return res.status(400).json({ error: 'CVV is required' });
-    }
-
+    // CVV is intentionally optional: PCI DSS 3.2 forbids storing CVV/CVC after
+    // authorization, even encrypted. Storing it here is the user's own choice.
     const userSalt = await getUserSalt(userId);
     const encryptedCardNumber = passwordEncryption.encrypt(cardNumber, userSalt);
     const encryptedExpiryDate = passwordEncryption.encrypt(expiryDate, userSalt);
-    const encryptedCVV = passwordEncryption.encrypt(cvv, userSalt);
+    const encryptedCVV = cvv ? passwordEncryption.encrypt(cvv, userSalt) : undefined;
 
     const detectedCardType = cardType || detectCardType(cardNumber);
     const lastFour = cardNumber.replace(/\s/g, '').slice(-4);
@@ -188,7 +186,7 @@ const decryptCard = async (req, res, next) => {
     const userSalt = await getUserSalt(userId);
     const decryptedCardNumber = passwordEncryption.decrypt(card.encryptedCardNumber, userSalt);
     const decryptedExpiryDate = passwordEncryption.decrypt(card.encryptedExpiryDate, userSalt);
-    const decryptedCVV = passwordEncryption.decrypt(card.encryptedCVV, userSalt);
+    const decryptedCVV = card.encryptedCVV ? passwordEncryption.decrypt(card.encryptedCVV, userSalt) : null;
 
     res.json({
       cardNumber: decryptedCardNumber,

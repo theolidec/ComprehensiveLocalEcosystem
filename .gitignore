@@ -9,6 +9,17 @@ backend/node_modules/
 .env.*.local
 backend/.env
 
+# TLS certificates and private keys
+backend/certs/
+backend/ssl/
+*.key
+*.crt
+*.pem
+
+# Session cookies and editor temp files
+cookies.txt
+*.save
+
 # Logs
 logs/
 backend/logs/

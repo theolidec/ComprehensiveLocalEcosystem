@@ -15,6 +15,32 @@ const ensureUploadDir = () => {
   }
 };
 
+// MIME types that can execute script (or load external content) when served inline
+// from this origin. Serving them un-sandboxed would let an uploaded file run
+// JavaScript on the API origin with the victim's cookies attached (stored XSS).
+const SCRIPT_CAPABLE_MIME_TYPES = new Set([
+  'image/svg+xml',
+  'text/html',
+  'application/xhtml+xml',
+  'application/xml',
+  'text/xml',
+  'text/javascript',
+  'application/javascript',
+]);
+
+// Strip characters that could break out of the quoted Content-Disposition
+// filename parameter (header injection / response splitting).
+const sanitizeFilename = (name) => String(name || 'file').replace(/[\r\n"\\]/g, '_');
+
+const setInlineSecurityHeaders = (res, mimeType) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  if (SCRIPT_CAPABLE_MIME_TYPES.has(mimeType)) {
+    // sandbox (without allow-scripts) blocks script execution, plugins, forms and
+    // top-level navigation; default-src 'none' blocks all external loads.
+    res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+  }
+};
+
 const fileController = {
   uploadFile: async (req, res) => {
     try {
@@ -171,14 +197,8 @@ const fileController = {
       }
 
       res.setHeader('Content-Type', file.mimeType);
-      res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      // SVG can contain <script> that executes on top-level navigation. Sandbox the
-      // response so embedded scripts cannot run, run in their own origin, or trigger
-      // navigation/form submission.
-      if (file.mimeType === 'image/svg+xml') {
-        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
-      }
+      res.setHeader('Content-Disposition', `inline; filename="${sanitizeFilename(file.originalName)}"`);
+      setInlineSecurityHeaders(res, file.mimeType);
 
       const stream = fs.createReadStream(file.path);
       stream.pipe(res);
@@ -390,11 +410,8 @@ const fileController = {
       }
 
       res.setHeader('Content-Type', file.mimeType);
-      res.setHeader('Content-Disposition', `inline; filename="${file.originalName}"`);
-      res.setHeader('X-Content-Type-Options', 'nosniff');
-      if (file.mimeType === 'image/svg+xml') {
-        res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
-      }
+      res.setHeader('Content-Disposition', `inline; filename="${sanitizeFilename(file.originalName)}"`);
+      setInlineSecurityHeaders(res, file.mimeType);
 
       const stream = fs.createReadStream(file.path);
       stream.pipe(res);

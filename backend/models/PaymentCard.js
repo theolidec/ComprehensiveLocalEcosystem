@@ -26,9 +26,11 @@ const paymentCardSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Expiry date is required']
   },
+  // Optional by design: PCI DSS 3.2 forbids storing CVV/CVC after authorization,
+  // even encrypted. Users may choose to store it in this personal vault, but it
+  // must never be mandatory.
   encryptedCVV: {
-    type: String,
-    required: [true, 'CVV is required']
+    type: String
   },
   cardType: {
     type: String,

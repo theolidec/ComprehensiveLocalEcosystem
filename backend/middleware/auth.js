@@ -72,8 +72,10 @@ const authenticateToken = async (req, res, next) => {
 // Middleware to verify refresh token
 const verifyRefreshToken = async (req, res, next) => {
   try {
-    // Get refresh token from request body or cookies
-    let refreshToken = req.body.refreshToken || req.cookies?.refreshToken;
+    // HttpOnly cookie only — mirroring authenticateToken. Accepting the token
+    // from the request body would let script-injected code replay a token it
+    // obtained elsewhere and weakens the cookie-only design.
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
       logger.warn('Token refresh denied - No refresh token provided');

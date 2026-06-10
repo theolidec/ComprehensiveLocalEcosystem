@@ -86,25 +86,30 @@ const tokenRefreshLimiter = rateLimit({
 const createUserRateLimiter = (windowMs, max, message) => {
   const userRequests = new Map();
 
+  // Periodic cleanup instead of scanning the whole Map on every request,
+  // which would be O(total users) per request. unref() so the timer never
+  // keeps the process alive on shutdown.
+  const cleanup = setInterval(() => {
+    const windowStart = Date.now() - windowMs;
+    for (const [key, requests] of userRequests.entries()) {
+      const fresh = requests.filter(time => time > windowStart);
+      if (fresh.length === 0) {
+        userRequests.delete(key);
+      } else {
+        userRequests.set(key, fresh);
+      }
+    }
+  }, Math.min(windowMs, 5 * 60 * 1000));
+  cleanup.unref();
+
   return (req, res, next) => {
     const userId = req.user?.id || req.ip;
     const now = Date.now();
     const windowStart = now - windowMs;
 
-    // Clean up old entries
-    for (const [key, requests] of userRequests.entries()) {
-      userRequests.set(key, requests.filter(time => time > windowStart));
-      if (userRequests.get(key).length === 0) {
-        userRequests.delete(key);
-      }
-    }
-
-    // Get or create user request array
-    if (!userRequests.has(userId)) {
-      userRequests.set(userId, []);
-    }
-
-    const requests = userRequests.get(userId);
+    // Get or create this caller's request array, pruning only their own entries
+    const requests = (userRequests.get(userId) || []).filter(time => time > windowStart);
+    userRequests.set(userId, requests);
 
     // Check if limit exceeded
     if (requests.length >= max) {
