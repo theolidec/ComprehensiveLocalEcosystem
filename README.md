@@ -173,6 +173,19 @@ SUM/SIOM (User Manuals)
 - **Soft Delete**: Audit trail with deletion reason and state snapshot
 - **Analytics**: Time-series charts, per-location averages, GitHub-style heatmap calendar
 
+### Finance System
+- **Flow Map**: SVG canvas with draggable account cards, animated rule-based flow edges, scroll-to-zoom, drag-to-pan, read-only lock mode, auto-layout (BFS topological sort), and mini-map overlay
+- **Account Types**: Checking, Savings, Investment, Income Source, Expense Bucket, Cash, Credit, and Bridge (passthrough routing hub with cascade fan-out)
+- **Canvas Groups**: Named, colour-coded groups that visually cluster accounts on the flow map; managed via an inline side drawer
+- **Money Flow Rules**: Full rule engine with *Percentage*, *Fixed amount*, *Threshold* (above/below balance), and *Recurring* triggers; priority ordering, dry-run preview, and inline rule history (last 10 triggered transactions)
+- **Transaction Log**: Log deposits, withdrawals, and transfers; pagination, multi-field filtering, CSV export (current filter), and bulk CSV import with parse-preview
+- **Analytics**: Balance KPIs, net worth over time chart (SVG area), per-account inflow/outflow bar chart, daily flow line chart, account breakdown table; configurable 30/90/180/365-day window
+- **Budgets**: Named spending budgets (weekly/monthly/yearly) per account or account type with progress-bar tracking
+- **Account Archiving**: Soft-delete with Archive/Unarchive; archived accounts hidden by default
+- **Daily Scheduler**: Server-side job at 03:30 — takes a balance snapshot and fires due recurring rules automatically
+- **Multi-Currency**: Single currency per user (USD, EUR, GBP, NOK, SEK, DKK, CAD, AUD, CHF, JPY) set in Settings
+- **GDPR**: Finance data included in user export and cascade-deleted on account deletion
+
 ### Wiki System
 - **Wiki Spaces**: Create multiple wiki workspaces for different projects
 - **Hierarchical Pages**: Parent-child page relationships for organized structure
