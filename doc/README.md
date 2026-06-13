@@ -166,10 +166,16 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: June 9, 2026  
-**Version**: 2.9.0
+**Last Updated**: June 13, 2026  
+**Version**: 2.10.0
 
 ## Recent Changes
+
+### Music — Song Queue (v2.10.0, 2026-06-13)
+- **`frontend/src/context/MusicContext.js`**: Added `userQueue` state + `userQueueRef`; `handleEnded` and `playNext` now drain the user queue first before advancing the context (playlist); added `addToQueue`, `removeFromQueue`, `clearQueue` callbacks; `dismissPlayer` also clears the user queue; `shuffledQueue` and user queue API now exported in context value; user queue persisted in `musicState` cookie.
+- **`frontend/src/components/FloatingMusicPlayer.js`**: Added `showQueue` toggle state; ☰ Queue button at the bottom of the player opens a panel showing "Next in queue" (user-queued tracks with per-item ✕ remove and Clear all) and "Next from [context]" (next 5 context tracks, hoverable + to queue from panel); ⏭ Next button now enabled when either user queue or context queue is non-empty.
+- **`frontend/src/components/music/Playlist.js`**: Added ⏭ Add-to-Queue button on every track row in library, public, playlist, and artist views.
+- **`doc/modules/music.md`**: Documented queue feature, panel behavior, and context API.
 
 ### Floating Music Player — Dismiss Button + Volume Persistence Fix (v2.9.0, 2026-06-02)
 - **`frontend/src/components/FloatingMusicPlayer.js`**: Added a `✕` close button (top-right corner) that calls `dismissPlayer`; clicking it stops audio playback, clears the current track, playlist, and queue, and dismisses the player entirely.

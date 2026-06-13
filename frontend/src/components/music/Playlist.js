@@ -4,7 +4,7 @@ import api from '../../utils/fetchClient';
 import { useMusic } from '../../context/MusicContext';
 
 const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPublic = false, showArtistsOnly = false, initialArtist = null }, ref) => {
-  const { currentTrack, currentPlaylist, playTrack, playPlaylist } = useMusic();
+  const { currentTrack, currentPlaylist, playTrack, playPlaylist, addToQueue } = useMusic();
   const navigate = useNavigate();
   const [playlists, setPlaylists] = useState([]);
   const [music, setMusic] = useState([]);
@@ -398,6 +398,13 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                       </button>
                     </div>
                     <button
+                      onClick={() => addToQueue(track)}
+                      className="ml-2 px-2 py-1 text-sm text-gray-400 hover:text-green-500 transition-colors"
+                      title="Add to queue"
+                    >
+                      ⏭
+                    </button>
+                    <button
                       onClick={() => handleRemoveFromPlaylist(selectedPlaylist._id, track._id)}
                       className="ml-2 text-gray-400 hover:text-red-500"
                       title="Remove from playlist"
@@ -515,6 +522,13 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                     + Add to Playlist
                   </button>
                   <button
+                    onClick={() => addToQueue(track)}
+                    className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-green-500 hover:text-white transition-colors"
+                    title="Add to queue"
+                  >
+                    ⏭
+                  </button>
+                  <button
                     onClick={() => openEditModal(track)}
                     className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-yellow-500 hover:text-white transition-colors"
                     title="Edit song"
@@ -570,6 +584,13 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                     className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
                   >
                     + Add to Playlist
+                  </button>
+                  <button
+                    onClick={() => addToQueue(track)}
+                    className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-green-500 hover:text-white transition-colors"
+                    title="Add to queue"
+                  >
+                    ⏭
                   </button>
                 </li>
               ))}
@@ -637,6 +658,13 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
                             className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-blue-500 hover:text-white transition-colors"
                           >
                             + Add to Playlist
+                          </button>
+                          <button
+                            onClick={() => addToQueue(track)}
+                            className="ml-2 px-3 py-1 text-sm bg-gray-200 dark:bg-gray-600 rounded hover:bg-green-500 hover:text-white transition-colors"
+                            title="Add to queue"
+                          >
+                            ⏭
                           </button>
                         </li>
                       );

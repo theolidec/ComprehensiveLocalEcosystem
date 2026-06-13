@@ -8,6 +8,7 @@
 - Playlist creation and management
 - Playlist playback (auto-advance to next song, loop from end to start)
 - Shuffle/scrambled playback
+- **Song queue** — Spotify-style user queue that plays before the active playlist/context
 - Spotify-style UI
 - Floating player visible on all pages (appears when a song is selected)
 
@@ -27,7 +28,7 @@
   - `/music/upload` → Upload tab
 - Components: `MusicPage`, `MusicUpload`, `MusicPlayer`, `Playlist`, `FloatingMusicPlayer`
 - Floating player is always visible (bottom right)
-- Context: `MusicContext` manages playback state, playlist queue, shuffle, volume (`volume`, `changeVolume`), and player dismissal (`dismissPlayer`)
+- Context: `MusicContext` manages playback state, playlist queue, shuffle, volume (`volume`, `changeVolume`), player dismissal (`dismissPlayer`), and user queue (`userQueue`, `addToQueue`, `removeFromQueue`, `clearQueue`)
 
 ## Usage
 - Go to `/music/library` to view your music library
@@ -58,6 +59,18 @@
 - Use the 🔊/🔉/🔇 volume slider to adjust playback volume (0–100%); persisted across page navigations via cookie
 - When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
 - Click the **✕** button (top-right corner of the floating player) to dismiss the player entirely — stops playback and clears the current track and queue
+
+### Song Queue
+- Click the **⏭** button on any track (library, public, playlist, or artist view) to add it to the queue
+- The queue plays **before** the current playlist/context (identical to Spotify's queue behavior)
+- Click **☰ Queue** at the bottom of the floating player to toggle the queue panel
+- The queue panel shows two sections:
+  - **Next in queue** — manually added tracks (green header); hover a row and click ✕ to remove it; click **Clear all** to empty the queue
+  - **Next from [playlist/library]** — next 5 tracks from the current context; hover a row and click **+** to move a track into the user queue
+- The queue badge shows the count of manually queued tracks (e.g., `☰ Queue · 3 in queue`)
+- The ⏭ Next button in the player is enabled whenever there is either a user-queued track **or** a context track to advance to
+- Dismissing the player (✕) also clears the user queue
+- The user queue is persisted in the `musicState` cookie and restored on page reload
 
 ## Architecture References
 - See also: `doc/architecture/backend.md`, `doc/architecture/frontend.md`, `doc/architecture/api-overview.md`

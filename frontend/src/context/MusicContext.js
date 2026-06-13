@@ -38,6 +38,7 @@ export const MusicProvider = ({ children }) => {
   const [shuffle, setShuffle] = useState(storedState?.shuffle || false);
   const [volume, setVolume] = useState(storedState?.volume ?? 1);
   const [shuffledQueue, setShuffledQueue] = useState(storedState?.shuffledQueue || []);
+  const [userQueue, setUserQueue] = useState(storedState?.userQueue || []);
 
   const playlistRef = useRef(null);
   const audioRef = useRef(null);
@@ -53,6 +54,7 @@ export const MusicProvider = ({ children }) => {
   const playlistQueueRef = useRef(storedState?.playlistQueue || []);
   const shuffledQueueRef = useRef(storedState?.shuffledQueue || []);
   const queueRef = useRef(storedState?.playlistQueue || []);
+  const userQueueRef = useRef(storedState?.userQueue || []);
 
   useEffect(() => {
     playlistQueueRef.current = playlistQueue;
@@ -67,6 +69,10 @@ export const MusicProvider = ({ children }) => {
   useEffect(() => {
     currentIndexRef.current = currentIndex;
   }, [currentIndex]);
+
+  useEffect(() => {
+    userQueueRef.current = userQueue;
+  }, [userQueue]);
 
   useEffect(() => {
     if (!globalAudio) {
@@ -94,10 +100,25 @@ export const MusicProvider = ({ children }) => {
     };
     const handleEnded = () => {
       if (loopRef.current) return;
-      
+
+      if (userQueueRef.current.length > 0) {
+        const [nextTrack, ...rest] = userQueueRef.current;
+        userQueueRef.current = rest;
+        setUserQueue(rest);
+        autoAdvancingRef.current = true;
+        audio.src = `/api/music/stream/${nextTrack._id}`;
+        audio.loop = loopRef.current;
+        audio.load();
+        audio.play().catch(() => {});
+        savedProgress.current = 0;
+        setProgress(0);
+        setCurrentTrack(nextTrack);
+        return;
+      }
+
       const queue = queueRef.current;
       const idx = currentIndexRef.current;
-      
+
       if (queue.length > 0 && idx >= 0) {
         const nextIndex = (idx + 1) % queue.length;
         const nextTrack = queue[nextIndex];
@@ -152,7 +173,8 @@ export const MusicProvider = ({ children }) => {
           playlistQueue: playlistQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName })),
           currentIndex,
           shuffle,
-          shuffledQueue: shuffledQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName }))
+          shuffledQueue: shuffledQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName })),
+          userQueue: userQueue.map(t => ({ _id: t._id, title: t.title, originalName: t.originalName, artist: t.artist }))
         });
       } else {
         setCookie({ volume });
@@ -161,7 +183,7 @@ export const MusicProvider = ({ children }) => {
     save();
     const interval = setInterval(save, 100);
     return () => clearInterval(interval);
-  }, [currentTrack, isPlaying, loop, currentPlaylist, playlistQueue, currentIndex, shuffle, shuffledQueue, volume]);
+  }, [currentTrack, isPlaying, loop, currentPlaylist, playlistQueue, currentIndex, shuffle, shuffledQueue, volume, userQueue]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -249,22 +271,31 @@ export const MusicProvider = ({ children }) => {
   }, []);
 
   const playNext = useCallback(() => {
-    const queue = shuffleRef.current ? shuffledQueue : playlistQueue;
+    if (userQueueRef.current.length > 0) {
+      const [nextTrack, ...rest] = userQueueRef.current;
+      userQueueRef.current = rest;
+      setUserQueue(rest);
+      setCurrentTrack(nextTrack);
+      return;
+    }
+    const queue = shuffleRef.current ? shuffledQueueRef.current : playlistQueueRef.current;
     if (queue.length === 0) return;
-    
-    const nextIndex = (currentIndex + 1) % queue.length;
+
+    const nextIndex = (currentIndexRef.current + 1) % queue.length;
+    currentIndexRef.current = nextIndex;
     setCurrentIndex(nextIndex);
     setCurrentTrack(queue[nextIndex]);
-  }, [currentIndex, playlistQueue, shuffledQueue]);
+  }, []);
 
   const playPrevious = useCallback(() => {
-    const queue = shuffleRef.current ? shuffledQueue : playlistQueue;
+    const queue = shuffleRef.current ? shuffledQueueRef.current : playlistQueueRef.current;
     if (queue.length === 0) return;
-    
-    const prevIndex = currentIndex <= 0 ? queue.length - 1 : currentIndex - 1;
+
+    const prevIndex = currentIndexRef.current <= 0 ? queue.length - 1 : currentIndexRef.current - 1;
+    currentIndexRef.current = prevIndex;
     setCurrentIndex(prevIndex);
     setCurrentTrack(queue[prevIndex]);
-  }, [currentIndex, playlistQueue, shuffledQueue]);
+  }, []);
 
   const togglePlay = useCallback(() => {
     setIsPlaying(prev => !prev);
@@ -285,6 +316,8 @@ export const MusicProvider = ({ children }) => {
     setCurrentPlaylist(null);
     setPlaylistQueue([]);
     setCurrentIndex(-1);
+    setUserQueue([]);
+    userQueueRef.current = [];
     setProgress(0);
     setDuration(0);
     savedProgress.current = 0;
@@ -343,6 +376,27 @@ export const MusicProvider = ({ children }) => {
     });
   }, [currentTrack, playlistQueue]);
 
+  const addToQueue = useCallback((track) => {
+    setUserQueue(prev => {
+      const next = [...prev, track];
+      userQueueRef.current = next;
+      return next;
+    });
+  }, []);
+
+  const removeFromQueue = useCallback((index) => {
+    setUserQueue(prev => {
+      const next = prev.filter((_, i) => i !== index);
+      userQueueRef.current = next;
+      return next;
+    });
+  }, []);
+
+  const clearQueue = useCallback(() => {
+    setUserQueue([]);
+    userQueueRef.current = [];
+  }, []);
+
   return (
     <MusicContext.Provider value={{
       currentTrack,
@@ -365,10 +419,15 @@ export const MusicProvider = ({ children }) => {
       refreshPlaylists,
       currentPlaylist,
       playlistQueue,
+      shuffledQueue,
       currentIndex,
       shuffle,
       volume,
-      changeVolume
+      changeVolume,
+      userQueue,
+      addToQueue,
+      removeFromQueue,
+      clearQueue
     }}>
       {children}
     </MusicContext.Provider>

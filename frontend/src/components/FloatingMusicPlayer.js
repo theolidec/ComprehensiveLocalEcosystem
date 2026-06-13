@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -10,8 +10,9 @@ const formatTime = (seconds) => {
 };
 
 const FloatingMusicPlayer = () => {
-  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, volume, changeVolume, dismissPlayer } = useMusic();
+  const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, shuffledQueue, volume, changeVolume, dismissPlayer, userQueue, addToQueue, removeFromQueue, clearQueue } = useMusic();
   const { isAuthenticated } = useAuth();
+  const [showQueue, setShowQueue] = useState(false);
 
   if (!currentTrack || !isAuthenticated) return null;
 
@@ -19,7 +20,12 @@ const FloatingMusicPlayer = () => {
     seek(parseFloat(e.target.value));
   };
 
-  const hasQueue = playlistQueue.length > 0;
+  const hasContextQueue = playlistQueue.length > 0;
+  const hasNext = playlistQueue.length > 0 || userQueue.length > 0;
+  const activeContextQueue = shuffle ? shuffledQueue : playlistQueue;
+  const contextUpNext = activeContextQueue.length > 0
+    ? activeContextQueue.slice(currentIndex + 1, currentIndex + 6)
+    : [];
 
   return (
     <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-3 sm:p-4 flex flex-col items-center w-72 sm:w-80 max-w-[calc(100vw-1rem)] transition-transform hover:scale-105 animate-fade-in">
@@ -31,6 +37,65 @@ const FloatingMusicPlayer = () => {
       >
         ✕
       </button>
+
+      {showQueue && (
+        <div className="w-full max-h-60 overflow-y-auto mb-3 border-b border-gray-200 dark:border-gray-700 pb-3 pr-6">
+          {userQueue.length > 0 && (
+            <div className="mb-2">
+              <div className="flex justify-between items-center mb-1">
+                <span className="text-xs font-semibold text-green-500 uppercase tracking-wide">Next in queue</span>
+                <button
+                  onClick={clearQueue}
+                  className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                  title="Clear queue"
+                >
+                  Clear all
+                </button>
+              </div>
+              {userQueue.map((track, i) => (
+                <div key={i} className="flex items-center gap-1 py-1 px-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 group">
+                  <span className="flex-1 text-xs truncate">
+                    {track.title || track.originalName}
+                    {track.artist && <span className="text-gray-400 ml-1">– {track.artist}</span>}
+                  </span>
+                  <button
+                    onClick={() => removeFromQueue(i)}
+                    className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs ml-1 flex-shrink-0"
+                    title="Remove from queue"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {contextUpNext.length > 0 && (
+            <div>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide block mb-1">
+                Next from {currentPlaylist?.name || 'library'}
+              </span>
+              {contextUpNext.map((track, i) => (
+                <div key={track._id || i} className="flex items-center gap-1 py-1 px-1 rounded">
+                  <span className="flex-1 text-xs truncate text-gray-500">
+                    {track.title || track.originalName}
+                    {track.artist && <span className="text-gray-400 ml-1">– {track.artist}</span>}
+                  </span>
+                  <button
+                    onClick={() => addToQueue(track)}
+                    className="text-gray-300 hover:text-green-500 opacity-0 group-hover:opacity-100 transition-opacity text-xs ml-1 flex-shrink-0"
+                    title="Add to queue"
+                  >
+                    +
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          {userQueue.length === 0 && contextUpNext.length === 0 && (
+            <p className="text-xs text-gray-400 text-center py-2">Queue is empty</p>
+          )}
+        </div>
+      )}
       {currentPlaylist && (
         <div className="text-xs text-blue-500 truncate w-full text-center mb-1">
           ▶ {currentPlaylist.name}
@@ -45,14 +110,14 @@ const FloatingMusicPlayer = () => {
           className={`btn btn-secondary font-bold ${shuffle ? 'text-green-500' : ''}`}
           onClick={toggleShuffle}
           title="Shuffle"
-          disabled={!hasQueue}
+          disabled={!hasContextQueue}
         >
           ⇌
         </button>
         <button
           className="btn btn-secondary"
           onClick={playPrevious}
-          disabled={!hasQueue}
+          disabled={!hasContextQueue}
           title="Previous"
         >
           ⏮
@@ -73,7 +138,7 @@ const FloatingMusicPlayer = () => {
         <button
           className="btn btn-secondary"
           onClick={playNext}
-          disabled={!hasQueue}
+          disabled={!hasNext}
           title="Next"
         >
           ⏭
@@ -106,6 +171,17 @@ const FloatingMusicPlayer = () => {
         />
         <span className="text-xs w-8 text-right text-gray-500">{Math.round(volume * 100)}%</span>
       </div>
+      <button
+        onClick={() => setShowQueue(q => !q)}
+        className={`mt-2 w-full text-xs py-1 rounded transition-colors ${
+          showQueue
+            ? 'text-green-500 bg-green-50 dark:bg-green-900/20'
+            : 'text-gray-400 hover:text-blue-500 hover:bg-gray-100 dark:hover:bg-gray-800'
+        }`}
+        title="Toggle queue"
+      >
+        ☰ Queue{userQueue.length > 0 ? ` · ${userQueue.length} in queue` : ''}
+      </button>
     </div>
   );
 };
