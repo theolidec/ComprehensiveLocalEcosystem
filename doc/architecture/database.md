@@ -409,7 +409,15 @@ mongoose.connect(process.env.MONGODB_URI, {
     theme: String,         // Enum: light/dark/system
     language: String,      // Default: 'en'
     compactMode: Boolean,
-    showCompletedEvents: Boolean
+    showCompletedEvents: Boolean,
+    homepageLayout: {
+      showDailyTracker: Boolean,   // Default: true
+      showEvents: Boolean,         // Default: true
+      showQuickAccess: Boolean,    // Default: true
+      showProTips: Boolean,        // Default: true
+      order: [String],             // Default: ['dailyTracker','events','quickAccess','proTips']
+      quickActions: [String]       // Default: ['calendar','passwords','wishlist','files','calculator','following','wikis','tracker']
+    }
   },
   
   privacy: {
@@ -427,6 +435,10 @@ mongoose.connect(process.env.MONGODB_URI, {
     preferredUnit: String,       // Enum: µSv/h|mSv/h|nSv/h|µGy/h|mGy/h|mR/h|CPM, default: 'µSv/h'
     defaultLocationId: ObjectId, // Ref: 'RadiationLocation', default: null
     cpmConversionFactor: Number  // 1-10000, default: 151 (SBM-20 tube)
+  },
+
+  finance: {
+    currency: String             // Enum: USD|EUR|GBP|NOK|SEK|DKK|CAD|AUD|CHF|JPY, default: 'USD'
   },
 
   createdAt: Date,

@@ -368,7 +368,8 @@ Manages music playback state, playlist queue, and shuffle mode globally so the f
   shuffle: boolean,
   loop: boolean,
   volume: number,             // 0–1, persisted via cookie
-  currentPlaylist: Playlist | null
+  currentPlaylist: Playlist | null,
+  userQueue: Music[]          // Manually queued tracks; drain before advancing context
 }
 
 // Key methods
@@ -384,6 +385,9 @@ seek(time)                   // Seek to position in seconds
 changeVolume(val)             // Set volume 0–1
 dismissPlayer()              // Stop audio, clear track/playlist/queue state, persist volume to cookie
 refreshPlaylists()            // Trigger playlist component refresh
+addToQueue(track)            // Append a track to the user queue
+removeFromQueue(index)       // Remove a track from the user queue by index
+clearQueue()                 // Empty the entire user queue
 ```
 
 ### WikiContext

@@ -148,6 +148,7 @@ SUM/SIOM (User Manuals)
 - **Shuffle & Loop**: Shuffle mode for randomised playback, single-track loop mode
 - **Auto-Advance**: Playlist auto-advances to the next track; loops back at the end
 - **Floating Player**: Spotify-style persistent floating player (bottom-right) visible on all pages
+- **Song Queue**: Spotify-style user queue that plays before the active playlist; queue panel shows next-in-queue and next-from-context tracks
 - **Public/Private Tracks**: Control visibility of individual songs
 - **Metadata**: Store title, artist, album, cover URL, duration per track
 - **Volume Control**: Adjustable playback volume (0–100%) via slider; persisted across navigations in a cookie
@@ -597,7 +598,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
-**Version**: 2.9.1
-**Last Updated**: 2026-06-10
+**Version**: 2.10.0
+**Last Updated**: 2026-06-13
 **Status**: Production Ready
 **Repository**: https://github.com/theolidec/ComprehensiveLocalEcosystem
