@@ -58,6 +58,7 @@
 - Use ↻ button to toggle loop mode (single track loop)
 - Use the 🔊/🔉/🔇 volume slider to adjust playback volume (0–100%); persisted across page navigations via cookie
 - When playlist reaches the end, it loops back to the beginning (unless shuffle is on)
+- Click the **−** button (second from top-right on the floating player) to minimize it — collapses the player into a small pill at the bottom-right corner with two buttons: ⏸/▶ to toggle play/pause without opening the player, and ↑ to restore the full player
 - Click the **✕** button (top-right corner of the floating player) to dismiss the player entirely — stops playback and clears the current track and queue
 
 ### Song Queue

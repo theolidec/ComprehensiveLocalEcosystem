@@ -13,8 +13,32 @@ const FloatingMusicPlayer = () => {
   const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, shuffledQueue, volume, changeVolume, dismissPlayer, userQueue, addToQueue, removeFromQueue, clearQueue } = useMusic();
   const { isAuthenticated } = useAuth();
   const [showQueue, setShowQueue] = useState(false);
+  const [minimized, setMinimized] = useState(false);
 
   if (!currentTrack || !isAuthenticated) return null;
+
+  if (minimized) {
+    return (
+      <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-full flex items-center animate-fade-in overflow-hidden">
+        <button
+          className="w-12 h-12 flex items-center justify-center text-xl hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+          onClick={() => setIsPlaying(!isPlaying)}
+          title={isPlaying ? 'Pause' : 'Play'}
+          aria-label={isPlaying ? 'Pause music' : 'Play music'}
+        >
+          {isPlaying ? '⏸' : '▶'}
+        </button>
+        <button
+          className="w-8 h-12 flex items-center justify-center text-xs text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors border-l border-gray-200 dark:border-gray-700 pr-1"
+          onClick={() => setMinimized(false)}
+          title="Expand player"
+          aria-label="Expand music player"
+        >
+          ↑
+        </button>
+      </div>
+    );
+  }
 
   const handleSeek = (e) => {
     seek(parseFloat(e.target.value));
@@ -29,6 +53,14 @@ const FloatingMusicPlayer = () => {
 
   return (
     <div className="fixed bottom-4 right-2 sm:bottom-6 sm:right-6 z-50 bg-white dark:bg-gray-900 shadow-2xl border-2 border-gray-200 dark:border-gray-700 rounded-2xl p-3 sm:p-4 flex flex-col items-center w-72 sm:w-80 max-w-[calc(100vw-1rem)] transition-transform hover:scale-105 animate-fade-in">
+      <button
+        className="absolute top-2 right-8 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-xs leading-none"
+        onClick={() => setMinimized(true)}
+        title="Minimize player"
+        aria-label="Minimize player"
+      >
+        −
+      </button>
       <button
         className="absolute top-2 right-2 w-5 h-5 flex items-center justify-center text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-xs leading-none"
         onClick={dismissPlayer}
