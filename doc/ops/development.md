@@ -11,7 +11,7 @@ This guide covers development workflows, debugging techniques, and common tasks 
 - **Node.js**: 18+ (check with `node --version`)
 - **npm**: 9+ (check with `npm --version`)
 - **MongoDB**: 5.0+ (or use Docker)
-- **Docker & Docker Compose**: For containerized services
+- **Docker & Docker Compose v2**: For containerized services (`docker compose` plugin, v2+)
 - **Git**: For version control
 
 ### Quick Start
@@ -467,13 +467,13 @@ lsof -ti:3000 | xargs kill -9
 **MongoDB connection error**:
 ```bash
 # Check if MongoDB is running
-docker-compose ps
+docker compose ps
 
 # Restart MongoDB
-docker-compose restart mongodb
+docker compose restart mongodb
 
 # Check logs
-docker-compose logs mongodb
+docker compose logs mongodb
 ```
 
 **Module not found**:

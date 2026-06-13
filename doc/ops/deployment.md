@@ -28,7 +28,7 @@ This guide covers deployment options for the Comprehensive Local Ecosystem, incl
 ### Prerequisites
 
 - Docker 20.10+
-- Docker Compose 2.0+
+- Docker Compose v2+ (`docker compose` plugin)
 - 2GB RAM minimum
 - 10GB storage
 
@@ -44,10 +44,10 @@ cp backend/.env.example backend/.env
 # Edit backend/.env with production values
 
 # 3. Start all services
-docker-compose up -d
+docker compose up -d
 
 # 4. Verify deployment
-docker-compose ps
+docker compose ps
 curl http://localhost/health
 ```
 
@@ -56,8 +56,6 @@ curl http://localhost/health
 **`docker-compose.yml`**:
 
 ```yaml
-version: '3.8'
-
 services:
   # MongoDB Database
   mongodb:
@@ -343,7 +341,7 @@ docker run --rm \
   certbot/certbot renew --quiet
 
 # Reload nginx
-docker-compose exec nginx nginx -s reload
+docker compose exec nginx nginx -s reload
 ```
 
 ```bash
@@ -587,18 +585,18 @@ rsync -avz $BACKUP_DIR user@backup-server:/backups/
 
 ```bash
 # View logs
-docker-compose logs -f backend
-docker-compose logs -f mongodb
+docker compose logs -f backend
+docker compose logs -f mongodb
 
 # Restart service
-docker-compose restart backend
+docker compose restart backend
 
 # Rebuild after changes
-docker-compose up -d --build backend
+docker compose up -d --build backend
 
 # Reset everything (DATA LOSS)
-docker-compose down -v
-docker-compose up -d
+docker compose down -v
+docker compose up -d
 ```
 
 ### SSL Issues
@@ -608,10 +606,10 @@ docker-compose up -d
 openssl x509 -in data/certbot/conf/live/yourdomain.com/fullchain.pem -text
 
 # Renew manually
-docker-compose run --rm certbot renew
+docker compose run --rm certbot renew
 
 # Check nginx config
-docker-compose exec nginx nginx -t
+docker compose exec nginx nginx -t
 ```
 
 ### Performance Issues
@@ -621,7 +619,7 @@ docker-compose exec nginx nginx -t
 docker stats
 
 # View slow queries (MongoDB)
-docker-compose exec mongodb mongosh --eval "db.setProfilingLevel(2)"
+docker compose exec mongodb mongosh --eval "db.setProfilingLevel(2)"
 
 # Enable query logging in backend
 LOG_LEVEL=debug
@@ -692,15 +690,15 @@ docker push <account>.dkr.ecr.<region>.amazonaws.com/ecosystem-backend:latest
 | Renew SSL | Auto (cron) | `certbot renew` |
 | Backup database | Daily | `backup-mongodb.sh` |
 | Review logs | Weekly | Check error.log |
-| Update images | Monthly | `docker-compose pull && up -d` |
+| Update images | Monthly | `docker compose pull && docker compose up -d` |
 | Clean Docker | Monthly | `docker system prune` |
 
 ### Zero-Downtime Updates
 
 ```bash
 # Blue-green deployment with Docker Compose
-docker-compose up -d --no-deps --build backend
-docker-compose up -d --no-deps --build frontend
+docker compose up -d --no-deps --build backend
+docker compose up -d --no-deps --build frontend
 
 # Rolling update (if using swarm)
 docker service update --image ecosystem-backend:latest ecosystem_backend
