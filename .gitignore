@@ -38,6 +38,9 @@ dist/
 build/
 frontend/build/
 
+# Test coverage reports
+coverage/
+
 # IDE
 .idea/
 .vscode/

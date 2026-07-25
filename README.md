@@ -427,17 +427,34 @@ ComprehensiveLocalEcosystem/
 
 ## Testing
 
+Unit tests run with Jest on both sides. See [doc/ops/development.md](doc/ops/development.md#testing)
+for test layout, patterns and what is currently covered.
+
 ### Backend Testing
+Suites live in `backend/tests/` and mirror the source layout (`utils/`, `services/`, `middleware/`).
+
 ```bash
 cd backend
-npm test
+npm test                 # Run all suites
+npm run test:coverage    # Run with a coverage report
 ```
 
+Covered: `utils/regex.js`, `services/passwordService.js`, `services/recurringEventService.js`,
+`middleware/auth.js`. Controllers, routes and models still require an integration harness
+(`supertest` + an in-memory MongoDB) and are not unit tested yet.
+
 ### Frontend Testing
+Suites live next to the code in `__tests__/` folders.
+
 ```bash
 cd frontend
-npm test
+npm test                                                          # Watch mode
+CI=true npm test -- --watchAll=false                              # Single run
+npm run test:coverage -- --collectCoverageFrom="src/utils/**/*.js" # Coverage
 ```
+
+Covered: `utils/radiationUnits.js`, `utils/MathParser.js`, `utils/GraphingEngine.js`,
+`utils/fetchClient.js`. React components and API service wrappers are not tested yet.
 
 ### API Testing Examples
 

@@ -117,7 +117,7 @@ class RecurringEventService {
         
         // If it was Feb 29 and next year is not leap year, use Feb 28
         if (month === 1 && day === 29 && nextDate.getDate() !== 29) {
-          nextDate.setDate(28);
+          nextDate.setDate(0); // Last day of the previous month (Feb 28)
         }
         break;
       default:
