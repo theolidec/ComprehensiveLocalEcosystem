@@ -63,7 +63,9 @@ backend/
 │   ├── wikiController.js
 │   └── wikiPageController.js
 ├── middleware/          # Express middleware
-│   └── auth.js          # Authentication middleware
+│   ├── auth.js          # Authentication middleware
+│   ├── asyncHandler.js  # Forwards async handler rejections to the error handler
+│   └── uploadErrors.js  # Translates multer/fileFilter failures into 4xx responses
 ├── models/              # Mongoose schemas
 │   ├── User.js
 │   ├── RefreshToken.js
@@ -509,24 +511,76 @@ const allInstances = RecurringEventService.expandRecurringEvents(events, rangeSt
 
 ```javascript
 app.use((error, req, res, next) => {
-  logger.error('Unhandled error:', {
-    error: error.message,
-    stack: error.stack,
-    url: req.url,
-    method: req.method
-  });
+  const status = error.status || error.statusCode || 500;
 
-  const message = process.env.NODE_ENV === 'production' 
-    ? 'Internal server error' 
+  // 5xx = server fault (logger.error), 4xx = client fault (logger.warn)
+  if (status >= 500) logger.error('Unhandled error:', { ... });
+  else logger.warn('Request rejected:', { ... });
+
+  // A partially-written response cannot be replaced
+  if (res.headersSent) return next(error);
+
+  // Only 5xx messages are masked in production; 4xx messages are deliberate
+  const message = process.env.NODE_ENV === 'production' && status >= 500
+    ? 'Internal server error'
     : error.message;
 
-  res.status(error.status || 500).json({
+  res.status(status).json({
     error: message,
-    code: 'INTERNAL_SERVER_ERROR',
+    // Numeric driver codes (e.g. MongoDB 11000) are not exposed
+    code: (typeof error.code === 'string' && error.code) ||
+      (status >= 500 ? 'INTERNAL_SERVER_ERROR' : 'BAD_REQUEST'),
     ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
   });
 });
 ```
+
+### Async Handler (`middleware/asyncHandler.js`)
+
+Express 4 does not forward a rejected promise returned by an `async` route handler
+to the error middleware: the rejection is lost and the request hangs until the
+client times out. Route handlers that do not catch internally are wrapped:
+
+```javascript
+const asyncHandler = require('../middleware/asyncHandler');
+
+router.get('/:slug', optionalAuth, asyncHandler(async (req, res) => {
+  await wikiController.getWiki(req, res);
+}));
+```
+
+Used by `routes/wikis.js` and `routes/wikiPages.js`, whose handlers delegate to
+the controllers instead of running their own `try/catch`.
+
+### Upload Errors (`middleware/uploadErrors.js`)
+
+Multer reports rejected uploads (size limit exceeded, unexpected field,
+`fileFilter` rejection) through `next(error)`. `handleUploadErrors` is mounted
+directly after each `upload.single(...)` and translates them into client errors
+instead of an opaque 500:
+
+| Multer condition | Response |
+|------------------|----------|
+| `LIMIT_FILE_SIZE` | `413` `{ error: 'File is too large', code: 'LIMIT_FILE_SIZE' }` |
+| other `MulterError` | `413`/`400` with the multer `code` |
+| `fileFilter` rejection | `400` `{ code: 'INVALID_FILE_TYPE' }` |
+
+`fileFilter` implementations must build their error with `fileFilterError(message)`
+so it can be told apart from an unexpected server failure.
+
+### Process-Level Handlers
+
+`server.js` registers `unhandledRejection` (logged) and `uncaughtException`
+(logged, then `process.exit(1)` so the supervisor restarts a process left in an
+undefined state). Without them these failures only reach stderr and never the
+winston log files.
+
+### Optional Authentication
+
+`optionalAuth` continues as an anonymous request only for token problems
+(`JsonWebTokenError`, `TokenExpiredError`, `NotBeforeError`). Any other failure
+(e.g. the user lookup failing) is logged and passed to `next(error)` rather than
+being silently downgraded to "not logged in".
 
 ### 404 Handler
 

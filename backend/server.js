@@ -227,23 +227,39 @@ app.use('*', (req, res) => {
 
 // Global error handler
 app.use((error, req, res, next) => {
-  logger.error('Unhandled error:', {
+  const status = error.status || error.statusCode || 500;
+
+  const logPayload = {
     error: error.message,
     stack: error.stack,
     url: req.url,
     method: req.method,
     ip: req.ip,
     userAgent: req.get('User-Agent')
-  });
+  };
+  // 4xx responses are caused by the client, not by a server fault — logging them
+  // as errors buries genuine failures in logs/error.log.
+  if (status >= 500) {
+    logger.error('Unhandled error:', logPayload);
+  } else {
+    logger.warn('Request rejected:', logPayload);
+  }
 
-  // Don't leak error details in production
-  const message = process.env.NODE_ENV === 'production' 
-    ? 'Internal server error' 
+  // The response may already have been started (e.g. a stream that failed midway);
+  // writing again throws ERR_HTTP_HEADERS_SENT and masks the original error.
+  if (res.headersSent) return next(error);
+
+  // Don't leak internal failure details in production. Client errors carry a
+  // deliberate, safe message, so they are passed through as-is.
+  const message = process.env.NODE_ENV === 'production' && status >= 500
+    ? 'Internal server error'
     : error.message;
 
-  res.status(error.status || 500).json({
+  res.status(status).json({
     error: message,
-    code: 'INTERNAL_SERVER_ERROR',
+    // Driver-level errors (e.g. MongoDB) use numeric codes; only surface string codes.
+    code: (typeof error.code === 'string' && error.code) ||
+      (status >= 500 ? 'INTERNAL_SERVER_ERROR' : 'BAD_REQUEST'),
     ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
   });
 });
@@ -304,6 +320,26 @@ process.on('SIGTERM', () => {
 process.on('SIGINT', () => {
   logger.info('SIGINT received, shutting down gracefully');
   process.exit(0);
+});
+
+// Without these listeners Node prints the failure to stderr only (and, for
+// unhandled rejections, terminates the process from Node 15 on) — nothing reaches
+// the winston log files, so production failures leave no trace.
+process.on('unhandledRejection', (reason) => {
+  logger.error('Unhandled promise rejection:', {
+    error: reason instanceof Error ? reason.message : String(reason),
+    stack: reason instanceof Error ? reason.stack : undefined
+  });
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught exception — shutting down:', {
+    error: error.message,
+    stack: error.stack
+  });
+  // The process is in an undefined state after an uncaught exception; exit and let
+  // the supervisor (docker/systemd) restart it rather than serving corrupt state.
+  process.exit(1);
 });
 
 // Start server with HTTPS support

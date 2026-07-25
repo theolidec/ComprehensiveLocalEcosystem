@@ -502,6 +502,7 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [selected, setSelected] = useState(null);
+  const [error, setError] = useState(null);
   const saveTimer = useRef({});
 
   // View transform: zoom scale + pan offset
@@ -526,7 +527,9 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
     try {
       const data = await financeAPI.getGroups();
       setGroups(data.groups || []);
-    } catch (_) {}
+    } catch (e) {
+      setError(e.message || 'Failed to load groups');
+    }
   }, []);
 
   useEffect(() => { loadGroups(); }, [loadGroups]);
@@ -535,7 +538,9 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
     try {
       await financeAPI.updateAccount(accountId, { groupId });
       onRefresh();
-    } catch (_) {}
+    } catch (e) {
+      setError(e.message || 'Failed to assign account to group');
+    }
   }, [onRefresh]);
 
   const allDefault = accounts.length > 0 && accounts.every(a => a.position.x === 100 && a.position.y === 100);
@@ -653,6 +658,12 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
     updateVt({ scale: 1, dx: 0, dy: 0 });
   }, [accounts, rules, updateVt]);
 
+  // Position saves are fire-and-forget, so a failure is only visible as the layout
+  // snapping back on the next refresh — report it instead.
+  const onPositionSaveFailed = useCallback((e) => {
+    setError(e.message || 'Failed to save account position');
+  }, []);
+
   const handleDragMove = useCallback((accountId, x, y) => {
     setPositions(prev => ({ ...prev, [accountId]: { x, y } }));
   }, []);
@@ -663,16 +674,16 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
       const snap = { ...positionsRef.current, [accountId]: { x, y } };
       accounts.forEach(a => {
         const p = snap[a._id];
-        if (p) financeAPI.updateAccountPosition(a._id, p.x, p.y).catch(() => {});
+        if (p) financeAPI.updateAccountPosition(a._id, p.x, p.y).catch(onPositionSaveFailed);
       });
       return;
     }
     clearTimeout(saveTimer.current[accountId]);
     saveTimer.current[accountId] = setTimeout(async () => {
       try { await financeAPI.updateAccountPosition(accountId, x, y); }
-      catch (_) {}
+      catch (e) { onPositionSaveFailed(e); }
     }, 600);
-  }, [accounts]);
+  }, [accounts, onPositionSaveFailed]);
 
   const handleGroupDragMove = useCallback((newPositions) => {
     setPositions(prev => ({ ...prev, ...newPositions }));
@@ -684,7 +695,7 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
       const snap = positionsRef.current;
       accounts.forEach(a => {
         const p = snap[a._id];
-        if (p) financeAPI.updateAccountPosition(a._id, p.x, p.y).catch(() => {});
+        if (p) financeAPI.updateAccountPosition(a._id, p.x, p.y).catch(onPositionSaveFailed);
       });
       return;
     }
@@ -694,10 +705,10 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
         const p = positionsRef.current[accountId];
         if (!p) return;
         try { await financeAPI.updateAccountPosition(accountId, p.x, p.y); }
-        catch (_) {}
+        catch (e) { onPositionSaveFailed(e); }
       }, 600);
     });
-  }, [accounts]);
+  }, [accounts, onPositionSaveFailed]);
 
   const groupMembers = {};
   accounts.forEach(a => {
@@ -729,6 +740,12 @@ function FlowchartTab({ accounts, rules, onRefresh, currencySymbol, onEditAccoun
 
   return (
     <div className="flex flex-col h-full">
+      {error && (
+        <div className="flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm">
+          <span>{error}</span>
+          <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-600"><X size={14} /></button>
+        </div>
+      )}
       <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-gray-700 flex-wrap gap-2">
         <p className="text-xs text-gray-400 dark:text-gray-500">
           {readOnly ? '\uD83D\uDD12 Read-only — positions locked' : 'Scroll to zoom \u00b7 Drag background to pan \u00b7 Hover edges for labels'}
@@ -1077,7 +1094,10 @@ function RulesTab({ rules, accounts, onRefresh, currencySymbol }) {
       try {
         const data = await financeAPI.getTransactions({ ruleId, limit: 10 });
         setHistoryCache(c => ({ ...c, [ruleId]: data.transactions || [] }));
-      } catch (_) { setHistoryCache(c => ({ ...c, [ruleId]: [] })); }
+      } catch (e) {
+        setError(e.message || 'Failed to load rule history');
+        setHistoryCache(c => ({ ...c, [ruleId]: [] }));
+      }
     }
   };
 

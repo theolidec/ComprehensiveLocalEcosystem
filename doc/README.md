@@ -166,10 +166,28 @@ If you find gaps in documentation:
 
 ---
 
-**Last Updated**: June 13, 2026  
-**Version**: 2.10.0
+**Last Updated**: July 25, 2026  
+**Version**: 2.11.0
 
 ## Recent Changes
+
+### Error Handling Pass (v2.11.0, 2026-07-25)
+
+**Backend:**
+- **`backend/middleware/asyncHandler.js`** (new): Wraps async route handlers so a rejected promise reaches the global error handler instead of hanging the request (Express 4 does not forward them). Applied to every bare handler in `routes/wikis.js` and `routes/wikiPages.js`.
+- **`backend/middleware/uploadErrors.js`** (new): `handleUploadErrors` maps `multer.MulterError` to `413`/`400` (`LIMIT_FILE_SIZE` → "File is too large") and `fileFilter` rejections to `400 INVALID_FILE_TYPE`; `fileFilterError(message)` tags the filter's error. Mounted after `upload.single(...)` in `routes/files.js` and `routes/music.js`, whose filters now use `fileFilterError`. Previously every rejected upload surfaced as an opaque 500.
+- **`backend/routes/music.js`**: Creates `MUSIC_UPLOAD_DIR` at startup (as `routes/files.js` already did) so multer cannot fail with `ENOENT`.
+- **`backend/server.js`**: Global error handler honours `error.status`/`statusCode`, logs 4xx at `warn` and 5xx at `error`, bails out via `next(error)` when `res.headersSent`, only masks messages for 5xx in production, and passes through string `error.code`s. Added `unhandledRejection` and `uncaughtException` listeners (the latter exits 1) so those failures reach the winston logs.
+- **`backend/middleware/auth.js`**: `optionalAuth` only ignores JWT errors; any other failure is logged and forwarded with `next(error)` instead of silently degrading the request to anonymous.
+
+**Frontend:**
+- **`src/utils/fetchClient.js`**: Network-level `fetch` rejections become a `NETWORK_ERROR` Error with a readable message; failed refresh yields `SESSION_EXPIRED`; response errors carry `code`/`status` and fall back to the status line when the body is not JSON.
+- **`src/services/{calendar,category,password,tracker,wishlist,wishlistCategory}API.js`**: `handleApiError` now throws a real `Error` (with `code`, `status`, `details`) instead of an object literal, matching `paymentCardAPI.js`.
+- **`src/services/radiationAPI.js`**: `handleError` throws a normalised `Error` instead of the raw response body; `Radiation.js` reads `err.message` accordingly.
+- **`src/components/Pages/Finance.js`**: `FlowchartTab` gained an error banner; group loading, group assignment, account-position saves and rule history no longer swallow failures.
+- **`src/components/Pages/FileManager.js`**: Added an error banner and `reportError(action, error)`; the fourteen console-only catches (load, download, delete, restore, favourite, share, copy, empty trash, upload) now tell the user.
+- **`src/components/music/MusicUpload.js`**, **`Playlist.js`**: Empty `.catch(() => {})` handlers replaced with error messages.
+- **Documentation**: `doc/architecture/backend.md` (error handling section rewritten, new middleware documented), `doc/architecture/frontend.md` (transport-layer error table, service error contract, component rules).
 
 ### Music — Song Queue (v2.10.0, 2026-06-13)
 - **`frontend/src/context/MusicContext.js`**: Added `userQueue` state + `userQueueRef`; `handleEnded` and `playNext` now drain the user queue first before advancing the context (playlist); added `addToQueue`, `removeFromQueue`, `clearQueue` callbacks; `dismissPlayer` also clears the user queue; `shuffledQueue` and user queue API now exported in context value; user queue persisted in `musicState` cookie.

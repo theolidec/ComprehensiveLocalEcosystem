@@ -2,6 +2,7 @@ const express = require('express');
 const { body, validationResult } = require('express-validator');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const wikiController = require('../controllers/wikiController');
+const asyncHandler = require('../middleware/asyncHandler');
 const logger = require('../config/logger');
 
 const router = express.Router();
@@ -13,7 +14,7 @@ router.post('/', authenticateToken, [
   body('visibility').optional().isIn(['private', 'team', 'public']).withMessage('Invalid visibility'),
   body('icon').optional().isString(),
   body('color').optional().isString()
-], async (req, res) => {
+], asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -22,36 +23,36 @@ router.post('/', authenticateToken, [
     });
   }
   await wikiController.createWiki(req, res);
-});
+}));
 
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', authenticateToken, asyncHandler(async (req, res) => {
   await wikiController.getWikis(req, res);
-});
+}));
 
-router.get('/public', optionalAuth, async (req, res) => {
+router.get('/public', optionalAuth, asyncHandler(async (req, res) => {
   await wikiController.getPublicWikis(req, res);
-});
+}));
 
-router.get('/:slug', optionalAuth, async (req, res) => {
+router.get('/:slug', optionalAuth, asyncHandler(async (req, res) => {
   await wikiController.getWiki(req, res);
-});
+}));
 
-router.put('/:slug', authenticateToken, async (req, res) => {
+router.put('/:slug', authenticateToken, asyncHandler(async (req, res) => {
   await wikiController.updateWiki(req, res);
-});
+}));
 
-router.delete('/:slug', authenticateToken, async (req, res) => {
+router.delete('/:slug', authenticateToken, asyncHandler(async (req, res) => {
   await wikiController.deleteWiki(req, res);
-});
+}));
 
-router.get('/:slug/members', authenticateToken, async (req, res) => {
+router.get('/:slug/members', authenticateToken, asyncHandler(async (req, res) => {
   await wikiController.getWikiMembers(req, res);
-});
+}));
 
 router.post('/:slug/members', authenticateToken, [
   body('userId').notEmpty().withMessage('User ID is required'),
   body('role').optional().isIn(['viewer', 'editor', 'admin']).withMessage('Invalid role')
-], async (req, res) => {
+], asyncHandler(async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
@@ -60,10 +61,10 @@ router.post('/:slug/members', authenticateToken, [
     });
   }
   await wikiController.addWikiMember(req, res);
-});
+}));
 
-router.delete('/:slug/members/:userId', authenticateToken, async (req, res) => {
+router.delete('/:slug/members/:userId', authenticateToken, asyncHandler(async (req, res) => {
   await wikiController.removeWikiMember(req, res);
-});
+}));
 
 module.exports = router;

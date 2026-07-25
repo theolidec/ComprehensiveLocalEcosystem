@@ -156,8 +156,15 @@ const optionalAuth = async (req, res, next) => {
 
     next();
   } catch (error) {
-    // Optional auth - continue even if token is invalid
-    next();
+    // A malformed or expired token simply means "not logged in" here.
+    if (['JsonWebTokenError', 'TokenExpiredError', 'NotBeforeError'].includes(error.name)) {
+      logger.debug(`Optional auth - ignoring invalid token: ${error.message}`);
+      return next();
+    }
+    // Anything else (e.g. the user lookup failing) is a real fault. Treating it as
+    // "anonymous visitor" hides outages and silently downgrades what the caller sees.
+    logger.error('Optional authentication error:', error);
+    next(error);
   }
 };
 
