@@ -4,22 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
-const { body, param, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const fileController = require('../controllers/fileController');
-const logger = require('../config/logger');
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    logger.warn('File validation errors:', errors.array());
-    return res.status(400).json({
-      errors: errors.array(),
-      code: 'VALIDATION_ERROR'
-    });
-  }
-  next();
-};
 
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '..', 'uploads', 'files');
 

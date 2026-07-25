@@ -108,6 +108,9 @@ frontend/
 │   ├── contexts/            # React Context providers
 │   ├── services/            # API service functions
 │   ├── utils/               # Utility functions
+│   │   ├── fetchClient.js   # fetch wrapper with token-refresh interceptor
+│   │   ├── apiError.js      # Shared API error normalisation for services
+│   │   └── format.js        # formatTime() / formatFileSize() display helpers
 │   ├── config/              # Configuration files
 │   ├── types/               # TypeScript definitions
 │   ├── App.js               # Main application component
@@ -447,17 +450,22 @@ API service functions wrap the custom `fetchClient` (`src/utils/fetchClient.js`)
 ```javascript
 import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
+import { handleApiError } from '../utils/apiError';
 
 export const fetchData = async () => {
-  const response = await api.get(API_URLS.ENDPOINT);
-  return response.data;
-};
-
-export const createData = async (data) => {
-  const response = await api.post(API_URLS.ENDPOINT, data);
-  return response.data;
+  try {
+    const response = await api.get(API_URLS.ENDPOINT);
+    return response.data;
+  } catch (error) {
+    handleApiError(error);
+  }
 };
 ```
+
+`handleApiError` (`src/utils/apiError.js`) rethrows a `fetchClient` error as a plain
+`{ message, code, status }` object so every service surfaces the same shape.
+`handleApiErrorAsError` does the same but throws an `Error` carrying `code`/`status`
+(used by `paymentCardAPI.js`); both build on `extractApiError`.
 
 ### Service Files (`frontend/src/services/`)
 

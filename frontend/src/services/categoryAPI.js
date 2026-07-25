@@ -1,11 +1,6 @@
 import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-const handleApiError = (error) => {
-  const message = error.response?.data?.error || error.message || 'An error occurred';
-  const code = error.response?.data?.code || 'UNKNOWN_ERROR';
-  throw { message, code, status: error.response?.status };
-};
+import { handleApiError } from '../utils/apiError';
 
 export const categoryAPI = {
   getCategories: async () => {

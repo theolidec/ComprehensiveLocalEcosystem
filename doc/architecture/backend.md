@@ -30,6 +30,9 @@ The backend is built on **Node.js** with **Express.js**, using **MongoDB** with 
 
 **Active utilities**:
 - `backend/utils/regex.js` — `escapeRegex()` helper applied to all user-supplied search inputs before `$regex`/`new RegExp()` (ReDoS defense)
+- `backend/middleware/validation.js` — `handleValidationErrors()` rejects requests whose express-validator chain produced errors, with a `400 { errors, code: 'VALIDATION_ERROR' }` body. Used by every route file that validates input (`files`, `follow`, `tracker`, `wishlists`, `wishlistItems`, `wishlistCategories`, `wishlistReservations`)
+- `backend/utils/userSalt.js` — `getUserSalt(userId)` returns the per-user salt used to derive encryption keys for secrets, generating one on first use. Shared by `passwordController` and `paymentCardController`
+- `backend/utils/errorResponses.js` — `sendValidationError(res, error, code)` (Mongoose `ValidationError` → 400 with per-field `details`) and `sendDuplicateKeyError(res, message, code)` (MongoDB duplicate key `11000` → 400). Used in controller catch blocks
 
 ## Project Structure
 
@@ -63,7 +66,8 @@ backend/
 │   ├── wikiController.js
 │   └── wikiPageController.js
 ├── middleware/          # Express middleware
-│   └── auth.js          # Authentication middleware
+│   ├── auth.js          # Authentication middleware
+│   └── validation.js    # handleValidationErrors() — shared express-validator guard
 ├── models/              # Mongoose schemas
 │   ├── User.js
 │   ├── RefreshToken.js
@@ -128,7 +132,9 @@ backend/
 │   ├── passwordService.js
 │   └── recurringEventService.js
 ├── utils/               # Shared utilities
-│   └── regex.js         # escapeRegex() for ReDoS-safe MongoDB queries
+│   ├── regex.js         # escapeRegex() for ReDoS-safe MongoDB queries
+│   ├── userSalt.js      # getUserSalt() — per-user encryption salt (lazily generated)
+│   └── errorResponses.js # sendValidationError() / sendDuplicateKeyError() helpers
 ├── uploads/             # File storage directory
 ├── logs/                # Log files
 ├── .env                 # Environment variables
@@ -320,24 +326,16 @@ const express = require('express');
 const { body } = require('express-validator');
 const controller = require('../controllers/controller');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 
 const router = express.Router();
 
-// Validation middleware
-const validate = [
-  body('field').isEmail(),
-  (req, res, next) => {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    next();
-  }
-];
+// Validation rules — the shared handleValidationErrors middleware returns the 400
+const validate = [body('field').isEmail()];
 
 // Routes
 router.get('/', authenticateToken, controller.getAll);
-router.post('/', authenticateToken, validate, controller.create);
+router.post('/', authenticateToken, validate, handleValidationErrors, controller.create);
 
 module.exports = router;
 ```

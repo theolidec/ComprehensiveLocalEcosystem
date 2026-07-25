@@ -1,24 +1,11 @@
 const Password = require('../models/Password');
 const PaymentCard = require('../models/PaymentCard');
-const User = require('../models/User');
 const passwordEncryption = require('../services/passwordService');
 const logger = require('../config/logger');
+const { getUserSalt } = require('../utils/userSalt');
 const { escapeRegex } = require('../utils/regex');
 
 const MAX_IMPORT_ITEMS = 1000;
-
-const getUserSalt = async (userId) => {
-  const user = await User.findById(userId).select('+passwordSalt');
-  if (!user) {
-    throw new Error('User not found');
-  }
-  if (!user.passwordSalt) {
-    user.passwordSalt = require('crypto').randomBytes(32).toString('hex');
-    await user.save();
-    logger.info(`Generated passwordSalt for user ${userId}`);
-  }
-  return user.passwordSalt;
-};
 
 const getAllPasswords = async (req, res, next) => {
   try {
