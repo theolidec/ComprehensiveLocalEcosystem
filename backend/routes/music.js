@@ -2,11 +2,17 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs');
 const crypto = require('crypto');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
 const musicController = require('../controllers/musicController');
+const { handleUploadErrors, fileFilterError } = require('../middleware/uploadErrors');
 
 const MUSIC_UPLOAD_DIR = process.env.MUSIC_UPLOAD_DIR || path.join(__dirname, '..', 'uploads', 'music');
+
+if (!fs.existsSync(MUSIC_UPLOAD_DIR)) {
+  fs.mkdirSync(MUSIC_UPLOAD_DIR, { recursive: true });
+}
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -23,7 +29,7 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('audio/')) {
     cb(null, true);
   } else {
-    cb(new Error('Only audio files are allowed!'), false);
+    cb(fileFilterError('Only audio files are allowed!'), false);
   }
 };
 
@@ -34,7 +40,7 @@ const upload = multer({
 });
 
 // Upload music
-router.post('/upload', authenticateToken, upload.single('file'), musicController.uploadMusic);
+router.post('/upload', authenticateToken, upload.single('file'), handleUploadErrors, musicController.uploadMusic);
 
 // Get user's music
 router.get('/my', authenticateToken, musicController.getMyMusic);

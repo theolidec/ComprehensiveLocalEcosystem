@@ -30,7 +30,7 @@ const MusicUpload = ({ onUpload }) => {
   useEffect(() => {
     api.get('/api/music/playlist/my', { withCredentials: true })
       .then(res => setPlaylists(res.data))
-      .catch(() => {});
+      .catch(err => setError(err.message || 'Failed to load playlists'));
     api.get('/api/music/my', { withCredentials: true })
       .then(res => {
         const names = new Set();
@@ -44,7 +44,7 @@ const MusicUpload = ({ onUpload }) => {
         });
         setExistingArtists([...names]);
       })
-      .catch(() => {});
+      .catch(err => setError(err.message || 'Failed to load your music'));
   }, []);
 
   const handleFileSelect = (e) => {

@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const { body, param, validationResult } = require('express-validator');
 const { authenticateToken } = require('../middleware/auth');
 const fileController = require('../controllers/fileController');
+const { handleUploadErrors, fileFilterError } = require('../middleware/uploadErrors');
 const logger = require('../config/logger');
 
 const handleValidationErrors = (req, res, next) => {
@@ -114,7 +115,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('File type not allowed'), false);
+    cb(fileFilterError('File type not allowed'), false);
   }
 };
 
@@ -126,9 +127,9 @@ const upload = multer({
   }
 });
 
-router.post('/upload', authenticateToken, upload.single('file'), fileController.uploadFile);
+router.post('/upload', authenticateToken, upload.single('file'), handleUploadErrors, fileController.uploadFile);
 
-router.post('/document-image', authenticateToken, upload.single('image'), fileController.uploadDocumentImage);
+router.post('/document-image', authenticateToken, upload.single('image'), handleUploadErrors, fileController.uploadDocumentImage);
 router.get('/document-images/:filename', authenticateToken, [
   param('filename').matches(/^[a-f0-9]{32}\.[a-zA-Z0-9]{1,8}$/).withMessage('Invalid filename')
 ], handleValidationErrors, fileController.serveDocumentImage);

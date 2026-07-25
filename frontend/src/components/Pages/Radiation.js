@@ -78,7 +78,7 @@ const MeasurementModal = ({ measurement, locations, unit, cpmFactor, onSave, onC
       }
       onSave();
     } catch (err) {
-      setError(err?.error || 'Failed to save measurement');
+      setError(err.message || 'Failed to save measurement');
     } finally {
       setSaving(false);
     }
@@ -255,14 +255,14 @@ const LocationsTab = ({ locations, onRefresh }) => {
       if (editing) { await radiationAPI.updateLocation(editing._id, payload); }
       else { await radiationAPI.createLocation(payload); }
       setShowForm(false); onRefresh();
-    } catch (err) { setError(err?.error || 'Failed to save'); }
+    } catch (err) { setError(err.message || 'Failed to save'); }
     finally { setSaving(false); }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Delete this location?')) return;
     try { await radiationAPI.deleteLocation(id); onRefresh(); }
-    catch (err) { alert(err?.error || 'Failed to delete'); }
+    catch (err) { alert(err.message || 'Failed to delete'); }
   };
 
   return (
@@ -608,22 +608,22 @@ const MeasurementsTab = ({ locations, unit, cpmFactor, showDeleted }) => {
 
   const handleSoftDelete = async (reason) => {
     try { await radiationAPI.softDelete(deleteTarget._id, reason); setDeleteTarget(null); fetch(); }
-    catch (err) { alert(err?.error || 'Delete failed'); }
+    catch (err) { alert(err.message || 'Delete failed'); }
   };
 
   const handleHardDelete = async () => {
     try { await radiationAPI.hardDelete(hardDeleteTarget._id); setHardDeleteTarget(null); fetch(); }
-    catch (err) { alert(err?.error || 'Delete failed'); }
+    catch (err) { alert(err.message || 'Delete failed'); }
   };
 
   const handleRestore = async (id) => {
     try { await radiationAPI.restore(id); fetch(); }
-    catch (err) { alert(err?.error || 'Restore failed'); }
+    catch (err) { alert(err.message || 'Restore failed'); }
   };
 
   const handleToggleVisibility = async (id) => {
     try { await radiationAPI.toggleVisibility(id); fetch(); }
-    catch (err) { alert(err?.error || 'Failed'); }
+    catch (err) { alert(err.message || 'Failed'); }
   };
 
   const totalPages = Math.ceil(total / limit);

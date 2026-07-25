@@ -45,7 +45,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
       .catch(() => setError('Failed to load music'));
     api.get('/api/music/public', { withCredentials: true })
       .then(res => setPublicMusic(res.data))
-      .catch(() => {});
+      .catch(() => setError('Failed to load public music'));
   };
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const Playlist = forwardRef(({ onSelectTrack, compactMode = false, initialShowPu
         setUserSearchLoading(true);
         api.get('/api/follow/search', { params: { q: userSearchQuery }, withCredentials: true })
           .then(res => setUserSearchResults(res.data.users || []))
-          .catch(() => setUserSearchResults([]))
+          .catch(err => { setUserSearchResults([]); setError(err.message || 'User search failed'); })
           .finally(() => setUserSearchLoading(false));
       } else {
         setUserSearchResults([]);

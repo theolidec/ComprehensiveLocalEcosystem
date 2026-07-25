@@ -729,20 +729,39 @@ const handleUpload = async (file) => {
 
 ## Error Handling
 
+### Transport Layer (`utils/fetchClient.js`)
+
+`fetchClient` normalises every failure into a real `Error` before it reaches a
+service:
+
+| Failure | Thrown error |
+|---------|--------------|
+| Request never completed (offline, DNS, TLS, CORS) | `code: 'NETWORK_ERROR'`, message "Unable to reach the server…" |
+| Token refresh failed | `code: 'SESSION_EXPIRED'`, `status: 401` (also redirects to `/login`) |
+| Non-2xx response | message from the JSON body's `error`, falling back to the status line; `code`, `status` and `response` are attached |
+
+Error bodies are not assumed to be JSON — a gateway returning HTML still produces
+a meaningful message rather than an empty one.
+
 ### Global Error Pattern
 
 ```javascript
-// Service layer
+// Service layer — always throw an Error instance, never an object literal:
+// plain objects lose the stack, break `instanceof Error` and confuse error boundaries.
+const handleApiError = (error) => {
+  const err = new Error(error.response?.data?.error || error.message || 'An error occurred');
+  err.code = error.response?.data?.code || 'UNKNOWN_ERROR';
+  err.status = error.response?.status;
+  err.details = error.response?.data?.errors;  // express-validator details
+  throw err;
+};
+
 export const apiCall = async () => {
   try {
     const response = await api.get(url);
     return response.data;
   } catch (error) {
-    // Transform error for UI
-    throw new Error(
-      error.response?.data?.error || 
-      'An error occurred'
-    );
+    handleApiError(error);
   }
 };
 
@@ -760,6 +779,15 @@ const loadData = async () => {
   }
 };
 ```
+
+Rules for component-level handling:
+
+- No empty `catch (_) {}` and no `.catch(() => {})`. Every failed call either
+  updates an error banner or, for fire-and-forget saves (e.g. flowchart account
+  positions in `Finance.js`), routes into a shared reporter such as
+  `onPositionSaveFailed` / `reportError`.
+- `console.error` alone is not error handling — pair it with visible feedback, as
+  `FileManager.js` does via its `reportError(action, error)` helper.
 
 ## Environment Variables
 

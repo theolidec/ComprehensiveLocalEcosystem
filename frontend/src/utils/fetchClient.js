@@ -11,9 +11,21 @@ const processQueue = (error) => {
 };
 
 async function doFetch(url, options, responseType) {
-  const res = await fetch(url, options);
+  let res;
+  try {
+    res = await fetch(url, options);
+  } catch (networkErr) {
+    // fetch only rejects when the request never completed (offline, DNS failure,
+    // TLS rejection, CORS block). Surface that as a recognisable error instead of
+    // the browser's bare "Failed to fetch".
+    const err = new Error('Unable to reach the server. Check your connection and try again.');
+    err.code = 'NETWORK_ERROR';
+    err.cause = networkErr;
+    throw err;
+  }
 
   if (res.status === 403) {
+    // A non-JSON 403 (e.g. an HTML error page from a proxy) is not a token problem.
     let body;
     try { body = await res.clone().json(); } catch (_) {}
 
@@ -34,6 +46,8 @@ async function doFetch(url, options, responseType) {
         processQueue(refreshErr);
         window.location.href = '/login?from=' + encodeURIComponent(window.location.pathname);
         const err = new Error('Session expired');
+        err.code = 'SESSION_EXPIRED';
+        err.status = 401;
         err.response = { data: null, status: 401 };
         throw err;
       } finally {
@@ -43,9 +57,13 @@ async function doFetch(url, options, responseType) {
   }
 
   if (!res.ok) {
+    // Error responses are not guaranteed to be JSON (proxy/gateway failures are not),
+    // so fall back to the status line rather than losing the failure entirely.
     let errorData;
     try { errorData = await res.json(); } catch (_) {}
-    const err = new Error(errorData?.error || res.statusText);
+    const err = new Error(errorData?.error || res.statusText || `Request failed with status ${res.status}`);
+    err.code = errorData?.code;
+    err.status = res.status;
     err.response = { data: errorData, status: res.status };
     throw err;
   }

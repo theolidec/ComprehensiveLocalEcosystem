@@ -2,7 +2,11 @@ import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
 
 const handleError = (error) => {
-  throw error.response?.data || error;
+  const err = new Error(error.response?.data?.error || error.message || 'An error occurred');
+  err.code = error.response?.data?.code || 'UNKNOWN_ERROR';
+  err.status = error.response?.status;
+  err.details = error.response?.data?.errors;
+  throw err;
 };
 
 const radiationAPI = {

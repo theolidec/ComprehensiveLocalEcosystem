@@ -4,7 +4,11 @@ import { API_URLS } from '../config/api';
 const handleApiError = (error) => {
   const message = error.response?.data?.error || error.message || 'An error occurred';
   const code = error.response?.data?.code || 'UNKNOWN_ERROR';
-  throw { message, code, status: error.response?.status };
+  const err = new Error(message);
+  err.code = code;
+  err.status = error.response?.status;
+  err.details = error.response?.data?.errors;
+  throw err;
 };
 
 export const calendarAPI = {

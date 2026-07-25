@@ -69,6 +69,13 @@ const FileManager = () => {
   const [newFileName, setNewFileName] = useState('');
   const [newFileType, setNewFileType] = useState('txt');
   const [shareModal, setShareModal] = useState({ show: false, file: null, shareUrl: '', isPublic: false });
+  const [error, setError] = useState(null);
+
+  // Logs a failed action and shows it in the page banner.
+  const reportError = useCallback((action, error) => {
+    console.error(`${action}:`, error);
+    setError(`${action}: ${error.message || 'Unknown error'}`);
+  }, []);
 
   const showConfirm = (message, onConfirm) => {
     setConfirmModal({ show: true, message, onConfirm });
@@ -85,38 +92,38 @@ const FileManager = () => {
       const data = await fileService.getFiles({ folderId: currentFolder });
       setFiles(data.files || []);
     } catch (error) {
-      console.error('Failed to load files:', error);
+      reportError('Failed to load files', error);
     } finally {
       setLoading(false);
     }
-  }, [currentFolder]);
+  }, [currentFolder, reportError]);
 
   const loadFolders = useCallback(async () => {
     try {
       const data = await folderService.getFolders(currentFolder);
       setFolders(data || []);
     } catch (error) {
-      console.error('Failed to load folders:', error);
+      reportError('Failed to load folders', error);
     }
-  }, [currentFolder]);
+  }, [currentFolder, reportError]);
 
   const loadStats = useCallback(async () => {
     try {
       const data = await fileService.getStats();
       setStats(data);
     } catch (error) {
-      console.error('Failed to load stats:', error);
+      reportError('Failed to load storage stats', error);
     }
-  }, []);
+  }, [reportError]);
 
   const loadTrash = useCallback(async () => {
     try {
       const data = await fileService.getTrash();
       setTrashFiles(data || []);
     } catch (error) {
-      console.error('Failed to load trash:', error);
+      reportError('Failed to load trash', error);
     }
-  }, []);
+  }, [reportError]);
 
   useEffect(() => {
     if (!showTrash) {
@@ -285,7 +292,7 @@ const FileManager = () => {
           setPreviewUrl(result.dataUrl);
         }
       } catch (error) {
-        console.error('Failed to load preview:', error);
+        reportError('Failed to load preview', error);
         setPreviewUrl(null);
       }
     }
@@ -301,7 +308,7 @@ const FileManager = () => {
       a.click();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Download failed:', error);
+      reportError('Download failed', error);
     }
   };
 
@@ -312,7 +319,7 @@ const FileManager = () => {
         await loadFiles();
         await loadStats();
       } catch (error) {
-        console.error('Delete failed:', error);
+        reportError('Delete failed', error);
       }
     });
   };
@@ -324,7 +331,7 @@ const FileManager = () => {
         await loadTrash();
         await loadStats();
       } catch (error) {
-        console.error('Delete failed:', error);
+        reportError('Permanent delete failed', error);
       }
     });
   };
@@ -335,7 +342,7 @@ const FileManager = () => {
       await loadTrash();
       await loadStats();
     } catch (error) {
-      console.error('Restore failed:', error);
+      reportError('Restore failed', error);
     }
   };
 
@@ -344,7 +351,7 @@ const FileManager = () => {
       await fileService.updateFile(file._id, { isFavorite: !file.isFavorite });
       await loadFiles();
     } catch (error) {
-      console.error('Failed to update favorite:', error);
+      reportError('Failed to update favorite', error);
     }
   };
 
@@ -369,7 +376,7 @@ const FileManager = () => {
       }
       await loadFiles();
     } catch (error) {
-      console.error('Share failed:', error);
+      reportError('Share failed', error);
     }
   };
 
@@ -378,7 +385,7 @@ const FileManager = () => {
       await navigator.clipboard.writeText(shareModal.shareUrl);
       alert('Link copied to clipboard!');
     } catch (error) {
-      console.error('Copy failed:', error);
+      reportError('Copy failed', error);
     }
   };
 
@@ -389,7 +396,7 @@ const FileManager = () => {
         await loadTrash();
         await loadStats();
       } catch (error) {
-        console.error('Empty trash failed:', error);
+        reportError('Empty trash failed', error);
       }
     });
   };
@@ -408,7 +415,7 @@ const FileManager = () => {
       await loadFiles();
       await loadStats();
     } catch (error) {
-      console.error('Upload failed:', error);
+      reportError('Upload failed', error);
     } finally {
       setUploading(false);
     }
@@ -435,6 +442,12 @@ const FileManager = () => {
       )}
 
       <div className="max-w-7xl mx-auto">
+        {error && (
+          <div className="flex items-center gap-2 mb-4 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400 text-sm rounded-lg">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="ml-auto text-red-400 hover:text-red-600"><X className="h-4 w-4" /></button>
+          </div>
+        )}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
