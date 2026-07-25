@@ -122,6 +122,7 @@ The Calendar module provides comprehensive event management functionality with s
 ### Service
 - **File**: `backend/services/recurringEventService.js`
 - Handles expansion of recurring events into individual instances
+- Unit tests: `backend/tests/services/recurringEventService.test.js`
 
 ## Recurring Events
 The system supports four recurrence patterns:
@@ -131,6 +132,11 @@ The system supports four recurrence patterns:
 - **Yearly** - Repeats annually on same date
 
 Recurring events are expanded on-the-fly when fetching events within a date range. Each instance gets a virtual ID combining the original event ID and date.
+
+### Date Edge Cases
+- **Month-end**: a monthly event on the 31st falls back to the last day of shorter months (Feb 28/29, Apr 30).
+- **Leap day**: a yearly event on Feb 29 falls back to Feb 28 in non-leap years.
+- **Limits**: expansion stops at `recurringEndDate`, at `recurringOccurrences` (occurrences before the requested range count towards the limit), and at a hard cap of 100 instances per range.
 
 ## Default Categories
 The system auto-creates default categories for new users:

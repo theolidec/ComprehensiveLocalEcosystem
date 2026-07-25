@@ -46,6 +46,7 @@
     "start": "BROWSER=none react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test:coverage": "react-scripts test --watchAll=false --coverage",
     "eject": "react-scripts eject",
     "type-check": "tsc --noEmit"
   },

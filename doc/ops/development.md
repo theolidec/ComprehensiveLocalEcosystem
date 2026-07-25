@@ -338,20 +338,61 @@ migrate();
 
 ## Testing
 
+Unit tests live next to the code they cover:
+
+| Suite | Location | Runner |
+|-------|----------|--------|
+| Backend | `backend/tests/<layer>/<module>.test.js` | Jest (`testEnvironment: node`) |
+| Frontend | `frontend/src/<area>/__tests__/<module>.test.js` | Jest via react-scripts (jsdom) |
+
+Current unit test coverage:
+
+- `backend/utils/regex.js` — `escapeRegex` (ReDoS/injection hardening)
+- `backend/services/passwordService.js` — AES-256-GCM encrypt/decrypt round-trip, tamper and
+  wrong-key rejection, password generation charsets
+- `backend/services/recurringEventService.js` — recurrence expansion, month/leap-year edge cases,
+  occurrence limits, sorting
+- `backend/middleware/auth.js` — `authenticateToken`, `verifyRefreshToken`, `optionalAuth`
+  (cookie-only auth, locked/inactive users, JWT error mapping)
+- `frontend/src/utils/radiationUnits.js` — unit conversion, formatting, level colour thresholds
+- `frontend/src/utils/MathParser.js` — tokenizer, parser precedence, evaluator, error handling
+- `frontend/src/utils/GraphingEngine.js` — viewport maths, coordinate transforms, object/colour
+  management, rendering smoke tests, state serialisation
+- `frontend/src/utils/fetchClient.js` — request building, error mapping, token-refresh retry queue
+
+Database-backed controllers and routes are not unit tested yet; they need an integration harness
+(e.g. `supertest` + `mongodb-memory-server`).
+
 ### Backend Tests
 
 ```bash
 cd backend
 npm test
 
-# Run specific test
-npm test -- --grep "Auth Routes"
+# Run a single suite
+npm test -- tests/services/passwordService.test.js
+
+# Run tests matching a name
+npm test -- -t "escapeRegex"
 
 # Coverage report
-npm test -- --coverage
+npm run test:coverage
 ```
 
-**Test Pattern**:
+**Unit Test Pattern** (pure module, no database):
+```javascript
+jest.mock('../../config/logger', () => ({ error: jest.fn(), warn: jest.fn(), info: jest.fn(), debug: jest.fn() }));
+
+const { escapeRegex } = require('../../utils/regex');
+
+describe('escapeRegex', () => {
+  it('escapes regex metacharacters', () => {
+    expect(escapeRegex('a+b')).toBe('a\\+b');
+  });
+});
+```
+
+**Integration Test Pattern** (requires a database and `supertest`):
 ```javascript
 const request = require('supertest');
 const app = require('../server');
@@ -385,13 +426,24 @@ cd frontend
 npm test
 
 # Run in CI mode
-npm test -- --watchAll=false
+CI=true npm test -- --watchAll=false
 
-# Coverage
-npm test -- --coverage
+# Coverage (scope it to the modules you care about)
+npm run test:coverage -- --collectCoverageFrom="src/utils/**/*.js"
 ```
 
-**Test Pattern**:
+**Unit Test Pattern** (pure module):
+```javascript
+import { fromUSvH } from '../radiationUnits';
+
+describe('fromUSvH', () => {
+  it('converts µSv/h to nSv/h', () => {
+    expect(fromUSvH(2.5, 'nSv/h')).toBe(2500);
+  });
+});
+```
+
+**Component Test Pattern**:
 ```javascript
 import { render, screen, fireEvent } from '@testing-library/react';
 import MyComponent from './MyComponent';
