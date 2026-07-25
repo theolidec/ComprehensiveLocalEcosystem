@@ -130,7 +130,9 @@ wishlistItemSchema.statics.getStatsByUser = async function(userId) {
 // Static method to find public wishlist by share token
 wishlistItemSchema.statics.findByShareToken = function(token) {
   return this.findOne({ shareToken: token, isPublic: true })
-    .populate('reservations', 'reservedBy reservedAt message')
+    // Only the reserver's display name is exposed publicly — `reservedBy.email`
+    // and the free-text message are private to the item owner.
+    .populate('reservations', 'reservedBy.name reservedAt status')
     .select('-user');
 };
 

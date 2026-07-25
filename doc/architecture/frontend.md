@@ -146,7 +146,6 @@ components/
 │   ├── FileManager.js           # File explorer (~41KB)
 │   ├── DocumentViewer.js        # File preview / lightweight editor (~21KB)
 │   ├── DocumentEditor.js        # TipTap rich-text editor (~43KB)
-│   ├── DocumentEditor_old.js    # Pre-TipTap legacy editor (kept for reference; not routed)
 │   ├── UserFollowing.js + .css  # Social/follow page
 │   ├── LandingPage.js           # Marketing page container
 │   ├── Hero.js                  # Landing page hero section

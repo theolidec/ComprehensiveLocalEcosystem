@@ -128,7 +128,7 @@ const folderController = {
           if (current.toString() === id) {
             return res.status(400).json({ error: 'Cannot move folder into its own subfolder', code: 'INVALID_MOVE' });
           }
-          const f = await FileFolder.findById(current);
+          const f = await FileFolder.findOne({ _id: current, userId: req.user._id });
           current = f?.parentId;
         }
       }
