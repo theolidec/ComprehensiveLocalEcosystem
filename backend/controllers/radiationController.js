@@ -1,6 +1,7 @@
 const RadiationMeasurement = require('../models/RadiationMeasurement');
 const RadiationLocation = require('../models/RadiationLocation');
 const logger = require('../config/logger');
+const { escapeRegex } = require('../utils/regex');
 
 // ─── Locations ────────────────────────────────────────────────────────────────
 
@@ -130,8 +131,8 @@ const getMeasurements = async (req, res) => {
       query.isDeleted = false;
     }
 
-    if (status) query.status = status;
-    if (locationId) query.locationId = locationId;
+    if (status) query.status = String(status);
+    if (locationId) query.locationId = String(locationId);
     if (dateFrom || dateTo) {
       query.date = {};
       if (dateFrom) query.date.$gte = new Date(dateFrom);
@@ -142,11 +143,12 @@ const getMeasurements = async (req, res) => {
       query.tags = { $in: tagArr };
     }
     if (search) {
+      const safeSearch = escapeRegex(search);
       query.$or = [
-        { comments: { $regex: search, $options: 'i' } },
-        { notes: { $regex: search, $options: 'i' } },
-        { locationName: { $regex: search, $options: 'i' } },
-        { tags: { $regex: search, $options: 'i' } }
+        { comments: { $regex: safeSearch, $options: 'i' } },
+        { notes: { $regex: safeSearch, $options: 'i' } },
+        { locationName: { $regex: safeSearch, $options: 'i' } },
+        { tags: { $regex: safeSearch, $options: 'i' } }
       ];
     }
 

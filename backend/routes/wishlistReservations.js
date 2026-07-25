@@ -132,8 +132,9 @@ router.get('/:id/reservations', authenticateToken, [
   }
 });
 
-router.delete('/reservations/:reservationId', optionalAuth, [
-  param('reservationId').isMongoId().withMessage('Invalid reservation ID')
+router.delete('/reservations/:reservationId', publicReservationLimiter, optionalAuth, [
+  param('reservationId').isMongoId().withMessage('Invalid reservation ID'),
+  body('email').optional().trim().isEmail().withMessage('Please enter a valid email')
 ], handleValidationErrors, async (req, res) => {
   try {
     const reservation = await WishlistReservation.findById(req.params.reservationId)
@@ -147,9 +148,17 @@ router.delete('/reservations/:reservationId', optionalAuth, [
     }
 
     const isOwner = req.user && reservation.wishlistItem.user.toString() === req.user._id.toString();
-    const isPublicItem = reservation.wishlistItem.isPublic;
+    // A guest may only cancel the reservation they made, proven by supplying the
+    // email address it was created with. Allowing any anonymous caller to cancel
+    // reservations on a public item lets a stranger wipe someone else's reservation.
+    const claimedEmail = typeof req.body?.email === 'string' ? req.body.email.trim().toLowerCase() : '';
+    const isReserver = Boolean(
+      claimedEmail &&
+      reservation.reservedBy?.email &&
+      reservation.reservedBy.email.toLowerCase() === claimedEmail
+    );
 
-    if (!isOwner && !isPublicItem) {
+    if (!isOwner && !isReserver) {
       return res.status(403).json({
         error: 'Access denied',
         code: 'ACCESS_DENIED'

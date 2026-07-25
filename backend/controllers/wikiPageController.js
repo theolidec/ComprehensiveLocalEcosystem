@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Wiki = require('../models/Wiki');
 const WikiPage = require('../models/WikiPage');
 const WikiVersion = require('../models/WikiVersion');
@@ -478,8 +479,17 @@ const getDiff = async (req, res) => {
       });
     }
     
-    const version1 = await WikiVersion.findById(v1);
-    const version2 = await WikiVersion.findById(v2);
+    if (!mongoose.isValidObjectId(v1) || !mongoose.isValidObjectId(v2)) {
+      return res.status(400).json({
+        error: 'Invalid version id',
+        code: 'INVALID_VERSION_ID'
+      });
+    }
+
+    // Scope the lookup to this page: fetching versions by id alone leaks the
+    // content of pages in wikis the caller cannot view.
+    const version1 = await WikiVersion.findOne({ _id: v1, page: page._id });
+    const version2 = await WikiVersion.findOne({ _id: v2, page: page._id });
     
     if (!version1 || !version2) {
       return res.status(404).json({
