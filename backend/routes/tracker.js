@@ -1,26 +1,15 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { body, param, query, validationResult } = require('express-validator');
+const { body, param, query } = require('express-validator');
 const TrackerTask = require('../models/TrackerTask');
 const TrackerQuestion = require('../models/TrackerQuestion');
 const TrackerResponse = require('../models/TrackerResponse');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const logger = require('../config/logger');
 const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    logger.warn('Validation errors:', errors.array());
-    return res.status(400).json({
-      errors: errors.array(),
-      code: 'VALIDATION_ERROR'
-    });
-  }
-  next();
-};
 
 // ========================
 // TASK ROUTES

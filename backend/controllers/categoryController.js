@@ -1,6 +1,7 @@
 const Category = require('../models/Category');
 const Event = require('../models/Event');
 const logger = require('../config/logger');
+const { sendValidationError, sendDuplicateKeyError } = require('../utils/errorResponses');
 
 const createCategory = async (req, res) => {
   try {
@@ -25,17 +26,11 @@ const createCategory = async (req, res) => {
     logger.error('Category creation error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'Category name already exists',
-        code: 'DUPLICATE_CATEGORY'
-      });
+      return sendDuplicateKeyError(res, 'Category name already exists', 'DUPLICATE_CATEGORY');
     }
 
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message)
-      });
+      return sendValidationError(res, error);
     }
 
     res.status(500).json({
@@ -109,17 +104,11 @@ const updateCategory = async (req, res) => {
     logger.error('Category update error:', error);
 
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'Category name already exists',
-        code: 'DUPLICATE_CATEGORY'
-      });
+      return sendDuplicateKeyError(res, 'Category name already exists', 'DUPLICATE_CATEGORY');
     }
 
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message)
-      });
+      return sendValidationError(res, error);
     }
 
     res.status(500).json({

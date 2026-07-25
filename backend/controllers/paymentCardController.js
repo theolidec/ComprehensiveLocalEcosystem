@@ -1,20 +1,7 @@
 const PaymentCard = require('../models/PaymentCard');
-const User = require('../models/User');
 const passwordEncryption = require('../services/passwordService');
 const logger = require('../config/logger');
-
-const getUserSalt = async (userId) => {
-  const user = await User.findById(userId).select('+passwordSalt');
-  if (!user) {
-    throw new Error('User not found');
-  }
-  if (!user.passwordSalt) {
-    user.passwordSalt = require('crypto').randomBytes(32).toString('hex');
-    await user.save();
-    logger.info(`Generated passwordSalt for user ${userId}`);
-  }
-  return user.passwordSalt;
-};
+const { getUserSalt } = require('../utils/userSalt');
 
 const detectCardType = (cardNumber) => {
   const cleaned = cardNumber.replace(/\s/g, '');

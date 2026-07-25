@@ -1,11 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-
-const formatTime = (seconds) => {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+import { formatTime } from '../../utils/format';
 
 const MusicPlayer = ({ track, onPlay, onPause, isPlaying, onEnded }) => {
   const audioRef = useRef();

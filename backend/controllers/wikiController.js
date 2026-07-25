@@ -3,6 +3,7 @@ const WikiPage = require('../models/WikiPage');
 const WikiPermission = require('../models/WikiPermission');
 const WikiCategory = require('../models/WikiCategory');
 const logger = require('../config/logger');
+const { sendValidationError, sendDuplicateKeyError } = require('../utils/errorResponses');
 
 const createWiki = async (req, res) => {
   try {
@@ -44,17 +45,11 @@ const createWiki = async (req, res) => {
     logger.error('Wiki creation error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'Wiki with this name already exists',
-        code: 'WIKI_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'Wiki with this name already exists', 'WIKI_EXISTS');
     }
     
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message)
-      });
+      return sendValidationError(res, error);
     }
     
     res.status(500).json({
@@ -241,10 +236,7 @@ const updateWiki = async (req, res) => {
     logger.error('Wiki update error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'Wiki with this name already exists',
-        code: 'WIKI_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'Wiki with this name already exists', 'WIKI_EXISTS');
     }
     
     res.status(500).json({
@@ -391,10 +383,7 @@ const addWikiMember = async (req, res) => {
     logger.error('Add wiki member error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'User is already a member',
-        code: 'MEMBER_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'User is already a member', 'MEMBER_EXISTS');
     }
     
     res.status(500).json({

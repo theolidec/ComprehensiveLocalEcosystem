@@ -4,6 +4,7 @@ const WikiVersion = require('../models/WikiVersion');
 const WikiCategory = require('../models/WikiCategory');
 const WikiPermission = require('../models/WikiPermission');
 const logger = require('../config/logger');
+const { sendValidationError, sendDuplicateKeyError } = require('../utils/errorResponses');
 const { escapeRegex } = require('../utils/regex');
 
 const createPage = async (req, res) => {
@@ -66,18 +67,11 @@ const createPage = async (req, res) => {
     });
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'A page with this title already exists',
-        code: 'PAGE_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'A page with this title already exists', 'PAGE_EXISTS');
     }
     
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message),
-        code: 'VALIDATION_ERROR'
-      });
+      return sendValidationError(res, error, 'VALIDATION_ERROR');
     }
     
     res.status(500).json({
@@ -259,10 +253,7 @@ const updatePage = async (req, res) => {
     logger.error('Update page error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'A page with this title already exists',
-        code: 'PAGE_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'A page with this title already exists', 'PAGE_EXISTS');
     }
     
     res.status(500).json({
@@ -768,10 +759,7 @@ const createCategory = async (req, res) => {
     logger.error('Create category error:', error);
     
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'Category with this name already exists',
-        code: 'CATEGORY_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'Category with this name already exists', 'CATEGORY_EXISTS');
     }
     
     res.status(500).json({
@@ -841,10 +829,7 @@ const movePage = async (req, res) => {
     logger.error('Move page error:', error);
 
     if (error.code === 11000) {
-      return res.status(400).json({
-        error: 'A page with this title already exists',
-        code: 'PAGE_EXISTS'
-      });
+      return sendDuplicateKeyError(res, 'A page with this title already exists', 'PAGE_EXISTS');
     }
 
     res.status(500).json({

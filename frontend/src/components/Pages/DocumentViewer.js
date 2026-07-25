@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 
 import fileStorageService from '../../services/fileService';
+import { formatFileSize } from '../../utils/format';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -248,13 +249,6 @@ const DocumentViewer = () => {
     return `${API_URL}/api/files/${fileId}/download`;
   };
 
-  const formatFileSize = (bytes) => {
-    if (!bytes) return '';
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / 1024 / 1024).toFixed(2) + ' MB';
-  };
-
   if (loading) {
     return (
       <div className="h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
@@ -317,7 +311,7 @@ const DocumentViewer = () => {
               {fileInfo?.originalName || 'Document'}
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {formatInfo.label} • {formatFileSize(fileInfo?.size)}
+              {formatInfo.label} • {formatFileSize(fileInfo?.size, '')}
               {isEditable && hasChanges && <span className="ml-2 text-orange-500">• Modified</span>}
             </p>
           </div>

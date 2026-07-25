@@ -1,14 +1,6 @@
 import api from '../utils/fetchClient';
 import { API_URLS } from '../config/api';
-
-const handleApiError = (error) => {
-  const message = error.response?.data?.error || error.message || 'An error occurred';
-  const code = error.response?.data?.code || 'UNKNOWN_ERROR';
-  const err = new Error(message);
-  err.code = code;
-  err.status = error.response?.status;
-  throw err;
-};
+import { handleApiErrorAsError as handleApiError } from '../utils/apiError';
 
 export const paymentCardAPI = {
   getAllCards: async (params = {}) => {

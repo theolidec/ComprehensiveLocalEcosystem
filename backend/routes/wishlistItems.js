@@ -1,7 +1,8 @@
 const express = require('express');
-const { body, param, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
 const WishlistItem = require('../models/WishlistItem');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const { userActionLimiter } = require('../config/rateLimiter');
 const logger = require('../config/logger');
 const PDFDocument = require('pdfkit');
@@ -10,18 +11,6 @@ const { escapeRegex } = require('../utils/regex');
 const MAX_CSV_IMPORT_ROWS = 1000;
 
 const router = express.Router();
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    logger.warn('Validation errors:', errors.array());
-    return res.status(400).json({
-      errors: errors.array(),
-      code: 'VALIDATION_ERROR'
-    });
-  }
-  next();
-};
 
 const isValidUrlOrEmpty = (value) => {
   if (!value || value.trim() === '') return true;

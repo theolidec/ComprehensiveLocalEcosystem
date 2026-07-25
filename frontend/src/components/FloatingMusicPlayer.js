@@ -1,13 +1,7 @@
 import React, { useState } from 'react';
 import { useMusic } from '../context/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
-
-const formatTime = (seconds) => {
-  if (!seconds || isNaN(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
+import { formatTime } from '../utils/format';
 
 const FloatingMusicPlayer = () => {
   const { currentTrack, isPlaying, setIsPlaying, loop, toggleLoop, toggleShuffle, shuffle, progress, duration, seek, playNext, playPrevious, currentPlaylist, currentIndex, playlistQueue, shuffledQueue, volume, changeVolume, dismissPlayer, userQueue, addToQueue, removeFromQueue, clearQueue } = useMusic();

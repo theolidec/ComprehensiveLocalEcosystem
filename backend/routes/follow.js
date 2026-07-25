@@ -1,21 +1,14 @@
 const express = require('express');
-const { param, validationResult } = require('express-validator');
+const { param } = require('express-validator');
 const mongoose = require('mongoose');
 const UserFollow = require('../models/UserFollow');
 const User = require('../models/User');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const logger = require('../config/logger');
 const { escapeRegex } = require('../utils/regex');
 
 const router = express.Router();
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array(), code: 'VALIDATION_ERROR' });
-  }
-  next();
-};
 
 // Get followers of a user
 router.get('/:userId/followers', authenticateToken, [

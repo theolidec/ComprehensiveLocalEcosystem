@@ -1,6 +1,7 @@
 const Event = require('../models/Event');
 const RecurringEventService = require('../services/recurringEventService');
 const logger = require('../config/logger');
+const { sendValidationError } = require('../utils/errorResponses');
 const { escapeRegex } = require('../utils/regex');
 
 const extractOriginalEventId = (id) => {
@@ -60,10 +61,7 @@ const createEvent = async (req, res) => {
     logger.error('Event creation error:', error);
     
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message)
-      });
+      return sendValidationError(res, error);
     }
 
     res.status(500).json({
@@ -243,10 +241,7 @@ const updateEvent = async (req, res) => {
     }
 
     if (error.name === 'ValidationError') {
-      return res.status(400).json({
-        error: 'Validation failed',
-        details: Object.values(error.errors).map(e => e.message)
-      });
+      return sendValidationError(res, error);
     }
 
     res.status(500).json({

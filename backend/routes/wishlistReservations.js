@@ -1,24 +1,13 @@
 const express = require('express');
-const { body, param, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
 const WishlistItem = require('../models/WishlistItem');
 const WishlistReservation = require('../models/WishlistReservation');
 const { authenticateToken, optionalAuth } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const logger = require('../config/logger');
 const { publicReservationLimiter } = require('../config/rateLimiter');
 
 const router = express.Router();
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    logger.warn('Validation errors:', errors.array());
-    return res.status(400).json({
-      errors: errors.array(),
-      code: 'VALIDATION_ERROR'
-    });
-  }
-  next();
-};
 
 const invalidateCache = (token) => {
   const publicItemCache = require('./wishlistPublic').getPublicItemCache();

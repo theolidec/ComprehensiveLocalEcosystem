@@ -1,19 +1,12 @@
 const express = require('express');
-const { body, param, validationResult } = require('express-validator');
+const { body, param } = require('express-validator');
 const Wishlist = require('../models/Wishlist');
 const WishlistItem = require('../models/WishlistItem');
 const { authenticateToken } = require('../middleware/auth');
+const { handleValidationErrors } = require('../middleware/validation');
 const logger = require('../config/logger');
 
 const router = express.Router();
-
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array(), code: 'VALIDATION_ERROR' });
-  }
-  next();
-};
 
 // Get available templates
 router.get('/templates', (req, res) => {
